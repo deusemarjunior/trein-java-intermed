@@ -1,0 +1,19 @@
+# Development Profile
+
+spring:
+  # H2 Console habilitado
+  h2:
+    console:
+      enabled: true
+  
+  # JPA
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+# Logging verboso
+logging:
+  level:
+    root: DEBUG
+    com.example.products: DEBUG

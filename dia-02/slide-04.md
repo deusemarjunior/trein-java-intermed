@@ -36,14 +36,14 @@ public class ProductController {
 flowchart TD
     A[Request] --> B[Controller]
     B --> C{Exception?}
-    C -->|SIM| D[@ControllerAdvice<br/>captura]
+    C -->|SIM| D["@ControllerAdvice<br/>captura"]
     C -->|NÃO| E[Response OK]
     
-    D --> F{Tipo de<br/>Exception}
-    F -->|NotFoundException| G[404 + JSON]
-    F -->|ValidationException| H[400 + JSON]
-    F -->|BusinessException| I[422 + JSON]
-    F -->|Outras| J[500 + JSON]
+    D --> F{"Tipo de<br/>Exception"}
+    F -->|NotFoundException| G["404 + JSON"]
+    F -->|ValidationException| H["400 + JSON"]
+    F -->|BusinessException| I["422 + JSON"]
+    F -->|Outras| J["500 + JSON"]
     
     style D fill:#FFB6C1
     style G fill:#FFD700

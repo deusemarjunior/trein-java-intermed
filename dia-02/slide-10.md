@@ -8,15 +8,15 @@
 
 ```mermaid
 flowchart TD
-    A[Por que DTOs?] --> B[Separação de Concerns]
-    A --> C[Controle de Exposição]
+    A["Por que DTOs?"] --> B["Separação de Concerns"]
+    A --> C["Controle de Exposição"]
     A --> D[Versionamento]
     A --> E[Performance]
     
-    B --> B1[Entity != API Contract]
-    C --> C1[Ocultar campos sensíveis]
-    D --> D1[/api/v1 vs /api/v2]
-    E --> E1[Evitar lazy loading exceptions]
+    B --> B1["Entity != API Contract"]
+    C --> C1["Ocultar campos sensíveis"]
+    D --> D1["api/v1 vs api/v2"]
+    E --> E1["Evitar lazy loading exceptions"]
     
     style A fill:#FFD700
 ```

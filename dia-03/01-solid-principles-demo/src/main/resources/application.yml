@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: solid-principles-demo
+
+logging:
+  level:
+    com.example.solid: INFO

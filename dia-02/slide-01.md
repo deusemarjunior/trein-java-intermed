@@ -9,19 +9,18 @@
 ### O que vimos?
 
 ```mermaid
-mindmap
-  root((Dia 1))
-    Java Moderno
-      Records
-      Sealed Classes
-      Text Blocks
-      Pattern Matching
-      Stream API
-    Spring Boot
-      IoC/DI
-      Auto-configuração
-      Starters
-      Primeira API REST
+graph TD
+    A[Dia 1] --> B[Java Moderno]
+    A --> C[Spring Boot]
+    B --> D[Records]
+    B --> E[Sealed Classes]
+    B --> F[Text Blocks]
+    B --> G[Pattern Matching]
+    B --> H[Stream API]
+    C --> I[IoC/DI]
+    C --> J[Auto-configuração]
+    C --> K[Starters]
+    C --> L[Primeira API REST]
 ```
 
 ---

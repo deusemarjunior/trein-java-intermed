@@ -1,0 +1,141 @@
+### ========================================
+### TASKS API - HTTP Requests Examples
+### Port: 8082
+### ========================================
+
+### 1. CRIAR NOVA TAREFA
+POST http://localhost:8082/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Nova tarefa de teste",
+  "description": "Testando criação via API",
+  "priority": "HIGH",
+  "dueDate": "2024-12-30T15:00:00"
+}
+
+### 2. LISTAR TODAS AS TAREFAS (paginado)
+GET http://localhost:8082/api/tasks?page=0&size=5&sort=priority&direction=DESC
+
+### 3. BUSCAR TAREFA POR ID
+GET http://localhost:8082/api/tasks/1
+
+### 4. BUSCA AVANÇADA COM FILTROS
+# Buscar tarefas com palavra-chave "Spring" e prioridade HIGH
+GET http://localhost:8082/api/tasks/search?keyword=Spring&priority=HIGH&page=0&size=10
+
+### 5. BUSCA POR TAREFAS PENDENTES
+GET http://localhost:8082/api/tasks/pending
+
+### 6. BUSCA POR TAREFAS CONCLUÍDAS
+GET http://localhost:8082/api/tasks/completed
+
+### 7. BUSCA POR PRIORIDADE
+GET http://localhost:8082/api/tasks/priority/URGENT
+
+### 8. LISTAR TAREFAS ATRASADAS
+GET http://localhost:8082/api/tasks/overdue
+
+### 9. ESTATÍSTICAS
+GET http://localhost:8082/api/tasks/statistics
+
+### 10. ATUALIZAR TAREFA COMPLETAMENTE (PUT)
+PUT http://localhost:8082/api/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Estudar Spring Data JPA - Atualizado",
+  "description": "Revisar conceitos de repositórios, query methods e JPQL",
+  "priority": "URGENT",
+  "dueDate": "2024-12-30T18:00:00",
+  "completed": false
+}
+
+### 11. ATUALIZAÇÃO PARCIAL (PATCH) - Apenas alguns campos
+PATCH http://localhost:8082/api/tasks/3
+Content-Type: application/json
+
+{
+  "priority": "URGENT",
+  "dueDate": "2024-12-26T10:00:00"
+}
+
+### 12. MARCAR COMO CONCLUÍDA
+PATCH http://localhost:8082/api/tasks/3/complete
+
+### 13. DELETAR TAREFA
+DELETE http://localhost:8082/api/tasks/10
+
+### ========================================
+### TESTES DE VALIDAÇÃO
+### ========================================
+
+### 14. ERRO: Título vazio (deve retornar 400)
+POST http://localhost:8082/api/tasks
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "Teste de validação",
+  "priority": "LOW"
+}
+
+### 15. ERRO: Prioridade ausente (deve retornar 400)
+POST http://localhost:8082/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Tarefa sem prioridade",
+  "description": "Teste de validação"
+}
+
+### 16. ERRO: ID inexistente (deve retornar 404)
+GET http://localhost:8082/api/tasks/999
+
+### ========================================
+### EXERCÍCIOS PRÁTICOS
+### ========================================
+
+### EXERCÍCIO 1: Criar 3 tarefas URGENTES com prazos diferentes
+# 1.1 - Prazo amanhã
+POST http://localhost:8082/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Entregar relatório urgente",
+  "description": "Relatório de performance Q4",
+  "priority": "URGENT",
+  "dueDate": "2024-12-24T09:00:00"
+}
+
+### EXERCÍCIO 2: Buscar todas as tarefas URGENTES e verificar quantas existem
+GET http://localhost:8082/api/tasks/priority/URGENT
+
+### EXERCÍCIO 3: Buscar tarefas atrasadas e marcá-las como concluídas
+# 3.1 - Listar atrasadas
+GET http://localhost:8082/api/tasks/overdue
+
+# 3.2 - Marcar uma como concluída (substitua {id} pelo ID real)
+PATCH http://localhost:8082/api/tasks/{id}/complete
+
+### EXERCÍCIO 4: Filtrar tarefas por palavra-chave "API"
+GET http://localhost:8082/api/tasks/search?keyword=API
+
+### EXERCÍCIO 5: Ver estatísticas e comparar pendentes vs concluídas
+GET http://localhost:8082/api/tasks/statistics
+
+### ========================================
+### PAGINAÇÃO E ORDENAÇÃO
+### ========================================
+
+### Primeira página (5 itens) ordenada por data de criação (DESC)
+GET http://localhost:8082/api/tasks?page=0&size=5&sort=createdAt&direction=DESC
+
+### Segunda página
+GET http://localhost:8082/api/tasks?page=1&size=5&sort=createdAt&direction=DESC
+
+### Ordenar por prioridade (descendente) e título (ascendente)
+GET http://localhost:8082/api/tasks?page=0&size=10&sort=priority&direction=DESC
+
+### Buscar tarefas concluídas com paginação
+GET http://localhost:8082/api/tasks/search?completed=true&page=0&size=3

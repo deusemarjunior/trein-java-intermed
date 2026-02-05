@@ -14,9 +14,9 @@ flowchart TD
     B --> E[Resposta lenta]
     
     F[Com Paginação] --> G[20 registros por vez]
-    G --> H[Baixo uso de memória ✅]
-    G --> I[Query rápida ✅]
-    G --> J[Melhor UX ✅]
+    G --> H["Baixo uso de memória ✓"]
+    G --> I["Query rápida ✓"]
+    G --> J["Melhor UX ✓"]
     
     style F fill:#90EE90
     style A fill:#FFB6C6
@@ -34,12 +34,12 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[Cliente:<br/>page=2&size=10] --> B[Controller]
+    A["Cliente:<br/>page=2&size=10"] --> B[Controller]
     B --> C[PageRequest]
     C --> D[Repository]
-    D --> E[(DB:<br/>LIMIT 10<br/>OFFSET 20)]
-    E --> F[Page<T>]
-    F --> G[JSON:<br/>content,<br/>totalPages,<br/>totalElements]
+    D --> E[("DB:<br/>LIMIT 10<br/>OFFSET 20")]
+    E --> F["Page&lt;T&gt;"]
+    F --> G["JSON:<br/>content,<br/>totalPages,<br/>totalElements"]
     
     style C fill:#87CEEB
     style F fill:#90EE90

@@ -37,7 +37,7 @@
 ## 📊 HTTP Status Codes - Família de Respostas
 
 ```mermaid
-graph LR
+graph TD
     A[HTTP Status] --> B[1xx Informational]
     A --> C[2xx Success]
     A --> D[3xx Redirection]
@@ -91,12 +91,12 @@ flowchart TD
     A --> D[Update]
     A --> E[Delete]
     
-    B --> B1[POST /resources<br/>201 Created]
-    C --> C1[GET /resources<br/>200 OK]
-    C --> C2[GET /resources/:id<br/>200 OK]
-    D --> D1[PUT /resources/:id<br/>200 OK - substituição completa]
-    D --> D2[PATCH /resources/:id<br/>200 OK - atualização parcial]
-    E --> E1[DELETE /resources/:id<br/>204 No Content]
+    B --> B1[\"POST /resources<br/>201 Created\"]
+    C --> C1[\"GET /resources<br/>200 OK\"]
+    C --> C2[\"GET /resources/:id<br/>200 OK\"]
+    D --> D1[\"PUT /resources/:id<br/>200 OK - substituição completa\"]
+    D --> D2[\"PATCH /resources/:id<br/>200 OK - atualização parcial\"]
+    E --> E1[\"DELETE /resources/:id<br/>204 No Content\"]
     
     style B1 fill:#90EE90
     style C1 fill:#87CEEB
