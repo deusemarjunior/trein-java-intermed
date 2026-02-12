@@ -1,379 +1,272 @@
-# Slide 4: Exception Handling Global
+# Slide 4: Primeira API REST com Spring Boot - Hands-on!
 
-**Horário:** 09:55 - 10:15
-
----
-
-## ❌ O Problema: Exceções Não Tratadas
-
-```java
-// ❌ SEM tratamento global
-@RestController
-@RequestMapping("/api/products")
-public class ProductController {
-    
-    @GetMapping("/{id}")
-    public ProductResponse findById(@PathVariable Long id) {
-        return service.findById(id);  // Se não existir? 💥
-    }
-}
-
-// Cliente recebe:
-{
-  "timestamp": "2026-02-04T10:00:00",
-  "status": 500,
-  "error": "Internal Server Error",
-  "path": "/api/products/999"
-}
-// ❌ Pouca informação, status code errado (deveria ser 404)
-```
+**Horário:** 13:45 - 14:30
 
 ---
 
-## ✅ Solução: @ControllerAdvice
+## 🎯 Objetivo
+
+Criar API completa para gerenciar produtos (CRUD)
+
+### Fluxo da Aplicação
 
 ```mermaid
 flowchart TD
-    A[Request] --> B[Controller]
-    B --> C{Exception?}
-    C -->|SIM| D["@ControllerAdvice<br/>captura"]
-    C -->|NÃO| E[Response OK]
+    A[HTTP Request] --> B[ProductController]
+    B --> C{Método HTTP}
+    C -->|GET| D[findAll / findById]
+    C -->|POST| E[create]
+    C -->|PUT| F[update]
+    C -->|DELETE| G[delete]
     
-    D --> F{"Tipo de<br/>Exception"}
-    F -->|NotFoundException| G["404 + JSON"]
-    F -->|ValidationException| H["400 + JSON"]
-    F -->|BusinessException| I["422 + JSON"]
-    F -->|Outras| J["500 + JSON"]
+    D --> H[ProductService]
+    E --> H
+    F --> H
+    G --> H
     
-    style D fill:#FFB6C1
-    style G fill:#FFD700
-    style H fill:#FFD700
-    style I fill:#FFD700
-    style J fill:#FF6B6B
+    H --> I[ProductRepository]
+    I --> J[(H2 Database)]
+    
+    J -.-> I
+    I -.-> H
+    H -.-> B
+    B -.-> K[HTTP Response + JSON]
+    
+    style A fill:#FFE4B5
+    style B fill:#87CEEB
+    style H fill:#90EE90
+    style I fill:#FFB6C1
+    style J fill:#DDA0DD
+    style K fill:#F0E68C
 ```
 
 ---
 
-## 🎬 DEMO: Exception Handler Completo
-
-### 1. Exceções Customizadas
+## Passo 1: Criar a Entidade
 
 ```java
-// src/main/java/com/example/exception/ResourceNotFoundException.java
-package com.example.exception;
+// src/main/java/com/example/products/model/Product.java
+package com.example.products.model;
 
-public class ResourceNotFoundException extends RuntimeException {
-    private final String resourceName;
-    private final String fieldName;
-    private final Object fieldValue;
-    
-    public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
-        super(String.format("%s not found with %s: '%s'", resourceName, fieldName, fieldValue));
-        this.resourceName = resourceName;
-        this.fieldName = fieldName;
-        this.fieldValue = fieldValue;
-    }
-    
-    // Getters...
-}
-
-// BusinessException.java
-public class BusinessException extends RuntimeException {
-    private final String code;
-    
-    public BusinessException(String code, String message) {
-        super(message);
-        this.code = code;
-    }
-    
-    public String getCode() { return code; }
-}
-```
-
----
-
-### 2. DTOs de Erro
-
-```java
-// ErrorResponse.java
-package com.example.dto.response;
-
+import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "products")
+public class Product {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 100)
+    private String name;
+    
+    @Column(length = 500)
+    private String description;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+    
+    @Column(length = 50)
+    private String category;
+    
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    // Construtores, getters, setters...
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+```
+
+---
+
+## Passo 2: Criar o Repository
+
+```java
+// src/main/java/com/example/products/repository/ProductRepository.java
+package com.example.products.repository;
+
+import com.example.products.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-public record ErrorResponse(
-    LocalDateTime timestamp,
-    int status,
-    String error,
-    String message,
-    String path,
-    List<FieldError> fieldErrors
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    
+    // Spring Data JPA cria implementação automaticamente! 🎉
+    
+    // Métodos derivados do nome (query methods)
+    List<Product> findByCategory(String category);
+    
+    List<Product> findByNameContainingIgnoreCase(String name);
+    
+    boolean existsByName(String name);
+}
+```
+
+---
+
+## Passo 3: Criar DTOs
+
+```java
+// CreateProductRequest.java
+package com.example.products.dto.request;
+
+import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
+
+public record CreateProductRequest(
+    
+    @NotBlank(message = "Name is required")
+    @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
+    String name,
+    
+    @Size(max = 500, message = "Description must be less than 500 characters")
+    String description,
+    
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
+    BigDecimal price,
+    
+    @Size(max = 50, message = "Category must be less than 50 characters")
+    String category
+    
+) {}
+```
+
+```java
+// ProductResponse.java
+package com.example.products.dto.response;
+
+import com.example.products.model.Product;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+public record ProductResponse(
+    Long id,
+    String name,
+    String description,
+    BigDecimal price,
+    String category,
+    LocalDateTime createdAt
 ) {
-    public ErrorResponse(int status, String error, String message, String path) {
-        this(LocalDateTime.now(), status, error, message, path, null);
-    }
-    
-    public record FieldError(String field, String message) {}
-}
-```
-
----
-
-### 3. Global Exception Handler
-
-```java
-// src/main/java/com/example/exception/GlobalExceptionHandler.java
-package com.example.exception;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-@RestControllerAdvice
-public class GlobalExceptionHandler {
-    
-    // 404 - Resource Not Found
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            WebRequest request) {
-        
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Not Found",
-            ex.getMessage(),
-            request.getDescription(false).replace("uri=", "")
+    public static ProductResponse from(Product product) {
+        return new ProductResponse(
+            product.getId(),
+            product.getName(),
+            product.getDescription(),
+            product.getPrice(),
+            product.getCategory(),
+            product.getCreatedAt()
         );
-        
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-    
-    // 400 - Validation Error
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
-            MethodArgumentNotValidException ex,
-            WebRequest request) {
-        
-        List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(error -> new ErrorResponse.FieldError(
-                error.getField(),
-                error.getDefaultMessage()
-            ))
-            .collect(Collectors.toList());
-        
-        ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation Failed",
-            "One or more fields have validation errors",
-            request.getDescription(false).replace("uri=", ""),
-            fieldErrors
-        );
-        
-        return ResponseEntity.badRequest().body(error);
-    }
-    
-    // 422 - Business Exception
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
-            BusinessException ex,
-            WebRequest request) {
-        
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.UNPROCESSABLE_ENTITY.value(),
-            ex.getCode(),
-            ex.getMessage(),
-            request.getDescription(false).replace("uri=", "")
-        );
-        
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
-    }
-    
-    // 409 - Conflict (duplicata)
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
-            DataIntegrityViolationException ex,
-            WebRequest request) {
-        
-        String message = "Data integrity violation. Possibly duplicate entry.";
-        
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.CONFLICT.value(),
-            "Conflict",
-            message,
-            request.getDescription(false).replace("uri=", "")
-        );
-        
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
-    }
-    
-    // 500 - Internal Server Error (fallback)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex,
-            WebRequest request) {
-        
-        // Log do erro real (não expor detalhes ao cliente!)
-        log.error("Unexpected error occurred", ex);
-        
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal Server Error",
-            "An unexpected error occurred. Please try again later.",
-            request.getDescription(false).replace("uri=", "")
-        );
-        
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
 ```
 
 ---
 
-## 🎯 Usando as Exceções no Service
+## Passo 4: Criar o Service
 
 ```java
+// src/main/java/com/example/products/service/ProductService.java
 @Service
 public class ProductService {
     
     private final ProductRepository repository;
     
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ProductResponse> findAll() {
+        return repository.findAll()
+            .stream()
+            .map(ProductResponse::from)
+            .toList();
+    }
+    
+    @Transactional(readOnly = true)
     public ProductResponse findById(Long id) {
         Product product = repository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-        
+            .orElseThrow(() -> new RuntimeException("Product not found: " + id));
         return ProductResponse.from(product);
     }
     
+    @Transactional
     public ProductResponse create(CreateProductRequest request) {
-        // Verificar duplicata
-        if (repository.existsByName(request.name())) {
-            throw new BusinessException(
-                "PRODUCT_DUPLICATE",
-                "Product with name '" + request.name() + "' already exists"
-            );
-        }
-        
-        // Regra de negócio
-        if (request.price().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException(
-                "INVALID_PRICE",
-                "Product price must be greater than zero"
-            );
-        }
-        
-        Product product = new Product(...);
+        Product product = new Product(
+            request.name(),
+            request.description(),
+            request.price(),
+            request.category()
+        );
         Product saved = repository.save(product);
-        
         return ProductResponse.from(saved);
     }
-}
-```
-
----
-
-## 📊 Respostas de Erro Padronizadas
-
-### 404 - Not Found
-```json
-{
-  "timestamp": "2026-02-04T10:15:00",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Product not found with id: '999'",
-  "path": "/api/products/999",
-  "fieldErrors": null
-}
-```
-
-### 400 - Validation Error
-```json
-{
-  "timestamp": "2026-02-04T10:15:00",
-  "status": 400,
-  "error": "Validation Failed",
-  "message": "One or more fields have validation errors",
-  "path": "/api/products",
-  "fieldErrors": [
-    {
-      "field": "name",
-      "message": "Name is required"
-    },
-    {
-      "field": "price",
-      "message": "Price must be greater than 0"
+    
+    @Transactional
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Product not found: " + id);
+        }
+        repository.deleteById(id);
     }
-  ]
-}
-```
-
-### 422 - Business Exception
-```json
-{
-  "timestamp": "2026-02-04T10:15:00",
-  "status": 422,
-  "error": "PRODUCT_DUPLICATE",
-  "message": "Product with name 'Laptop' already exists",
-  "path": "/api/products",
-  "fieldErrors": null
 }
 ```
 
 ---
 
-## 💡 Boas Práticas Exception Handling
-
-### ✅ FAÇA
+## Passo 5: Criar o Controller
 
 ```java
-// 1. Use exceções específicas
-throw new ResourceNotFoundException("Product", "id", id);
-
-// 2. Mensagens claras e úteis
-throw new BusinessException("INSUFFICIENT_STOCK", 
-    "Cannot order 10 units. Only 5 in stock.");
-
-// 3. Log erros inesperados
-@ExceptionHandler(Exception.class)
-public ResponseEntity<?> handleUnexpected(Exception ex) {
-    log.error("Unexpected error", ex);  // ✅ Log completo
-    return ResponseEntity.status(500)
-        .body("An error occurred");  // Mensagem genérica ao cliente
-}
-
-// 4. Status codes corretos
-404 - Not Found (recurso não existe)
-400 - Bad Request (validação falhou)
-422 - Unprocessable Entity (regra de negócio)
-409 - Conflict (duplicata)
-500 - Internal Server Error (erro inesperado)
-```
-
-### ❌ EVITE
-
-```java
-// 1. Expor stack traces ao cliente
-catch (Exception ex) {
-    return ex.getMessage();  // ❌ Pode vazar info sensível
-}
-
-// 2. Exceções genéricas
-throw new RuntimeException("Error");  // ❌ Pouca informação
-
-// 3. Misturar status codes
-throw new ResourceNotFoundException()  // mas retorna 500 ❌
-
-// 4. Não logar erros
-@ExceptionHandler(Exception.class)
-public ResponseEntity<?> handle(Exception ex) {
-    return ResponseEntity.status(500).build();  // ❌ Erro sumiu!
+// src/main/java/com/example/products/controller/ProductController.java
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+    
+    private final ProductService service;
+    
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+    
+    @PostMapping
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
+        ProductResponse created = service.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 ```

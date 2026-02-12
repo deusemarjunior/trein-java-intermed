@@ -1,214 +1,128 @@
-# Products API - Spring Boot Demo
+# Products API - Servlet + JDBC
 
-API REST completa para gerenciamento de produtos, demonstrando os conceitos do **Dia 1** do treinamento.
+API REST para gerenciamento de produtos usando **Servlet puro** e **JDBC** (sem Spring Boot).
 
-## 🎯 Recursos Demonstrados
+## 🎯 Objetivo
 
-### Java Moderno (17+)
-- ✅ **Records** para DTOs (Request/Response)
-- ✅ **Stream API** para transformações de dados
-- ✅ **Optional** para evitar NullPointerException
+Demonstrar como criar uma API REST completa sem frameworks, usando apenas:
+- **Jakarta Servlet** para endpoints HTTP
+- **JDBC** para acesso ao banco de dados
+- **Gson** para serialização JSON
+- **Tomcat Embedded** como servidor
+- **H2 Database** como banco em memória
 
-### Spring Boot
-- ✅ **REST Controllers** com `@RestController`
-- ✅ **Spring Data JPA** com query methods
-- ✅ **Bean Validation** com `@Valid`
-- ✅ **Dependency Injection** via constructor
-- ✅ **Exception Handling** com `@RestControllerAdvice`
-- ✅ **Profiles** (dev/prod)
-- ✅ **DevTools** para hot reload
-- ✅ **H2 Database** em memória
+## 🏗️ Arquitetura
 
-## 🚀 Como Executar
-
-### Pré-requisitos
-- Java 17 ou superior
-- Maven 3.8+
-
-### Executar a aplicação
-
-```bash
-# Opção 1: Maven Wrapper (recomendado)
-./mvnw spring-boot:run
-
-# Opção 2: Maven instalado
-mvn spring-boot:run
-
-# Opção 3: Compilar e executar JAR
-mvn clean package
-java -jar target/products-api-1.0-SNAPSHOT.jar
+```
+Cliente (Postman/cURL)
+    │
+    ▼
+ProductServlet (HTTP → JSON)
+    │
+    ▼
+ProductDAO (JDBC → SQL)
+    │
+    ▼
+H2 Database (em memória)
 ```
 
-A aplicação estará disponível em: **http://localhost:8080**
-
-## 📋 Endpoints da API
-
-### Listar todos os produtos
-```bash
-GET http://localhost:8080/api/products
-```
-
-### Listar produtos por categoria
-```bash
-GET http://localhost:8080/api/products?category=Electronics
-```
-
-### Buscar produto por ID
-```bash
-GET http://localhost:8080/api/products/1
-```
-
-### Criar produto
-```bash
-POST http://localhost:8080/api/products
-Content-Type: application/json
-
-{
-  "name": "Laptop Gaming",
-  "description": "High-end gaming laptop",
-  "price": 7500.00,
-  "category": "Electronics"
-}
-```
-
-### Atualizar produto
-```bash
-PUT http://localhost:8080/api/products/1
-Content-Type: application/json
-
-{
-  "name": "Laptop Gaming Pro",
-  "description": "Ultimate gaming laptop",
-  "price": 8500.00,
-  "category": "Electronics"
-}
-```
-
-### Deletar produto
-```bash
-DELETE http://localhost:8080/api/products/1
-```
-
-## 🗄️ H2 Console
-
-Acesse o console do banco de dados H2:
-
-**URL:** http://localhost:8080/h2-console
-
-**Configurações:**
-- JDBC URL: `jdbc:h2:mem:testdb`
-- User: `sa`
-- Password: *(deixar vazio)*
-
-## 🔧 Profiles
-
-### Desenvolvimento (padrão)
-```bash
-./mvnw spring-boot:run
-# ou
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-```
-
-### Produção
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
-```
-
-## 📁 Estrutura do Projeto
+## 📁 Estrutura
 
 ```
 src/main/java/com/example/products/
-├── ProductsApiApplication.java       # Classe principal
+├── ProductsApp.java           # Main - Tomcat Embedded
 ├── config/
-│   └── AppConfig.java               # Configurações e dados de teste
-├── controller/
-│   └── ProductController.java       # REST endpoints
-├── service/
-│   └── ProductService.java          # Lógica de negócio
-├── repository/
-│   └── ProductRepository.java       # Acesso a dados
+│   └── DatabaseConfig.java    # Configuração JDBC e DDL
 ├── model/
-│   └── Product.java                 # Entidade JPA
+│   └── Product.java           # Modelo de dados (POJO)
 ├── dto/
-│   ├── request/
-│   │   ├── CreateProductRequest.java
-│   │   └── UpdateProductRequest.java
-│   └── response/
-│       └── ProductResponse.java
-└── exception/
-    ├── ProductNotFoundException.java
-    └── GlobalExceptionHandler.java
+│   ├── CreateProductRequest.java  # DTO de entrada (Record)
+│   └── ProductResponse.java      # DTO de saída (Record)
+├── dao/
+│   └── ProductDAO.java        # Data Access Object (JDBC)
+└── servlet/
+    ├── ProductServlet.java    # REST endpoints
+    └── LocalDateTimeAdapter.java # Gson adapter
 ```
 
-## 🧪 Testando com cURL
+## 🚀 Como Executar
 
 ```bash
-# Listar todos
+# Compilar e executar
+mvn clean compile exec:java -Dexec.mainClass="com.example.products.ProductsApp"
+```
+
+## 📡 Endpoints
+
+| Método | URL | Descrição |
+|--------|-----|-----------|
+| GET | `/api/products` | Listar todos os produtos |
+| GET | `/api/products/{id}` | Buscar por ID |
+| GET | `/api/products?category=X` | Filtrar por categoria |
+| GET | `/api/products?name=X` | Buscar por nome |
+| POST | `/api/products` | Criar novo produto |
+| PUT | `/api/products/{id}` | Atualizar produto |
+| DELETE | `/api/products/{id}` | Deletar produto |
+
+## 🧪 Testando
+
+Use o arquivo `api-requests.http` com a extensão REST Client do VS Code, ou teste com cURL:
+
+```bash
+# Listar produtos (já vem com dados de exemplo!)
 curl http://localhost:8080/api/products
 
 # Criar produto
 curl -X POST http://localhost:8080/api/products \
   -H "Content-Type: application/json" \
-  -d '{"name":"Mouse","description":"Gaming mouse","price":150.00,"category":"Electronics"}'
+  -d '{"name":"Headset","description":"Headset 7.1","price":350,"category":"Electronics"}'
 
 # Buscar por ID
 curl http://localhost:8080/api/products/1
 
+# Filtrar por categoria
+curl "http://localhost:8080/api/products?category=Electronics"
+
 # Atualizar
 curl -X PUT http://localhost:8080/api/products/1 \
   -H "Content-Type: application/json" \
-  -d '{"name":"Mouse Pro","description":"Pro gaming mouse","price":200.00,"category":"Electronics"}'
+  -d '{"name":"Laptop Pro","description":"Updated","price":9000,"category":"Electronics"}'
 
 # Deletar
 curl -X DELETE http://localhost:8080/api/products/1
 ```
 
-## 💡 Conceitos Importantes
+## 🔑 Conceitos Demonstrados
 
-### 1. Camadas da Aplicação
-```
-Controller → Service → Repository → Database
-    ↓          ↓           ↓
-  DTOs    Business    Entity/Model
-          Logic
-```
+| Conceito | Implementação |
+|----------|--------------|
+| HTTP Servlet | `ProductServlet extends HttpServlet` |
+| REST API | doGet, doPost, doPut, doDelete |
+| JDBC | PreparedStatement, ResultSet |
+| DAO Pattern | `ProductDAO` encapsula acesso a dados |
+| DTOs com Records | `CreateProductRequest`, `ProductResponse` |
+| Validação manual | Construtor compacto do Record |
+| JSON | Gson para serialização/deserialização |
+| Servidor embedded | Tomcat Embedded |
+| Banco em memória | H2 Database |
 
-### 2. Records vs Classes
-- **Records**: DTOs imutáveis (Request/Response)
-- **Classes**: Entidades JPA (precisam setters)
+## 🔄 Comparação com Spring Boot (Dia 2)
 
-### 3. Validações
-```java
-@NotBlank(message = "Name is required")
-@Size(min = 3, max = 100)
-@DecimalMin(value = "0.01")
-```
+| Aspecto | Este projeto (Servlet+JDBC) | Spring Boot (Dia 2) |
+|---------|--------------------------|-------------------|
+| Servidor | Tomcat manual | Auto-configurado |
+| Routing | `pathInfo` manual | `@GetMapping` |
+| JSON | Gson manual | Jackson automático |
+| Banco | JDBC + PreparedStatement | JPA/Hibernate |
+| Validação | Manual no construtor | `@Valid` + annotations |
+| Injeção | `new ProductDAO()` | `@Autowired` |
+| Config | Código Java | `application.yml` |
+| Boilerplate | Alto | Baixo |
 
-### 4. Repository Query Methods
-Spring cria queries automaticamente pelo nome:
-```java
-findByCategory(String category)
-findByNameContainingIgnoreCase(String name)
-findByPriceGreaterThan(BigDecimal price)
-```
+## 📚 Slides Relacionados
 
-### 5. Exception Handling
-`@RestControllerAdvice` trata exceções globalmente
-
-## 📚 Próximos Passos
-
-- [ ] Adicionar testes unitários
-- [ ] Implementar paginação
-- [ ] Adicionar Swagger/OpenAPI
-- [ ] Conectar a banco real (PostgreSQL)
-- [ ] Adicionar autenticação
-
-## 🎓 Material de Estudo
-
-Este projeto demonstra os conceitos do **Dia 1** do treinamento:
-- Java Moderno (Records, Stream API, Optional)
-- Spring Boot Fundamentals
-- REST API completa
-- Bean Validation
-- Profiles
-- DevTools
+- **Slide 9:** Fundamentos Web & Servlets
+- **Slide 10:** Configurando o Projeto
+- **Slide 11:** Modelo, DAO e DTOs
+- **Slide 12:** Criando o Servlet REST
+- **Slide 13:** Testando a API

@@ -1,454 +1,273 @@
-# Slide 10: DTOs e Mapeamento
+# Slide 10: Fundamentos HTTP & REST Avançado
 
-**Horário:** 14:00 - 14:20
+**Horário:** 09:15 - 09:35
 
 ---
 
-## 🎯 Por que usar DTOs?
+## 🌐 HTTP: A Base de Tudo
+
+### Anatomia de uma Requisição HTTP
+
+```
+┌─────────────────────────────────────────────────────┐
+│ REQUEST                                             │
+├─────────────────────────────────────────────────────┤
+│ POST /api/products HTTP/1.1                         │ ← Método + URL + Versão
+│ Host: localhost:8080                                │ ← Headers
+│ Content-Type: application/json                      │
+│ Authorization: Bearer eyJhbGc...                    │
+│ Accept: application/json                            │
+│                                                     │
+│ {"name": "Laptop", "price": 3500}                  │ ← Body
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│ RESPONSE                                            │
+├─────────────────────────────────────────────────────┤
+│ HTTP/1.1 201 Created                                │ ← Status Code
+│ Content-Type: application/json                      │ ← Headers
+│ Location: /api/products/123                         │
+│                                                     │
+│ {"id": 123, "name": "Laptop", "price": 3500}       │ ← Body
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📊 HTTP Status Codes - Família de Respostas
+
+```mermaid
+graph TD
+    A[HTTP Status] --> B[1xx Informational]
+    A --> C[2xx Success]
+    A --> D[3xx Redirection]
+    A --> E[4xx Client Error]
+    A --> F[5xx Server Error]
+    
+    C --> C1[200 OK]
+    C --> C2[201 Created]
+    C --> C3[204 No Content]
+    
+    E --> E1[400 Bad Request]
+    E --> E2[401 Unauthorized]
+    E --> E3[403 Forbidden]
+    E --> E4[404 Not Found]
+    E --> E5[409 Conflict]
+    
+    F --> F1[500 Internal Error]
+    F --> F2[503 Service Unavailable]
+    
+    style C fill:#90EE90
+    style E fill:#FFB6C1
+    style F fill:#FF6B6B
+```
+
+---
+
+## 🎯 Status Codes: Quando Usar Cada Um
+
+| Code | Nome | Quando usar | Exemplo |
+|------|------|-------------|---------|
+| 200 | OK | Sucesso em GET/PUT | `GET /products/123` |
+| 201 | Created | Recurso criado | `POST /products` |
+| 204 | No Content | Sucesso sem corpo | `DELETE /products/123` |
+| 400 | Bad Request | Validação falhou | JSON inválido, campo obrigatório |
+| 401 | Unauthorized | Não autenticado | Token ausente/inválido |
+| 403 | Forbidden | Sem permissão | User não pode deletar |
+| 404 | Not Found | Recurso não existe | Produto ID 999 não existe |
+| 409 | Conflict | Conflito de estado | Email já cadastrado |
+| 500 | Internal Error | Erro no servidor | NullPointerException |
+
+---
+
+## 🔍 Métodos HTTP & Semântica REST
+
+### CRUD Mapping
 
 ```mermaid
 flowchart TD
-    A["Por que DTOs?"] --> B["Separação de Concerns"]
-    A --> C["Controle de Exposição"]
-    A --> D[Versionamento]
-    A --> E[Performance]
+    A[CRUD Operations] --> B[Create]
+    A --> C[Read]
+    A --> D[Update]
+    A --> E[Delete]
     
-    B --> B1["Entity != API Contract"]
-    C --> C1["Ocultar campos sensíveis"]
-    D --> D1["api/v1 vs api/v2"]
-    E --> E1["Evitar lazy loading exceptions"]
+    B --> B1[\"POST /resources<br/>201 Created\"]
+    C --> C1[\"GET /resources<br/>200 OK\"]
+    C --> C2[\"GET /resources/:id<br/>200 OK\"]
+    D --> D1[\"PUT /resources/:id<br/>200 OK - substituição completa\"]
+    D --> D2[\"PATCH /resources/:id<br/>200 OK - atualização parcial\"]
+    E --> E1[\"DELETE /resources/:id<br/>204 No Content\"]
     
-    style A fill:#FFD700
-```
-
-**DTO = Data Transfer Object**
-- Objetos simples para transferir dados entre camadas
-- Controla exatamente o que entra e sai da API
-- Desacopla modelo de domínio da API
-
----
-
-## ❌ Problemas de Expor Entidades
-
-```java
-@Entity
-public class User {
-    private Long id;
-    private String username;
-    private String password;  // ❌ NUNCA expor!
-    private String email;
-    private LocalDateTime lastLogin;
-    
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Order> orders;  // ❌ LazyInitializationException
-    
-    @ManyToOne
-    private Company company;  // ❌ Serialização infinita
-}
-
-// Controller ❌ NÃO FAÇA ISSO
-@GetMapping("/{id}")
-public User findById(@PathVariable Long id) {
-    return userRepository.findById(id).orElseThrow();
-    // Problemas:
-    // 1. Expõe password
-    // 2. Lazy loading exception com orders
-    // 3. Pode serializar company → users → company → ...
-    // 4. Mudança na entity quebra a API
-}
+    style B1 fill:#90EE90
+    style C1 fill:#87CEEB
+    style C2 fill:#87CEEB
+    style D1 fill:#FFD700
+    style D2 fill:#FFD700
+    style E1 fill:#FFB6C1
 ```
 
 ---
 
-## ✅ Solução: Request e Response DTOs
+## 🎓 Princípios REST
+
+### 1. **Stateless** (Sem Estado)
 
 ```java
-// Entity (nunca expor!)
-@Entity
-public class User {
-    private Long id;
-    private String username;
-    private String password;
-    private String email;
-    private LocalDateTime createdAt;
+// ❌ MAU - servidor guarda estado do cliente
+@RestController
+public class BadController {
+    private Map<String, User> userSessions = new HashMap<>(); // ❌
     
-    @OneToMany
-    private List<Order> orders;
-}
-
-// Request DTO (dados de entrada)
-public record CreateUserRequest(
-    @NotBlank(message = "Username é obrigatório")
-    @Size(min = 3, max = 50)
-    String username,
-    
-    @Email(message = "Email inválido")
-    @NotBlank
-    String email,
-    
-    @Size(min = 8, message = "Senha deve ter no mínimo 8 caracteres")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9]).*$", 
-             message = "Senha deve ter letra maiúscula e número")
-    String password
-) {}
-
-// Response DTO (dados de saída)
-public record UserResponse(
-    Long id,
-    String username,
-    String email,
-    LocalDateTime createdAt
-) {
-    // Factory method para conversão
-    public static UserResponse from(User user) {
-        return new UserResponse(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getCreatedAt()
-        );
+    @PostMapping("/login")
+    public void login(@RequestBody LoginRequest req) {
+        userSessions.put(req.username(), user); // Estado no servidor!
     }
 }
 
-// Controller ✅ Usando DTOs
-@PostMapping
-public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
-    User user = userService.create(request);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(UserResponse.from(user));
-}
-
-@GetMapping("/{id}")
-public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-    User user = userService.findById(id);
-    return ResponseEntity.ok(UserResponse.from(user));
-}
-```
-
----
-
-## 🎨 Tipos de DTOs
-
-### 1. Request DTOs (Input)
-
-```java
-public record CreateProductRequest(
-    @NotBlank String name,
-    @NotNull @Positive BigDecimal price,
-    @NotNull Long categoryId
-) {}
-
-public record UpdateProductRequest(
-    @NotBlank String name,
-    @Positive BigDecimal price,
-    Long categoryId  // Opcional no update
-) {}
-```
-
-### 2. Response DTOs (Output)
-
-```java
-public record ProductResponse(
-    Long id,
-    String name,
-    BigDecimal price,
-    String categoryName,  // Denormalizado!
-    LocalDateTime createdAt
-) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getPrice(),
-            product.getCategory().getName(),
-            product.getCreatedAt()
-        );
+// ✅ BOM - stateless com token
+@RestController
+public class GoodController {
+    
+    @PostMapping("/login")
+    public TokenResponse login(@RequestBody LoginRequest req) {
+        String token = jwtService.generateToken(user);
+        return new TokenResponse(token); // Cliente guarda o estado (token)
     }
-}
-```
-
-### 3. DTOs Aninhados
-
-```java
-public record OrderResponse(
-    Long id,
-    LocalDateTime createdAt,
-    BigDecimal total,
-    List<OrderItemResponse> items  // DTO aninhado
-) {
-    public static OrderResponse from(Order order) {
-        return new OrderResponse(
-            order.getId(),
-            order.getCreatedAt(),
-            order.getTotal(),
-            order.getItems().stream()
-                .map(OrderItemResponse::from)
-                .toList()
-        );
-    }
-}
-
-public record OrderItemResponse(
-    Long productId,
-    String productName,
-    int quantity,
-    BigDecimal price
-) {
-    public static OrderItemResponse from(OrderItem item) {
-        return new OrderItemResponse(
-            item.getProduct().getId(),
-            item.getProduct().getName(),
-            item.getQuantity(),
-            item.getPrice()
-        );
+    
+    @GetMapping("/profile")
+    public UserProfile getProfile(@RequestHeader("Authorization") String token) {
+        User user = jwtService.validateToken(token); // Cada request é independente
+        return UserProfile.from(user);
     }
 }
 ```
 
 ---
 
-## 🔄 Mapeamento Entity ↔ DTO
-
-### Opção 1: Factory Methods (Recomendado para projetos pequenos)
+### 2. **Recursos** (Resources)
 
 ```java
-public record UserResponse(Long id, String name, String email) {
-    
-    // Entity → DTO
-    public static UserResponse from(User user) {
-        return new UserResponse(
-            user.getId(),
-            user.getName(),
-            user.getEmail()
-        );
-    }
-}
+// ✅ BOM - URLs representam RECURSOS, não ações
+GET    /api/products           // Lista de produtos (recurso)
+POST   /api/products           // Criar produto
+GET    /api/products/123       // Produto específico
+PUT    /api/products/123       // Atualizar produto
+DELETE /api/products/123       // Deletar produto
 
-// Uso
-UserResponse response = UserResponse.from(user);
-List<UserResponse> responses = users.stream()
-    .map(UserResponse::from)
-    .toList();
-```
-
-### Opção 2: Métodos no Service
-
-```java
-@Service
-public class UserService {
-    
-    public User toEntity(CreateUserRequest request) {
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        return user;
-    }
-    
-    public void updateEntity(User user, UpdateUserRequest request) {
-        user.setEmail(request.email());
-        if (request.username() != null) {
-            user.setUsername(request.username());
-        }
-    }
-}
-```
-
-### Opção 3: MapStruct (Para projetos maiores)
-
-```java
-@Mapper(componentModel = "spring")
-public interface UserMapper {
-    
-    UserResponse toResponse(User user);
-    
-    List<UserResponse> toResponseList(List<User> users);
-    
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    User toEntity(CreateUserRequest request);
-}
-
-// Uso no Service
-@Service
-public class UserService {
-    private final UserMapper mapper;
-    
-    public UserResponse create(CreateUserRequest request) {
-        User user = mapper.toEntity(request);
-        User saved = repository.save(user);
-        return mapper.toResponse(saved);
-    }
-}
+// ❌ RUIM - URLs com verbos (não é REST!)
+GET    /api/getAllProducts
+POST   /api/createProduct
+GET    /api/getProductById?id=123
+POST   /api/updateProduct
+POST   /api/deleteProduct
 ```
 
 ---
 
-## 🎬 DEMO Completo: Product CRUD
+### 3. **Representações** (JSON, XML, etc)
 
 ```java
-// Request DTOs
-public record CreateProductRequest(
-    @NotBlank String name,
-    @Size(max = 500) String description,
-    @NotNull @Positive BigDecimal price,
-    @NotNull Long categoryId
-) {}
-
-public record UpdateProductRequest(
-    @NotBlank String name,
-    String description,
-    @Positive BigDecimal price
-) {}
-
-// Response DTO
-public record ProductResponse(
-    Long id,
-    String name,
-    String description,
-    BigDecimal price,
-    CategoryResponse category,
-    LocalDateTime createdAt
-) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getPrice(),
-            CategoryResponse.from(product.getCategory()),
-            product.getCreatedAt()
-        );
-    }
-}
-
-public record CategoryResponse(Long id, String name) {
-    public static CategoryResponse from(Category category) {
-        return new CategoryResponse(category.getId(), category.getName());
-    }
-}
-
-// Controller
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
     
-    @Autowired
-    private ProductService service;
-    
-    @PostMapping
-    public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
-        ProductResponse response = service.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    // Content Negotiation - cliente escolhe formato
+    @GetMapping(value = "/{id}", 
+                produces = {MediaType.APPLICATION_JSON_VALUE, 
+                           MediaType.APPLICATION_XML_VALUE})
+    public ProductResponse findById(@PathVariable Long id) {
+        // Spring serializa automaticamente para JSON ou XML
+        // baseado no header "Accept" do cliente
+        return productService.findById(id);
     }
     
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
-        ProductResponse response = service.findById(id);
-        return ResponseEntity.ok(response);
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateProductRequest request) {
-        ProductResponse response = service.update(id, request);
-        return ResponseEntity.ok(response);
-    }
-}
-
-// Service
-@Service
-public class ProductService {
-    
-    @Autowired
-    private ProductRepository productRepository;
-    
-    @Autowired
-    private CategoryRepository categoryRepository;
-    
-    public ProductResponse create(CreateProductRequest request) {
-        Category category = categoryRepository.findById(request.categoryId())
-            .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-        
-        Product product = new Product();
-        product.setName(request.name());
-        product.setDescription(request.description());
-        product.setPrice(request.price());
-        product.setCategory(category);
-        
-        Product saved = productRepository.save(product);
-        return ProductResponse.from(saved);
-    }
-    
-    public ProductResponse findById(Long id) {
-        Product product = productRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Product not found"));
-        return ProductResponse.from(product);
-    }
-    
-    public ProductResponse update(Long id, UpdateProductRequest request) {
-        Product product = productRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Product not found"));
-        
-        product.setName(request.name());
-        product.setDescription(request.description());
-        if (request.price() != null) {
-            product.setPrice(request.price());
-        }
-        
-        Product updated = productRepository.save(product);
-        return ProductResponse.from(updated);
+    // Aceita JSON ou XML no body
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,
+                            MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<ProductResponse> create(@RequestBody CreateProductRequest req) {
+        ProductResponse created = productService.create(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 }
 ```
 
 ---
 
-## 🎯 Boas Práticas
+## 💡 RESTful API Design - Boas Práticas
 
-### ✅ Faça:
+### ✅ URLs bem desenhadas
 
-1. **Sempre use DTOs em Controllers**
-2. **Nomeie claramente:** `CreateXRequest`, `UpdateXRequest`, `XResponse`
-3. **Valide requests** com Bean Validation
-4. **Factory methods** para conversões simples
-5. **Records** para DTOs (imutáveis, concisos)
+```
+# Hierarquia de recursos
+GET    /api/users/123/orders           # Pedidos do usuário 123
+GET    /api/users/123/orders/456       # Pedido 456 do usuário 123
+POST   /api/users/123/orders           # Criar pedido para usuário 123
 
-### ❌ Evite:
+# Filtering, Sorting, Pagination
+GET    /api/products?category=electronics&sort=price,desc&page=0&size=20
 
-1. **Expor entities** diretamente
-2. **DTOs genéricos** (`Map<String, Object>`)
-3. **Lógica de negócio** em DTOs
-4. **Reutilizar** mesmo DTO para create e update
-5. **Muitos campos opcionais** - crie DTOs específicos
+# Search
+GET    /api/products/search?q=laptop&minPrice=1000
+
+# Ações especiais (verbos quando necessário)
+POST   /api/orders/456/cancel          # Cancelar pedido
+POST   /api/users/123/activate         # Ativar usuário
+```
 
 ---
 
-## 🏋️ Exercício (10 min)
-
-Crie DTOs completos para **Task**:
+## 🎬 DEMO: ResponseEntity Completo
 
 ```java
-// Entity (já existe)
-@Entity
-public class Task {
-    private Long id;
-    private String title;
-    private String description;
-    private TaskStatus status;
-    private LocalDate dueDate;
-    @ManyToOne
-    private User assignee;
-    private LocalDateTime createdAt;
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+    
+    private final ProductService service;
+    
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
+    
+    // 200 OK - Sucesso simples
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
+        ProductResponse product = service.findById(id);
+        return ResponseEntity.ok(product);
+    }
+    
+    // 201 Created - com Location header
+    @PostMapping
+    public ResponseEntity<ProductResponse> create(@RequestBody CreateProductRequest req) {
+        ProductResponse created = service.create(req);
+        
+        URI location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(created.id())
+            .toUri();
+        
+        return ResponseEntity
+            .created(location)  // 201 + Location header
+            .body(created);
+    }
+    
+    // 204 No Content - sem body
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+    
+    // 200 OK com headers customizados
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> export() {
+        byte[] csvData = service.exportToCsv();
+        
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=products.csv")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(csvData);
+    }
 }
-
-// Criar:
-// 1. CreateTaskRequest (com validações)
-// 2. UpdateTaskRequest
-// 3. TaskResponse (com nome do assignee)
-// 4. TaskSummaryResponse (apenas id, title, status)
 ```
-
-**Próximo:** Coffee Break (15:00-15:15) →

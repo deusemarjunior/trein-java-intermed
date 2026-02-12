@@ -1,134 +1,440 @@
-# Slide 1: Review Dia 1 & Setup
+# Slide 1: Fundamentos Web & Spring Boot
 
-**Horário:** 09:00 - 09:15
+**Horário:** 13:00 - 13:15
 
 ---
 
-## 📝 Review Rápido - Dia 1
+## 🌐 Conceitos Básicos: Como funciona uma aplicação Web?
 
-### O que vimos?
+### Cliente-Servidor
 
 ```mermaid
-graph TD
-    A[Dia 1] --> B[Java Moderno]
-    A --> C[Spring Boot]
-    B --> D[Records]
-    B --> E[Sealed Classes]
-    B --> F[Text Blocks]
-    B --> G[Pattern Matching]
-    B --> H[Stream API]
-    C --> I[IoC/DI]
-    C --> J[Auto-configuração]
-    C --> K[Starters]
-    C --> L[Primeira API REST]
-```
-
----
-
-## ✅ Checklist - Todos conseguem?
-
-```
-[ ] Criar Records com validação
-[ ] Usar Stream API para filtrar/transformar listas
-[ ] Criar projeto Spring Boot no Initializr
-[ ] Desenvolver Controller → Service → Repository
-[ ] Testar API com Postman
-[ ] Entender a diferença entre @Service e @Repository
-```
-
-**🤔 Dúvidas pendentes?**
-
----
-
-## 🎯 Hoje vamos aprofundar
-
-### De onde viemos → Para onde vamos
-
-```mermaid
-flowchart LR
-    A[Dia 1<br/>API em Memória] --> B[Dia 2<br/>API com Banco de Dados]
+sequenceDiagram
+    participant C as Cliente<br/>(Browser/App)
+    participant S as Servidor<br/>(Aplicação Java)
+    participant D as Database
     
-    A1[List em memória] -.-> B1[PostgreSQL/H2]
-    A2[DTOs simples] -.-> B2[DTOs validados]
-    A3[CRUD básico] -.-> B3[Queries complexas]
-    A4[Exceptions simples] -.-> B4[Global Exception Handler]
+    C->>S: 1. HTTP Request<br/>GET /api/products
+    Note over S: Controller recebe
+    S->>S: 2. Processa<br/>Controller → Service
+    S->>D: 3. Consulta dados
+    D-->>S: 4. Retorna dados
+    S-->>C: 5. HTTP Response<br/>200 OK + JSON
+    Note over C: Exibe dados
+```
+
+### Protocolo HTTP
+
+```
+Request:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GET /api/products/123 HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+Authorization: Bearer token123
+
+Response:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id": 123, "name": "Laptop"}
+```
+
+---
+
+## 🔧 A Base: Servlets (Java EE/Jakarta EE)
+
+### O que é um Servlet?
+
+Classe Java que processa requisições HTTP no servidor.
+
+```java
+// Servlet "na unha" (antes do Spring)
+@WebServlet("/products")
+public class ProductServlet extends HttpServlet {
     
-    style B fill:#90EE90
-    style B1 fill:#87CEEB
-    style B2 fill:#87CEEB
-    style B3 fill:#87CEEB
-    style B4 fill:#87CEEB
+    @Override
+    protected void doGet(HttpServletRequest request, 
+                         HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // 1. Ler parâmetros
+        String id = request.getParameter("id");
+        
+        // 2. Processar (buscar no banco, etc)
+        Product product = productService.findById(Long.parseLong(id));
+        
+        // 3. Converter para JSON manualmente
+        String json = "{\"id\":" + product.getId() + 
+                      ",\"name\":\"" + product.getName() + "\"}";
+        
+        // 4. Configurar response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
+    }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, 
+                          HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // 1. Ler corpo da requisição
+        BufferedReader reader = request.getReader();
+        StringBuilder jsonBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            jsonBuilder.append(line);
+        }
+        
+        // 2. Parsear JSON manualmente (ou usar biblioteca)
+        String json = jsonBuilder.toString();
+        // ... parse json, extrair campos, validar...
+        
+        // 3. Salvar no banco
+        // 4. Retornar response
+    }
+}
+```
+
+**Problemas:**
+- ❌ Muito código boilerplate
+- ❌ Conversão JSON manual
+- ❌ Gerenciamento de dependências manual
+- ❌ Configuração complexa (web.xml)
+- ❌ Difícil de testar
+
+---
+
+## 📡 Comunicação: REST vs Outras Opções
+
+### Opção 1: REST (Representational State Transfer)
+
+✅ **Escolha moderna e recomendada**
+
+```
+Características:
+• Usa HTTP puro (GET, POST, PUT, DELETE)
+• Recursos identificados por URLs
+• Stateless (sem estado no servidor)
+• Formato: JSON (leve e legível)
+• Fácil de consumir (browser, mobile, etc)
+
+Exemplo:
+GET    /api/products          → Lista produtos
+GET    /api/products/123      → Busca produto
+POST   /api/products          → Cria produto
+PUT    /api/products/123      → Atualiza produto
+DELETE /api/products/123      → Deleta produto
 ```
 
 ---
 
-## 🔧 Setup do Dia
+### Opção 2: SOAP (Simple Object Access Protocol)
 
-### 1. Verificar PostgreSQL
-
-```bash
-# Opção 1: PostgreSQL instalado
-psql --version
-psql -U postgres -c "SELECT version();"
-
-# Opção 2: Docker
-docker run --name postgres-dev \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=java_training \
-  -p 5432:5432 \
-  -d postgres:15
-
-# Testar conexão
-docker exec -it postgres-dev psql -U postgres
-```
-
----
-
-### 2. Configurar DBeaver/pgAdmin
-
-```
-Host: localhost
-Port: 5432
-Database: java_training
-User: postgres
-Password: postgres
-```
-
----
-
-### 3. Dependências necessárias (pom.xml)
+⚠️ **Legado - ainda usado em sistemas antigos**
 
 ```xml
-<!-- JPA + PostgreSQL -->
+<!-- Request SOAP (verboso!) -->
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <getProduct xmlns="http://example.com/products">
+      <productId>123</productId>
+    </getProduct>
+  </soap:Body>
+</soap:Envelope>
+
+<!-- Response SOAP -->
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <getProductResponse xmlns="http://example.com/products">
+      <product>
+        <id>123</id>
+        <name>Laptop</name>
+      </product>
+    </getProductResponse>
+  </soap:Body>
+</soap:Envelope>
+```
+
+**Características:**
+- ❌ XML verboso
+- ❌ Complexo (WSDL, XML Schema)
+- ✅ Contratos rígidos
+- ✅ Segurança robusta (WS-Security)
+- 📌 Usado em: Bancos, governo, sistemas legados
+
+---
+
+### Opção 3: GraphQL
+
+🆕 **Alternativa moderna (Facebook, 2015)**
+
+```graphql
+# Query (cliente define o que quer)
+query {
+  product(id: 123) {
+    id
+    name
+    price
+    category {
+      name
+    }
+  }
+}
+
+# Response (exatamente o que foi pedido)
+{
+  "data": {
+    "product": {
+      "id": 123,
+      "name": "Laptop",
+      "price": 3500,
+      "category": {
+        "name": "Electronics"
+      }
+    }
+  }
+}
+```
+
+**Características:**
+- ✅ Cliente pede exatamente o que precisa
+- ✅ Evita over-fetching e under-fetching
+- ✅ Single endpoint
+- ❌ Mais complexo de implementar
+- ❌ Cache mais difícil
+- 📌 Usado em: Facebook, GitHub, Shopify
+
+---
+
+### Opção 4: gRPC
+
+⚡ **Alta performance (Google)**
+
+```protobuf
+// Definição (.proto)
+message Product {
+  int64 id = 1;
+  string name = 2;
+  double price = 3;
+}
+
+service ProductService {
+  rpc GetProduct(ProductRequest) returns (Product);
+}
+```
+
+**Características:**
+- ✅ Binário (Protocol Buffers) - muito rápido
+- ✅ Streaming bidirecional
+- ✅ Suporta múltiplas linguagens
+- ❌ Não funciona direto no browser
+- ❌ Menos legível (binário)
+- 📌 Usado em: Microsserviços, sistemas distribuídos
+
+---
+
+### 📊 Comparação Rápida
+
+| Aspecto | REST | SOAP | GraphQL | gRPC |
+|---------|:----:|:----:|:-------:|:----:|
+| Formato | JSON | XML | JSON | Binário |
+| Performance | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Simplicidade | ⭐⭐⭐⭐⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐ |
+| Flexibilidade | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| Browser | ✅ | ✅ | ✅ | ❌ |
+| Curva aprendizado | Baixa | Alta | Média | Média |
+
+**Recomendação 2026:**
+- 🎯 **REST**: 80% dos casos (APIs públicas, CRUD, web/mobile)
+- 📱 **GraphQL**: Apps complexos com muitas telas
+- ⚡ **gRPC**: Comunicação entre microsserviços
+- 🏛️ **SOAP**: Manutenção de sistemas legados
+
+---
+
+## A Evolução do Java Web
+
+```
+Spring Framework (2004)
+   ↓
+Configuração XML complexa 😫
+   ↓
+Spring 3.0 - Java Config
+   ↓
+Ainda precisa configurar TUDO manualmente
+   ↓
+Spring Boot (2014) 🎉
+   ↓
+"Convenção sobre Configuração"
+Zero XML, minimal config
+```
+
+---
+
+## Comparação: Antes vs Depois
+
+### SPRING FRAMEWORK (SEM BOOT) - ~50 linhas de config
+
+```xml
+<!-- web.xml -->
+<servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+</servlet>
+
+<!-- applicationContext.xml -->
+<beans>
+    <context:component-scan base-package="com.example"/>
+    <mvc:annotation-driven/>
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/db"/>
+        <property name="username" value="root"/>
+        <property name="password" value="password"/>
+    </bean>
+    
+    <!-- + muitas outras configurações... -->
+</beans>
+```
+
+---
+
+### SPRING BOOT - 0 linhas de XML! ✨
+
+```java
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+```yaml
+# application.yml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/db
+    username: root
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+```
+
+---
+
+## 🎯 Conceitos Fundamentais
+
+### 1. Inversão de Controle (IoC)
+
+```java
+// ❌ SEM IoC - Controle manual
+public class OrderService {
+    private ProductRepository repository = new ProductRepositoryImpl();
+    private PaymentGateway gateway = new PaymentGatewayImpl();
+    
+    // Acoplamento forte! Difícil de testar!
+}
+
+// ✅ COM IoC - Spring gerencia as dependências
+@Service
+public class OrderService {
+    private final ProductRepository repository;
+    private final PaymentGateway gateway;
+    
+    // Spring injeta automaticamente
+    public OrderService(ProductRepository repository, PaymentGateway gateway) {
+        this.repository = repository;
+        this.gateway = gateway;
+    }
+}
+```
+
+---
+
+### 2. Injeção de Dependências (DI)
+
+```java
+// 1️⃣ CONSTRUCTOR INJECTION ✅ RECOMENDADO!
+@Service
+public class ProductService {
+    private final ProductRepository repository;
+    
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+}
+
+// 2️⃣ SETTER INJECTION (raramente usado)
+@Service
+public class ProductService {
+    private ProductRepository repository;
+    
+    @Autowired
+    public void setRepository(ProductRepository repository) {
+        this.repository = repository;
+    }
+}
+
+// 3️⃣ FIELD INJECTION ❌ EVITE! (dificulta testes)
+@Service
+public class ProductService {
+    @Autowired
+    private ProductRepository repository;
+}
+```
+
+---
+
+### 3. Auto-configuração Mágica ✨
+
+```java
+// Apenas adicionando dependência no pom.xml:
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
 </dependency>
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <scope>runtime</scope>
-</dependency>
 
-<!-- H2 para testes -->
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>test</scope>
-</dependency>
+// Spring Boot automaticamente configura:
+// ✅ DataSource
+// ✅ EntityManager
+// ✅ TransactionManager
+// ✅ JPA Repositories
+// ✅ Hibernate
 
-<!-- Validação -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-validation</artifactId>
-</dependency>
+// Você só precisa usar!
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {}
 ```
 
 ---
 
-## 💡 Dica do Instrutor
+## 🏗️ Spring Boot Starters
 
-Hoje trabalharemos com **dados persistentes**. Cada alteração no código pode afetar o banco de dados. Use sempre:
-- `ddl-auto: validate` em produção
-- `ddl-auto: update` em desenvolvimento (com cuidado)
-- `ddl-auto: create-drop` apenas para testes
+```xml
+<!-- Starter Web: REST APIs -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<!-- Inclui: Tomcat, Jackson, Spring MVC, validation -->
+
+<!-- Starter Data JPA: Banco de dados -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<!-- Inclui: Hibernate, JPA, JDBC, Transaction -->
+
+<!-- Starter Validation -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+<!-- Inclui: Bean Validation, Hibernate Validator -->
+```

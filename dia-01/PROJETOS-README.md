@@ -1,4 +1,4 @@
-# Dia 1 - Fundamentos Java Moderno e Spring Boot
+# Dia 1 - Fundamentos Java Moderno, Servlets e JDBC
 
 Projetos práticos com código funcional para todos os conceitos abordados nos slides do Dia 1.
 
@@ -8,7 +8,7 @@ Projetos práticos com código funcional para todos os conceitos abordados nos s
 **Pasta:** `01-records-demo/`  
 **Conceitos:** Records, validação, imutabilidade, factory methods
 
-Records do Java 17+ substituem DTOs tradicionais, eliminando código boilerplate.
+Records do Java 21+ substituem DTOs tradicionais, eliminando código boilerplate.
 
 ```bash
 cd 01-records-demo
@@ -75,19 +75,19 @@ mvn exec:java -Dexec.mainClass="com.example.stream.StreamApiDemo"
 
 ---
 
-### 6. Products API - Spring Boot ⭐
+### 6. Products API - Servlet + JDBC ⭐
 **Pasta:** `06-products-api/`  
-**Conceitos:** Spring Boot, REST API, JPA, Validation, Profiles
+**Conceitos:** Servlet, JDBC, DAO Pattern, Tomcat Embedded, REST API, Gson
 
-API REST completa integrando todos os conceitos do Dia 1.
+API REST completa usando Servlet puro e JDBC (sem Spring Boot!).
 
 ```bash
 cd 06-products-api
-mvn spring-boot:run
+mvn clean compile exec:java -Dexec.mainClass="com.example.products.ProductsApp"
 ```
 
 **Endpoints:** http://localhost:8080/api/products  
-**H2 Console:** http://localhost:8080/h2-console
+**Arquivo de testes:** `06-products-api/api-requests.http`
 
 ---
 
@@ -98,18 +98,18 @@ mvn spring-boot:run
 3. **Text Blocks Demo** - Strings multilinha
 4. **Pattern Matching Demo** - Switch moderno
 5. **Stream API Demo** - Processamento funcional
-6. **Products API** - Integração completa com Spring Boot
+6. **Products API** - API REST com Servlet + JDBC (integração de todos os conceitos)
 
 ## 🔧 Pré-requisitos
 
-- **Java 17 ou superior** (Java 21 recomendado para projeto 4)
+- **Java 21 ou superior**
 - **Maven 3.8+**
 - **IDE** (IntelliJ IDEA, VS Code, Eclipse)
 
 ### Verificar instalação
 
 ```bash
-java -version   # Deve mostrar 17 ou superior
+java -version   # Deve mostrar 21 ou superior
 mvn -version    # Deve mostrar 3.8 ou superior
 ```
 
@@ -135,8 +135,8 @@ cd 04-pattern-matching-demo && mvn clean compile exec:java -Dexec.mainClass="com
 # Stream API
 cd 05-stream-api-demo && mvn clean compile exec:java -Dexec.mainClass="com.example.stream.StreamApiDemo" && cd ..
 
-# Spring Boot API
-cd 06-products-api && mvn spring-boot:run
+# Products API (Servlet + JDBC)
+cd 06-products-api && mvn clean compile exec:java -Dexec.mainClass="com.example.products.ProductsApp"
 ```
 
 ## 📖 Material de Referência
@@ -148,7 +148,7 @@ Cada projeto demonstra conceitos específicos dos slides:
 - **Slide 5:** Text Blocks → `03-text-blocks-demo`
 - **Slide 6:** Pattern Matching → `04-pattern-matching-demo`
 - **Slide 7:** Stream API → `05-stream-api-demo`
-- **Slides 10-15:** Spring Boot → `06-products-api`
+- **Slides 9-13:** Servlet + JDBC → `06-products-api`
 
 ## 💡 Dicas para os Alunos
 
@@ -183,7 +183,7 @@ Arquivo com exemplos: `06-products-api/api-requests.http`
 java -version
 
 # Atualizar JAVA_HOME se necessário
-export JAVA_HOME=/path/to/java17
+export JAVA_HOME=/path/to/java21
 ```
 
 ### Erro: "Port 8080 already in use"
@@ -198,6 +198,10 @@ lsof -ti:8080 | xargs kill -9
 ```
 
 ### Erro: Maven não encontrado
+```bash
+mvn -version
+# Se necessário, instalar Maven
+```
 ```bash
 # Use Maven Wrapper (incluído em cada projeto)
 ./mvnw clean install  # Linux/Mac
@@ -215,9 +219,9 @@ Após completar os projetos do Dia 1:
 
 ## 🎓 Recursos Adicionais
 
-- [Java Records Tutorial](https://docs.oracle.com/en/java/javase/17/language/records.html)
+- [Java Records Tutorial](https://docs.oracle.com/en/java/javase/21/language/records.html)
 - [Spring Boot Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/)
-- [Stream API Guide](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/package-summary.html)
+- [Stream API Guide](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)
 
 ---
 

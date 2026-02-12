@@ -2,6 +2,22 @@
 
 ## 📖 Ordem de Estudo Recomendada
 
+### 0️⃣ **04-products-api** (Projeto Spring Boot Introdutório)
+**Objetivo**: Primeira API REST com Spring Boot - migração conceitual do Servlet+JDBC (Dia 1) para Spring Boot.
+
+**Conceitos**:
+- Spring Boot auto-configuração
+- @RestController, @Service, @Repository
+- Spring Data JPA (CRUD automático)
+- Bean Validation (@NotBlank, @Valid)
+- Profiles (dev/prod)
+- DevTools (hot reload)
+
+**Porta**: 8080  
+**Arquivo de Testes**: `api-requests.http`
+
+---
+
 ### 1️⃣ **01-spring-data-jpa-demo** (Projeto Completo - Demonstração)
 **Objetivo**: Projeto completo demonstrando todos os conceitos de Spring Data JPA integrados.
 
@@ -83,36 +99,39 @@
    - Pratique Query Methods e JPQL
 
 ### 3. **Consulte os slides** para teoria complementar
-   - `slide-05.md` - Fundamentos JPA
-   - `slide-06.md` - Relacionamentos
-   - `slide-07.md` - Spring Data JPA Repositories
-   - `slide-08.md` - Query Methods e JPQL
-   - `slide-09.md` - Paginação e Ordenação
+   - `slide-01.md` a `slide-08.md` - Spring Boot Fundamentals
+   - `slide-09.md` - Review & Setup Persistência
+   - `slide-13.md` - Fundamentos JPA
+   - `slide-14.md` - Relacionamentos
+   - `slide-15.md` - Spring Data JPA Repositories
+   - `slide-16.md` - Query Methods e JPQL
+   - `slide-17.md` - Paginação e Ordenação
 
 ---
 
 ## 📊 Comparação dos Projetos
 
-| Aspecto | 01-demo | 02-blog-api | 03-tasks-api |
-|---------|---------|-------------|--------------|
-| **Foco** | Completo | Relacionamentos | Paginação/Queries |
-| **Entidades** | 7 | 3 | 1 |
-| **Relacionamentos** | ✅ Todos | ✅ Foco principal | ❌ Nenhum |
-| **N+1 Problem** | ✅ | ✅ Demonstração | - |
-| **Paginação** | ✅ | ❌ | ✅ Foco principal |
-| **Query Methods** | ✅ Básico | ✅ Com JOIN FETCH | ✅ Complexos |
-| **JPQL** | ✅ | ✅ | ✅ Busca dinâmica |
-| **PATCH** | ❌ | ❌ | ✅ Demonstração |
-| **Nível** | Intermediário | Iniciante | Intermediário |
+| Aspecto | 04-products-api | 01-demo | 02-blog-api | 03-tasks-api |
+|---------|----------------|---------|-------------|--------------|
+| **Foco** | Spring Boot Intro | Completo | Relacionamentos | Paginação/Queries |
+| **Entidades** | 1 | 7 | 3 | 1 |
+| **Relacionamentos** | ❌ | ✅ Todos | ✅ Foco principal | ❌ Nenhum |
+| **N+1 Problem** | - | ✅ | ✅ Demonstração | - |
+| **Paginação** | ❌ | ✅ | ❌ | ✅ Foco principal |
+| **Query Methods** | ✅ Básico | ✅ Básico | ✅ Com JOIN FETCH | ✅ Complexos |
+| **JPQL** | ❌ | ✅ | ✅ | ✅ Busca dinâmica |
+| **PATCH** | ❌ | ❌ | ❌ | ✅ Demonstração |
+| **Nível** | Iniciante | Intermediário | Iniciante | Intermediário |
 
 ---
 
 ## 📌 Informações Técnicas
 
 ### Portas dos Projetos
-- **01-spring-data-jpa-demo**: http://localhost:8080
-- **02-blog-api**: http://localhost:8081
-- **03-tasks-api**: http://localhost:8082
+- **04-products-api**: http://localhost:8080
+- **01-spring-data-jpa-demo**: http://localhost:8081
+- **02-blog-api**: http://localhost:8082
+- **03-tasks-api**: http://localhost:8083
 
 ### H2 Console
 Todos os projetos têm H2 Console habilitado:

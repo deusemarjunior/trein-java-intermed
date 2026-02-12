@@ -1,311 +1,488 @@
-# Slide 14: Review Final & Q&A
+# Slide 14: Relacionamentos JPA
 
-**Horário:** 16:15 - 16:30
-
----
-
-## ✅ O que aprendemos hoje - Dia 02
-
-### 🌅 Manhã (09:00 - 12:00)
-
-**1. Review e Setup (09:00 - 10:00)**
-- ✓ Revisão conceitos Dia 1
-- ✓ PostgreSQL + Docker
-- ✓ Configuração Spring Data JPA
-
-**2. HTTP & REST Avançado (10:00 - 11:00)**
-- ✓ Anatomia HTTP (method, headers, body, status)
-- ✓ Status codes (2xx, 3xx, 4xx, 5xx)
-- ✓ Princípios REST (stateless, recursos, representações)
-- ✓ CRUD com métodos HTTP corretos
-
-**3. Request/Response Handling (11:00 - 12:00)**
-- ✓ @PathVariable, @RequestParam, @RequestHeader, @RequestBody
-- ✓ Bean Validation (@NotBlank, @Email, @Size, etc)
-- ✓ @Valid para validar DTOs
-- ✓ Tratamento de erros de validação
+**Horário:** 10:50 - 11:30
 
 ---
 
-### 🍽️ Almoço (12:00 - 13:00)
-
----
-
-### 🌆 Tarde (13:00 - 16:30)
-
-**4. Exception Handling Global (13:00 - 13:20)**
-- ✓ @RestControllerAdvice
-- ✓ @ExceptionHandler
-- ✓ Exceções customizadas
-- ✓ ErrorResponse padronizado
-
-**5. JPA Fundamentals (parte da manhã)**
-- ✓ ORM e impedância objeto-relacional
-- ✓ Arquitetura JPA (EntityManager, Persistence Context)
-- ✓ Entity lifecycle (Transient, Managed, Detached, Removed)
-- ✓ @Entity, @Id, @GeneratedValue, @Column
-
-**6. Relacionamentos JPA**
-- ✓ @OneToOne
-- ✓ @OneToMany / @ManyToOne
-- ✓ @ManyToMany com @JoinTable
-- ✓ Cascade types (PERSIST, MERGE, REMOVE, ALL)
-- ✓ FetchType (LAZY vs EAGER)
-- ✓ N+1 problem e soluções (JOIN FETCH, @EntityGraph)
-
-**7. Spring Data Repositories (13:00 - 13:20)**
-- ✓ Hierarquia: Repository → CrudRepository → JpaRepository
-- ✓ Query methods (findBy, existsBy, countBy, deleteBy)
-- ✓ Keywords (And, Or, Between, Like, Containing, etc)
-
-**8. JPQL & Queries (13:20 - 13:40)**
-- ✓ JPQL vs SQL (entidades vs tabelas)
-- ✓ @Query com JPQL
-- ✓ @Query com SQL nativo (nativeQuery = true)
-- ✓ @Modifying para UPDATE/DELETE
-- ✓ JOIN vs JOIN FETCH
-- ✓ Projeções (DTO e Interface)
-
-**9. Paginação e Ordenação (13:40 - 14:00)**
-- ✓ Pageable e PageRequest
-- ✓ Sort e Sort.Order
-- ✓ Page<T> vs Slice<T> vs List<T>
-- ✓ Parsing de parâmetros de paginação
-
-**10. DTOs e Mapeamento (14:00 - 14:20)**
-- ✓ Por que usar DTOs (segurança, performance, desacoplamento)
-- ✓ Request DTOs vs Response DTOs
-- ✓ Factory methods (from/to)
-- ✓ Validações em DTOs
-
-**11. Coffee Break ☕ (14:20 - 15:00)**
-
-**12-13. Exercício Blog API (15:00 - 16:15)**
-- ✓ Entities: Post, Comment, Category, Tag
-- ✓ Relacionamentos @OneToMany e @ManyToMany
-- ✓ Repositories com queries customizadas
-- ✓ DTOs validados
-- ✓ Services com lógica de negócio
-- ✓ Controllers RESTful
-- ✓ Paginação e busca
-- ✓ Exception handling
-
----
-
-## 🎯 Principais Conceitos Aprendidos
+## 🔗 Tipos de Relacionamentos
 
 ```mermaid
-mindmap
-  root((Dia 02))
-    HTTP/REST
-      Status Codes
-      Métodos HTTP
-      ResponseEntity
-      Validações
+erDiagram
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : "ordered in"
+    PRODUCT }o--|| CATEGORY : belongs_to
+    POST }o--o{ TAG : has
     
-    Exception Handling
-      @ControllerAdvice
-      Custom Exceptions
-      ErrorResponse
-    
-    JPA
-      Entities
-      Relacionamentos
-      Cascade
-      FetchType
-      N+1 Problem
-    
-    Spring Data
-      Repositories
-      Query Methods
-      JPQL
-      Paginação
-      
-    DTOs
-      Request/Response
-      Validações
-      Mapeamento
-      
-    Prática
-      Blog API
-      CRUD Completo
-      Busca e Filtros
+    USER {
+        long id PK
+        string name
+    }
+    ORDER {
+        long id PK
+        long user_id FK
+        timestamp created_at
+    }
+    ORDER_ITEM {
+        long id PK
+        long order_id FK
+        long product_id FK
+        int quantity
+    }
+    PRODUCT {
+        long id PK
+        string name
+        long category_id FK
+    }
+    CATEGORY {
+        long id PK
+        string name
+    }
+    POST {
+        long id PK
+        string title
+    }
+    TAG {
+        long id PK
+        string name
+    }
 ```
 
 ---
 
-## 💡 Principais Lições
+## 1️⃣ @OneToOne - Um para Um
 
-### 1. Sempre use DTOs
+### Exemplo: User ↔ UserProfile
+
 ```java
-// ❌ NÃO
-@GetMapping("/{id}")
-public User findById(@PathVariable Long id) {
-    return repository.findById(id).orElseThrow();
+// User.java
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String username;
+    
+    // Lado proprietário da relação
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", referencedColumnName = "id")
+    private UserProfile profile;
+    
+    // Getters, Setters...
 }
 
-// ✅ SIM
-@GetMapping("/{id}")
-public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
-    User user = service.findById(id);
-    return ResponseEntity.ok(UserResponse.from(user));
+// UserProfile.java
+@Entity
+@Table(name = "user_profiles")
+public class UserProfile {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String bio;
+    private String avatarUrl;
+    
+    // Lado inverso (opcional - bidirecional)
+    @OneToOne(mappedBy = "profile")
+    private User user;
+    
+    // Getters, Setters...
 }
 ```
 
-### 2. Cuidado com N+1
-```java
-// ❌ Causa N+1
-List<Post> posts = postRepository.findAll();
-posts.forEach(p -> p.getComments().size()); // SELECT para cada post!
+**SQL Gerado:**
+```sql
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255),
+    profile_id BIGINT UNIQUE,  -- FK para user_profiles
+    FOREIGN KEY (profile_id) REFERENCES user_profiles(id)
+);
 
-// ✅ Resolve com JOIN FETCH
-@Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.comments")
+CREATE TABLE user_profiles (
+    id BIGSERIAL PRIMARY KEY,
+    bio TEXT,
+    avatar_url VARCHAR(500)
+);
+```
+
+---
+
+## 2️⃣ @ManyToOne / @OneToMany - Muitos para Um
+
+### Exemplo: Post ↔ Comments
+
+```java
+// Post.java
+@Entity
+@Table(name = "posts")
+public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String title;
+    private String content;
+    
+    // Um Post tem muitos Comments
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+    
+    // Helper methods
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setPost(this);  // Sincronizar ambos os lados
+    }
+    
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setPost(null);
+    }
+    
+    // Getters, Setters...
+}
+
+// Comment.java
+@Entity
+@Table(name = "comments")
+public class Comment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String text;
+    private String author;
+    
+    // Muitos Comments para um Post
+    @ManyToOne(fetch = FetchType.LAZY)  // ← LAZY é padrão e recomendado
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+    
+    // Getters, Setters...
+}
+```
+
+**SQL Gerado:**
+```sql
+CREATE TABLE posts (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    content TEXT
+);
+
+CREATE TABLE comments (
+    id BIGSERIAL PRIMARY KEY,
+    text TEXT,
+    author VARCHAR(100),
+    post_id BIGINT NOT NULL,  -- FK para posts
+    FOREIGN KEY (post_id) REFERENCES posts(id)
+);
+```
+
+---
+
+## 3️⃣ @ManyToMany - Muitos para Muitos
+
+### Exemplo: Post ↔ Tags
+
+```java
+// Post.java
+@Entity
+@Table(name = "posts")
+public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String title;
+    
+    // Muitos Posts para muitas Tags
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "post_tags",  // Nome da tabela de junção
+        joinColumns = @JoinColumn(name = "post_id"),  // FK para Post
+        inverseJoinColumns = @JoinColumn(name = "tag_id")  // FK para Tag
+    )
+    private Set<Tag> tags = new HashSet<>();
+    
+    // Helper methods
+    public void addTag(Tag tag) {
+        tags.add(tag);
+        tag.getPosts().add(this);
+    }
+    
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+        tag.getPosts().remove(this);
+    }
+    
+    // Getters, Setters...
+}
+
+// Tag.java
+@Entity
+@Table(name = "tags")
+public class Tag {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+    
+    // Lado inverso (opcional - bidirecional)
+    @ManyToMany(mappedBy = "tags")
+    private Set<Post> posts = new HashSet<>();
+    
+    // Getters, Setters...
+}
+```
+
+**SQL Gerado:**
+```sql
+CREATE TABLE posts (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255)
+);
+
+CREATE TABLE tags (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE post_tags (
+    post_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (post_id, tag_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(id)
+);
+```
+
+---
+
+## ⚙️ Cascade Types
+
+```java
+@Entity
+public class Post {
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Comment> comments;
+    
+    // CascadeType.ALL = TODAS as operações
+    // • PERSIST: ao salvar Post, salva Comments
+    // • MERGE: ao atualizar Post, atualiza Comments
+    // • REMOVE: ao deletar Post, deleta Comments
+    // • REFRESH: ao recarregar Post, recarrega Comments
+    // • DETACH: ao desanexar Post, desanexa Comments
+}
+```
+
+| Cascade | Quando usar |
+|---------|-------------|
+| `PERSIST` | Salvar entidades relacionadas junto |
+| `MERGE` | Atualizar relacionadas junto |
+| `REMOVE` | Deletar relacionadas junto (cuidado!) |
+| `REFRESH` | Recarregar relacionadas junto |
+| `ALL` | Todas acima (use com cuidado) |
+| `DETACH` | Raramente usado |
+
+**⚠️ Cuidado com CascadeType.REMOVE:**
+```java
+// ❌ PERIGOSO em ManyToOne/ManyToMany
+@ManyToOne(cascade = CascadeType.ALL)  // ❌
+private Category category;
+// Deletar Product vai deletar Category! (e todos os outros Products!)
+
+// ✅ BOM em OneToMany com dependentes
+@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Comment> comments;  // ✅
+// Deletar Post pode deletar Comments (OK!)
+```
+
+---
+
+## 🐌 Fetch Types: LAZY vs EAGER
+
+### LAZY (Preguiçoso) - Carrega sob demanda
+
+```java
+@Entity
+public class Post {
+    
+    @OneToMany(fetch = FetchType.LAZY)  // Padrão para coleções
+    private List<Comment> comments;
+    
+    // Comments são carregados apenas quando acessados
+}
+
+// Uso:
+Post post = repository.findById(1L).get();
+// SQL: SELECT * FROM posts WHERE id = 1
+// Comments NÃO carregados ainda!
+
+System.out.println(post.getComments().size());
+// SQL: SELECT * FROM comments WHERE post_id = 1
+// AGORA sim carrega Comments
+```
+
+### EAGER (Ansioso) - Carrega sempre
+
+```java
+@Entity
+public class Post {
+    
+    @OneToMany(fetch = FetchType.EAGER)  // Carrega sempre
+    private List<Comment> comments;
+}
+
+// Uso:
+Post post = repository.findById(1L).get();
+// SQL: SELECT * FROM posts p 
+//      LEFT JOIN comments c ON p.id = c.post_id 
+//      WHERE p.id = 1
+// Comments JÁ carregados!
+```
+
+---
+
+## ⚡ Problema N+1 Queries
+
+### ❌ Problema
+
+```java
+// LAZY fetch
+@OneToMany(fetch = FetchType.LAZY)
+private List<Comment> comments;
+
+// Código:
+List<Post> posts = repository.findAll();  // 1 query
+for (Post post : posts) {
+    System.out.println(post.getComments().size());  // N queries!
+}
+
+// Total: 1 + N queries! 💥
+// 100 posts = 101 queries!
+```
+
+### ✅ Solução 1: @EntityGraph
+
+```java
+@Repository
+public interface PostRepository extends JpaRepository<Post, Long> {
+    
+    @EntityGraph(attributePaths = {"comments"})
+    List<Post> findAll();
+    
+    // SQL: SELECT p.*, c.* FROM posts p 
+    //      LEFT JOIN comments c ON p.id = c.post_id
+    // 1 query apenas! ✅
+}
+```
+
+### ✅ Solução 2: JOIN FETCH (JPQL)
+
+```java
+@Query("SELECT p FROM Post p LEFT JOIN FETCH p.comments")
 List<Post> findAllWithComments();
 ```
 
-### 3. Use FetchType LAZY
-```java
-// ✅ Padrão correto
-@OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
-private List<Comment> comments;
+---
 
-// Carregue sob demanda quando precisar
-@EntityGraph(attributePaths = {"comments"})
-Optional<Post> findWithCommentsById(Long id);
+## 📊 Fetch Type: Quando Usar?
+
+| Relação | Padrão | Recomendação |
+|---------|--------|--------------|
+| `@OneToOne` | EAGER | LAZY (sempre que possível) |
+| `@ManyToOne` | EAGER | LAZY (padrão é ruim!) |
+| `@OneToMany` | LAZY | LAZY ✅ |
+| `@ManyToMany` | LAZY | LAZY ✅ |
+
+**Regra de ouro:**
+```java
+// ✅ Use LAZY por padrão
+@ManyToOne(fetch = FetchType.LAZY)
+
+// ✅ Carregue sob demanda com @EntityGraph ou JOIN FETCH
+@EntityGraph(attributePaths = {"category", "tags"})
+
+// ❌ Evite EAGER (causa N+1 problems)
+@ManyToOne(fetch = FetchType.EAGER)  // ❌
 ```
 
-### 4. Valide sempre
-```java
-public record CreatePostRequest(
-    @NotBlank(message = "Título obrigatório")
-    @Size(min = 5, max = 200)
-    String title,
-    
-    @NotBlank @Size(min = 20)
-    String content,
-    
-    @NotNull Long categoryId
-) {}
-```
+---
 
-### 5. Trate exceções globalmente
+## 🎬 DEMO: Relacionamento Completo
+
 ```java
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+// Category.java
+@Entity
+@Table(name = "categories")
+public class Category {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException ex) {
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(new ErrorResponse(ex.getMessage()));
+    @Column(unique = true, nullable = false)
+    private String name;
+    
+    @OneToMany(mappedBy = "category")
+    private List<Product> products = new ArrayList<>();
+    
+    // Getters, Setters, Constructors...
+}
+
+// Product.java
+@Entity
+@Table(name = "products")
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+    private BigDecimal price;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+    
+    // Helper methods
+    public void setCategory(Category category) {
+        this.category = category;
+        if (category != null) {
+            category.getProducts().add(this);
+        }
     }
+    
+    public void addReview(Review review) {
+        reviews.add(review);
+        review.setProduct(this);
+    }
+    
+    // Getters, Setters, Constructors...
+}
+
+// Review.java
+@Entity
+@Table(name = "reviews")
+public class Review {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String comment;
+    private Integer rating;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+    
+    // Getters, Setters, Constructors...
 }
 ```
-
----
-
-## 🏠 Tarefa de Casa
-
-### 1. **Completar Exercício Blog API** ⭐
-
-Adicione as funcionalidades que faltaram:
-- [ ] CategoryController completo
-- [ ] TagController completo
-- [ ] Busca de posts por tag
-- [ ] Estatísticas (posts por categoria, tags mais usadas)
-
-### 2. **Melhorias** 🚀
-
-- [ ] **Soft Delete**: Ao invés de deletar, marcar como `deleted = true`
-- [ ] **Auditoria**: @CreatedBy, @LastModifiedBy (Spring Data JPA Auditing)
-- [ ] **Slug**: Adicionar campo `slug` em Post para URLs amigáveis
-- [ ] **Paginação de Comments**: Paginar comentários de um post
-
-### 3. **Extras** 💎
-
-- [ ] Implementar upload de imagem do post
-- [ ] Adicionar campo `viewCount` para contar visualizações
-- [ ] Sistema de likes/dislikes para posts
-- [ ] Filtros avançados (data range, múltiplas tags)
-
-### 4. **Estudo** 📚
-
-Revisar para o Dia 03:
-- [ ] SOLID Principles (especialmente SRP, DIP)
-- [ ] Design Patterns (Strategy, Factory, Builder)
-- [ ] Transactions (@Transactional)
-- [ ] Database Migrations (Flyway)
-
----
-
-## 🤔 Perguntas Frequentes - Dia 02
-
-**P: Quando usar @Transactional?**  
-R: Em métodos que fazem múltiplas operações no banco que devem ser atômicas (tudo ou nada). Falaremos mais no Dia 03!
-
-**P: JOIN FETCH funciona com paginação?**  
-R: Não! JOIN FETCH com coleções + Page causa problemas. Use @EntityGraph ou queries separadas.
-
-**P: Posso usar Record para Entity?**  
-R: Não! JPA precisa de setters e construtor vazio. Use classes normais para entities.
-
-**P: Como testar repositories?**  
-R: Use @DataJpaTest! Veremos testes no Dia 5.
-
-**P: Devo sempre criar índices?**  
-R: Sim, para campos usados em WHERE, JOIN e ORDER BY. Ex: `@Column(name = "email", unique = true)` cria índice automaticamente.
-
----
-
-## 📊 Progresso do Curso
-
-```
-Dia 01: ✅ Java Moderno + Spring Boot Basics
-Dia 02: ✅ REST APIs + Spring Data JPA
-Dia 03: ⏭️ SOLID, Design Patterns, Transactions
-Dia 04: ⏭️ Security & Authentication
-Dia 05: ⏭️ Testing (Unit, Integration, E2E)
-Dia 06: ⏭️ Mensageria & Async
-Dia 07: ⏭️ Observabilidade & Performance
-Dia 08: ⏭️ Cloud & Deploy
-Dia 09: ⏭️ Projeto Final
-```
-
-**Progresso: 22% completo! 🎉**
-
----
-
-## 💬 Feedback
-
-Queremos sua opinião sobre o Dia 02:
-
-1. **Ritmo:** Muito rápido / Adequado / Muito lento?
-2. **Dificuldade:** Fácil / Médio / Difícil?
-3. **Exercício:** Foi útil? Tempo suficiente?
-4. **O que mais gostou?**
-5. **O que pode melhorar?**
-
----
-
-## 🎉 Parabéns!
-
-Você completou o **Dia 02** do curso de Java Intermediário!
-
-Hoje você aprendeu a criar APIs REST completas com Spring Data JPA, incluindo:
-- Persistência de dados
-- Relacionamentos complexos
-- Queries customizadas
-- Paginação
-- Exception handling
-- DTOs e validações
-
-**Continue praticando! Amanhã vamos para o próximo nível! 🚀**
-
----
-
-### ⏰ Até amanhã!
-
-**Dia 03 - SOLID & Design Patterns**  
-09:00 - Não se atrase! ⏰
-
-Bons estudos! 📚

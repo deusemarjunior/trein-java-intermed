@@ -1,7 +1,7 @@
-# Dia 2 - Spring Framework Core: Persistência e APIs
+# Dia 2 - Spring Boot, Spring Data JPA e APIs REST
 
-**Duração**: 5 horas  
-**Objetivo**: Dominar Spring Web avançado e Spring Data JPA para persistência de dados
+**Duração**: 8 horas (dia completo)  
+**Objetivo**: Dominar Spring Boot fundamentals, Spring Web avançado e Spring Data JPA para persistência
 
 ---
 
@@ -9,15 +9,19 @@
 
 | Horário | Duração | Tópico | Tipo |
 |---------|---------|--------|------|
-| 09:00 - 09:15 | 15min | Review Dia 1 & Setup | Discussão |
-| 09:15 - 10:15 | 1h | Spring Web Avançado | Teórico + Demo |
-| 10:15 - 10:30 | 15min | ☕ Coffee Break | - |
-| 10:30 - 12:00 | 1h30 | Spring Data JPA & Entities | Teórico + Demo |
+| 09:00 - 09:15 | 15min | Fundamentos Web & Spring Boot | Teórico |
+| 09:15 - 09:30 | 15min | Criando Primeiro Projeto Spring Boot | Demo |
+| 09:30 - 09:45 | 15min | Estrutura do Projeto Spring Boot | Teórico |
+| 09:45 - 10:30 | 45min | Primeira API REST com Spring Boot | Hands-on |
+| 10:30 - 11:00 | 30min | Testando a API + Profiles + DevTools | Demo |
+| 11:00 - 11:15 | 15min | ☕ Coffee Break | - |
+| 11:15 - 11:30 | 15min | Review Spring Boot & Setup Persistência | Discussão |
+| 11:30 - 12:00 | 30min | HTTP & REST Avançado | Teórico |
 | 12:00 - 13:00 | 1h | 🍽️ Almoço | - |
-| 13:00 - 14:00 | 1h | Repositories & Queries | Teórico + Demo |
-| 14:00 - 15:00 | 1h | DTOs & Exception Handling | Teórico + Demo |
+| 13:00 - 13:30 | 30min | Request/Response + Exception Handling | Teórico + Demo |
+| 13:30 - 15:00 | 1h30 | JPA, Relacionamentos e Repositories | Teórico + Demo |
 | 15:00 - 15:15 | 15min | ☕ Coffee Break | - |
-| 15:15 - 16:15 | 1h | Exercício Prático Completo | Hands-on |
+| 15:15 - 16:15 | 1h | Exercício Prático - Blog API | Hands-on |
 | 16:15 - 16:30 | 15min | Review e Q&A | Discussão |
 
 ---
@@ -31,7 +35,7 @@
 - [ ] H2 Console configurado
 
 ### Preparação
-- [ ] Projeto Spring Boot do Dia 1 funcionando
+- [ ] Projeto products-api (Servlet+JDBC) do Dia 1 funcionando
 - [ ] Scripts SQL de exemplo
 - [ ] Diagrama ER do modelo de dados
 - [ ] Exemplos de DTOs prontos
@@ -42,7 +46,23 @@
 
 ### Manhã (3 horas)
 
-#### 1. Spring Web Avançado (1.5h)
+#### 1. Spring Boot Fundamentals (1.5h) - NOVO!
+- **Fundamentos Web**
+  - HTTP, Servlets, REST vs SOAP vs GraphQL
+  - IoC e DI (Inversão de Controle, Injeção de Dependência)
+  - Auto-configuração e Starters
+
+- **Primeiro Projeto Spring Boot**
+  - Spring Initializr
+  - Estrutura do projeto
+  - @SpringBootApplication, @RestController, @Service, @Repository
+  
+- **Primeira API REST com Spring Boot**
+  - Entity, Repository, DTOs (Records), Service, Controller
+  - CRUD completo
+  - Profiles e DevTools
+
+#### 2. Spring Web Avançado (1h)
 - **Controllers e RestControllers**
   - Diferença entre @Controller e @RestController
   - Request Mapping avançado

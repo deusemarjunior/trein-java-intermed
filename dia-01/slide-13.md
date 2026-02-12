@@ -1,14 +1,23 @@
-# Slide 13: Testando a API
+# Slide 13: Testando a API Servlet
 
-**Horário:** 14:30 - 15:00
+**Horário:** 15:00 - 15:30
 
 ---
 
-## 🎬 DEMO: Testando com Postman
+## 🎬 DEMO: Testando com Postman/cURL
 
 ### 1️⃣ Iniciar aplicação
 ```bash
-./mvnw spring-boot:run
+cd 06-products-api
+mvn clean compile exec:java -Dexec.mainClass="com.example.products.ProductsApp"
+```
+
+**Output esperado:**
+```
+✅ Table 'products' created
+✅ Database initialized
+🚀 Server started on http://localhost:8080
+📡 Products API: http://localhost:8080/api/products
 ```
 
 ---
@@ -34,7 +43,7 @@ Content-Type: application/json
   "description": "High-end gaming laptop with RTX 4080",
   "price": 7500.00,
   "category": "Electronics",
-  "createdAt": "2026-02-03T14:35:22.123"
+  "createdAt": "2026-02-12T14:35:22.123"
 }
 ```
 
@@ -54,7 +63,7 @@ GET http://localhost:8080/api/products
     "description": "High-end gaming laptop with RTX 4080",
     "price": 7500.00,
     "category": "Electronics",
-    "createdAt": "2026-02-03T14:35:22.123"
+    "createdAt": "2026-02-12T14:35:22.123"
   }
 ]
 ```
@@ -92,32 +101,48 @@ DELETE http://localhost:8080/api/products/1
 
 ---
 
-## 🐞 Debugging - Ver logs no console
+## 🐞 Troubleshooting
 
+### Erro: "Port 8080 already in use"
 ```bash
-# SQL executado
-Hibernate: insert into products (category,created_at,description,name,price,updated_at) 
-values (?,?,?,?,?,?)
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
 
-# Request recebido
-2026-02-03 14:35:22.456 DEBUG --- [nio-8080-exec-1] c.e.p.controller.ProductController 
-: Creating product: Laptop Gaming
+# Linux/Mac
+lsof -ti:8080 | xargs kill -9
 ```
+
+### Erro: "Invalid JSON"
+- Verifique aspas duplas no JSON
+- Content-Type deve ser `application/json`
+
+### Erro: "NullPointerException no DAO"
+- Verifique se `DatabaseConfig.initialize()` foi chamado antes
+- Confira a URL JDBC
 
 ---
 
-## 🔍 H2 Console - Ver banco de dados
+## 📊 Exercício Rápido (15 min)
 
-1. Acessar: http://localhost:8080/h2-console
-2. JDBC URL: `jdbc:h2:mem:testdb`
-3. User: `sa`
-4. Password: (deixar vazio)
+### Adicione busca por categoria!
 
-```sql
--- Ver todos os produtos
-SELECT * FROM PRODUCTS;
+```java
+// No ProductDAO, adicione:
+public List<Product> findByCategory(String category) {
+    String sql = "SELECT * FROM products WHERE category = ? ORDER BY id";
+    // ... implemente usando PreparedStatement
+}
 
--- Inserir via SQL
-INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE, CATEGORY, CREATED_AT, UPDATED_AT)
-VALUES ('Mouse', 'Gaming mouse', 250.00, 'Electronics', NOW(), NOW());
+// No ProductServlet, no doGet():
+String category = req.getParameter("category");
+if (category != null) {
+    // filtrar por categoria
+}
 ```
+
+**Teste:**
+```http
+GET http://localhost:8080/api/products?category=Electronics
+```
+

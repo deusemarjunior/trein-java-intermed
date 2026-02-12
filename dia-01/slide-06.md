@@ -86,9 +86,9 @@ public static String getDescription(Object obj) {
     return switch (obj) {
         case null -> "Object is null";
         case String s -> "String of length " + s.length();
-        case Integer i && i > 0 -> "Positive integer: " + i;
+        case Integer i when i > 0 -> "Positive integer: " + i;
         case Integer i -> "Non-positive integer: " + i;
-        case Product p && p.price().compareTo(BigDecimal.valueOf(1000)) > 0 ->
+        case Product p when p.price().compareTo(BigDecimal.valueOf(1000)) > 0 ->
             "Expensive product: " + p.name();
         case Product p -> "Product: " + p.name();
         case List<?> list -> "List with " + list.size() + " elements";

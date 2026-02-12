@@ -6,7 +6,7 @@ import java.math.BigDecimal;
  * Sealed class - Hierarquia controlada
  * Apenas as classes listadas em 'permits' podem estender Payment
  */
-public sealed class Payment 
+public abstract sealed class Payment 
     permits CreditCardPayment, PixPayment, BoletoPayment {
     
     protected final BigDecimal amount;

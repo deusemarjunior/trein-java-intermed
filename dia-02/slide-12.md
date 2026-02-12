@@ -1,386 +1,379 @@
-# Slide 12: Exercício Prático - Blog API (Parte 1)
+# Slide 12: Exception Handling Global
 
-**Horário:** 15:00 - 15:45
-
----
-
-## 🎯 Objetivo
-
-Criar uma API REST completa para um sistema de Blog com:
-- **Posts** com título, conteúdo e autor
-- **Comments** vinculados a posts
-- **Categories** para organizar posts
-- **Tags** para marcar posts (ManyToMany)
-- Paginação, busca e filtros
-- Exception handling global
-- DTOs com validações
+**Horário:** 09:55 - 10:15
 
 ---
 
-## 📊 Modelo de Dados
+## ❌ O Problema: Exceções Não Tratadas
+
+```java
+// ❌ SEM tratamento global
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+    
+    @GetMapping("/{id}")
+    public ProductResponse findById(@PathVariable Long id) {
+        return service.findById(id);  // Se não existir? 💥
+    }
+}
+
+// Cliente recebe:
+{
+  "timestamp": "2026-02-04T10:00:00",
+  "status": 500,
+  "error": "Internal Server Error",
+  "path": "/api/products/999"
+}
+// ❌ Pouca informação, status code errado (deveria ser 404)
+```
+
+---
+
+## ✅ Solução: @ControllerAdvice
 
 ```mermaid
-erDiagram
-    POST ||--o{ COMMENT : "tem"
-    POST }o--|| CATEGORY : "pertence a"
-    POST }o--o{ TAG : "marcado com"
+flowchart TD
+    A[Request] --> B[Controller]
+    B --> C{Exception?}
+    C -->|SIM| D["@ControllerAdvice<br/>captura"]
+    C -->|NÃO| E[Response OK]
     
-    POST {
-        bigint id PK
-        string title
-        text content
-        string author
-        timestamp created_at
-        timestamp updated_at
-        bigint category_id FK
-    }
+    D --> F{"Tipo de<br/>Exception"}
+    F -->|NotFoundException| G["404 + JSON"]
+    F -->|ValidationException| H["400 + JSON"]
+    F -->|BusinessException| I["422 + JSON"]
+    F -->|Outras| J["500 + JSON"]
     
-    COMMENT {
-        bigint id PK
-        text text
-        string author
-        string email
-        timestamp created_at
-        bigint post_id FK
-    }
-    
-    CATEGORY {
-        bigint id PK
-        string name UK
-        string description
-    }
-    
-    TAG {
-        bigint id PK
-        string name UK
-    }
-    
-    POST_TAG {
-        bigint post_id PK,FK
-        bigint tag_id PK,FK
-    }
+    style D fill:#FFB6C1
+    style G fill:#FFD700
+    style H fill:#FFD700
+    style I fill:#FFD700
+    style J fill:#FF6B6B
 ```
 
 ---
 
-## 📋 Requisitos Funcionais
+## 🎬 DEMO: Exception Handler Completo
 
-### Endpoints Obrigatórios
-
-#### Posts
-```
-GET    /api/posts?page=0&size=10&sort=createdAt,desc
-GET    /api/posts/{id}
-GET    /api/posts/search?keyword=java&category=Tech
-POST   /api/posts
-PUT    /api/posts/{id}
-DELETE /api/posts/{id}
-```
-
-#### Comments
-```
-GET    /api/posts/{postId}/comments
-POST   /api/posts/{postId}/comments
-DELETE /api/comments/{id}
-```
-
-#### Categories
-```
-GET    /api/categories
-GET    /api/categories/{id}/posts
-POST   /api/categories
-```
-
-#### Tags
-```
-GET    /api/tags
-POST   /api/tags
-GET    /api/tags/{id}/posts
-```
-
----
-
-## 🏗️ Estrutura do Projeto
-
-```
-src/main/java/com/example/blog/
-├── controller/
-│   ├── PostController.java
-│   ├── CommentController.java
-│   ├── CategoryController.java
-│   └── TagController.java
-├── dto/
-│   ├── request/
-│   │   ├── CreatePostRequest.java
-│   │   ├── UpdatePostRequest.java
-│   │   └── CreateCommentRequest.java
-│   └── response/
-│       ├── PostResponse.java
-│       ├── PostSummaryResponse.java
-│       ├── CommentResponse.java
-│       └── CategoryResponse.java
-├── entity/
-│   ├── Post.java
-│   ├── Comment.java
-│   ├── Category.java
-│   └── Tag.java
-├── repository/
-│   ├── PostRepository.java
-│   ├── CommentRepository.java
-│   ├── CategoryRepository.java
-│   └── TagRepository.java
-├── service/
-│   ├── PostService.java
-│   ├── CommentService.java
-│   ├── CategoryService.java
-│   └── TagService.java
-└── exception/
-    ├── GlobalExceptionHandler.java
-    ├── EntityNotFoundException.java
-    └── ErrorResponse.java
-```
-
----
-
-## 🎬 Passo 1: Entities (20 min)
-
-### Category.java
+### 1. Exceções Customizadas
 
 ```java
-@Entity
-@Table(name = "categories")
-public class Category {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
-    
-    @Column(length = 500)
-    private String description;
-    
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Post> posts = new ArrayList<>();
-    
-    // Getters, Setters, Construtores
-}
-```
+// src/main/java/com/example/exception/ResourceNotFoundException.java
+package com.example.exception;
 
-### Tag.java
-
-```java
-@Entity
-@Table(name = "tags")
-public class Tag {
+public class ResourceNotFoundException extends RuntimeException {
+    private final String resourceName;
+    private final String fieldName;
+    private final Object fieldValue;
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
-    
-    @ManyToMany(mappedBy = "tags")
-    private Set<Post> posts = new HashSet<>();
-    
-    // Getters, Setters, Construtores
-}
-```
-
-### Post.java
-
-```java
-@Entity
-@Table(name = "posts")
-public class Post {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, length = 200)
-    private String title;
-    
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
-    
-    @Column(nullable = false, length = 100)
-    private String author;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "post_tags",
-        joinColumns = @JoinColumn(name = "post_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
-    private Set<Tag> tags = new HashSet<>();
-    
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-    
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    private LocalDateTime updatedAt;
-    
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+    public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
+        super(String.format("%s not found with %s: '%s'", resourceName, fieldName, fieldValue));
+        this.resourceName = resourceName;
+        this.fieldName = fieldName;
+        this.fieldValue = fieldValue;
     }
     
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-    
-    // Getters, Setters
+    // Getters...
 }
-```
 
-### Comment.java
-
-```java
-@Entity
-@Table(name = "comments")
-public class Comment {
+// BusinessException.java
+public class BusinessException extends RuntimeException {
+    private final String code;
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String text;
-    
-    @Column(nullable = false, length = 100)
-    private String author;
-    
-    @Column(length = 150)
-    @Email
-    private String email;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-    
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
+    public BusinessException(String code, String message) {
+        super(message);
+        this.code = code;
     }
     
-    // Getters, Setters
+    public String getCode() { return code; }
 }
 ```
 
 ---
 
-## 🎬 Passo 2: Repositories (10 min)
-
-### PostRepository.java
+### 2. DTOs de Erro
 
 ```java
-@Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
-    
-    // Busca paginada por categoria
-    Page<Post> findByCategory(Category category, Pageable pageable);
-    
-    // Busca por keyword no título ou conteúdo
-    @Query("SELECT p FROM Post p WHERE " +
-           "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Page<Post> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
-    
-    // Busca por keyword e categoria
-    @Query("SELECT p FROM Post p WHERE p.category = :category AND " +
-           "(LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    Page<Post> searchByCategoryAndKeyword(
-        @Param("category") Category category,
-        @Param("keyword") String keyword,
-        Pageable pageable
-    );
-    
-    // Buscar post com tags (evitar N+1)
-    @EntityGraph(attributePaths = {"tags", "category"})
-    Optional<Post> findWithTagsById(Long id);
-    
-    // Posts por tag
-    @Query("SELECT p FROM Post p JOIN p.tags t WHERE t.id = :tagId")
-    Page<Post> findByTagId(@Param("tagId") Long tagId, Pageable pageable);
-}
-```
+// ErrorResponse.java
+package com.example.dto.response;
 
-### CommentRepository.java
+import java.time.LocalDateTime;
+import java.util.List;
 
-```java
-@Repository
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public record ErrorResponse(
+    LocalDateTime timestamp,
+    int status,
+    String error,
+    String message,
+    String path,
+    List<FieldError> fieldErrors
+) {
+    public ErrorResponse(int status, String error, String message, String path) {
+        this(LocalDateTime.now(), status, error, message, path, null);
+    }
     
-    // Comentários de um post
-    List<Comment> findByPostId(Long postId);
-    
-    // Comentários de um post (paginado)
-    Page<Comment> findByPostId(Long postId, Pageable pageable);
-}
-```
-
-### CategoryRepository.java
-
-```java
-@Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
-    
-    Optional<Category> findByName(String name);
-    
-    boolean existsByName(String name);
-}
-```
-
-### TagRepository.java
-
-```java
-@Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-    
-    Optional<Tag> findByName(String name);
-    
-    @Query("SELECT t FROM Tag t WHERE t.name IN :names")
-    Set<Tag> findByNameIn(@Param("names") Set<String> names);
+    public record FieldError(String field, String message) {}
 }
 ```
 
 ---
 
-## ⏱️ Checkpoint (15:45)
+### 3. Global Exception Handler
 
-### ✅ O que deve estar pronto:
+```java
+// src/main/java/com/example/exception/GlobalExceptionHandler.java
+package com.example.exception;
 
-- [ ] 4 entities criadas (Post, Comment, Category, Tag)
-- [ ] Relacionamentos configurados corretamente
-- [ ] 4 repositories com query methods
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
-### 🧪 Teste Rápido:
+import java.util.List;
+import java.util.stream.Collectors;
 
-Execute a aplicação e verifique se as tabelas foram criadas no PostgreSQL:
-
-```sql
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public';
-
--- Deve mostrar: posts, comments, categories, tags, post_tags
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    // 404 - Resource Not Found
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException ex,
+            WebRequest request) {
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found",
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+    
+    // 400 - Validation Error
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationErrors(
+            MethodArgumentNotValidException ex,
+            WebRequest request) {
+        
+        List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> new ErrorResponse.FieldError(
+                error.getField(),
+                error.getDefaultMessage()
+            ))
+            .collect(Collectors.toList());
+        
+        ErrorResponse error = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.BAD_REQUEST.value(),
+            "Validation Failed",
+            "One or more fields have validation errors",
+            request.getDescription(false).replace("uri=", ""),
+            fieldErrors
+        );
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+    
+    // 422 - Business Exception
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(
+            BusinessException ex,
+            WebRequest request) {
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.UNPROCESSABLE_ENTITY.value(),
+            ex.getCode(),
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+    
+    // 409 - Conflict (duplicata)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            WebRequest request) {
+        
+        String message = "Data integrity violation. Possibly duplicate entry.";
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.CONFLICT.value(),
+            "Conflict",
+            message,
+            request.getDescription(false).replace("uri=", "")
+        );
+        
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+    
+    // 500 - Internal Server Error (fallback)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(
+            Exception ex,
+            WebRequest request) {
+        
+        // Log do erro real (não expor detalhes ao cliente!)
+        log.error("Unexpected error occurred", ex);
+        
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "Internal Server Error",
+            "An unexpected error occurred. Please try again later.",
+            request.getDescription(false).replace("uri=", "")
+        );
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+}
 ```
 
 ---
 
-**Próximo:** Slide 13 - DTOs, Services e Controllers →
+## 🎯 Usando as Exceções no Service
+
+```java
+@Service
+public class ProductService {
+    
+    private final ProductRepository repository;
+    
+    public ProductResponse findById(Long id) {
+        Product product = repository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        
+        return ProductResponse.from(product);
+    }
+    
+    public ProductResponse create(CreateProductRequest request) {
+        // Verificar duplicata
+        if (repository.existsByName(request.name())) {
+            throw new BusinessException(
+                "PRODUCT_DUPLICATE",
+                "Product with name '" + request.name() + "' already exists"
+            );
+        }
+        
+        // Regra de negócio
+        if (request.price().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(
+                "INVALID_PRICE",
+                "Product price must be greater than zero"
+            );
+        }
+        
+        Product product = new Product(...);
+        Product saved = repository.save(product);
+        
+        return ProductResponse.from(saved);
+    }
+}
+```
+
+---
+
+## 📊 Respostas de Erro Padronizadas
+
+### 404 - Not Found
+```json
+{
+  "timestamp": "2026-02-04T10:15:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Product not found with id: '999'",
+  "path": "/api/products/999",
+  "fieldErrors": null
+}
+```
+
+### 400 - Validation Error
+```json
+{
+  "timestamp": "2026-02-04T10:15:00",
+  "status": 400,
+  "error": "Validation Failed",
+  "message": "One or more fields have validation errors",
+  "path": "/api/products",
+  "fieldErrors": [
+    {
+      "field": "name",
+      "message": "Name is required"
+    },
+    {
+      "field": "price",
+      "message": "Price must be greater than 0"
+    }
+  ]
+}
+```
+
+### 422 - Business Exception
+```json
+{
+  "timestamp": "2026-02-04T10:15:00",
+  "status": 422,
+  "error": "PRODUCT_DUPLICATE",
+  "message": "Product with name 'Laptop' already exists",
+  "path": "/api/products",
+  "fieldErrors": null
+}
+```
+
+---
+
+## 💡 Boas Práticas Exception Handling
+
+### ✅ FAÇA
+
+```java
+// 1. Use exceções específicas
+throw new ResourceNotFoundException("Product", "id", id);
+
+// 2. Mensagens claras e úteis
+throw new BusinessException("INSUFFICIENT_STOCK", 
+    "Cannot order 10 units. Only 5 in stock.");
+
+// 3. Log erros inesperados
+@ExceptionHandler(Exception.class)
+public ResponseEntity<?> handleUnexpected(Exception ex) {
+    log.error("Unexpected error", ex);  // ✅ Log completo
+    return ResponseEntity.status(500)
+        .body("An error occurred");  // Mensagem genérica ao cliente
+}
+
+// 4. Status codes corretos
+404 - Not Found (recurso não existe)
+400 - Bad Request (validação falhou)
+422 - Unprocessable Entity (regra de negócio)
+409 - Conflict (duplicata)
+500 - Internal Server Error (erro inesperado)
+```
+
+### ❌ EVITE
+
+```java
+// 1. Expor stack traces ao cliente
+catch (Exception ex) {
+    return ex.getMessage();  // ❌ Pode vazar info sensível
+}
+
+// 2. Exceções genéricas
+throw new RuntimeException("Error");  // ❌ Pouca informação
+
+// 3. Misturar status codes
+throw new ResourceNotFoundException()  // mas retorna 500 ❌
+
+// 4. Não logar erros
+@ExceptionHandler(Exception.class)
+public ResponseEntity<?> handle(Exception ex) {
+    return ResponseEntity.status(500).build();  // ❌ Erro sumiu!
+}
+```

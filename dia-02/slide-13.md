@@ -1,480 +1,356 @@
-# Slide 13: Exercício Prático - Blog API (Parte 2)
+# Slide 13: Fundamentos de Persistência & JPA
 
-**Horário:** 15:45 - 16:15
+**Horário:** 10:30 - 10:50
 
 ---
 
-## 🎬 Passo 3: DTOs (15 min)
+## 💾 O que é Persistência?
 
-### Request DTOs
+### Problema: Dados em Memória são Voláteis
 
-```java
-// CreatePostRequest.java
-public record CreatePostRequest(
-    @NotBlank(message = "Título é obrigatório")
-    @Size(min = 5, max = 200, message = "Título deve ter entre 5 e 200 caracteres")
-    String title,
+```mermaid
+flowchart LR
+    A[Aplicação<br/>inicia] --> B[Dados em<br/>memória RAM]
+    B --> C[Aplicação<br/>processa]
+    C --> D[Aplicação<br/>encerra]
+    D --> E[💥 Dados<br/>perdidos!]
     
-    @NotBlank(message = "Conteúdo é obrigatório")
-    @Size(min = 20, message = "Conteúdo deve ter no mínimo 20 caracteres")
-    String content,
-    
-    @NotBlank(message = "Autor é obrigatório")
-    @Size(max = 100)
-    String author,
-    
-    @NotNull(message = "Categoria é obrigatória")
-    Long categoryId,
-    
-    Set<String> tags  // Opcional
-) {}
-
-// UpdatePostRequest.java
-public record UpdatePostRequest(
-    @NotBlank @Size(min = 5, max = 200) String title,
-    @NotBlank @Size(min = 20) String content,
-    Set<String> tags
-) {}
-
-// CreateCommentRequest.java
-public record CreateCommentRequest(
-    @NotBlank(message = "Comentário não pode estar vazio")
-    @Size(min = 5, max = 1000)
-    String text,
-    
-    @NotBlank @Size(max = 100) String author,
-    
-    @Email(message = "Email inválido")
-    String email
-) {}
-
-// CreateCategoryRequest.java
-public record CreateCategoryRequest(
-    @NotBlank @Size(max = 100) String name,
-    @Size(max = 500) String description
-) {}
-
-// CreateTagRequest.java
-public record CreateTagRequest(
-    @NotBlank @Size(max = 50) String name
-) {}
+    style E fill:#FF6B6B
 ```
 
-### Response DTOs
+### Solução: Persistir em Banco de Dados
 
-```java
-// PostResponse.java
-public record PostResponse(
-    Long id,
-    String title,
-    String content,
-    String author,
-    CategoryResponse category,
-    Set<String> tags,
-    int commentsCount,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {
-    public static PostResponse from(Post post) {
-        return new PostResponse(
-            post.getId(),
-            post.getTitle(),
-            post.getContent(),
-            post.getAuthor(),
-            CategoryResponse.from(post.getCategory()),
-            post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),
-            post.getComments().size(),
-            post.getCreatedAt(),
-            post.getUpdatedAt()
-        );
-    }
-}
-
-// PostSummaryResponse.java (para listagens)
-public record PostSummaryResponse(
-    Long id,
-    String title,
-    String author,
-    String categoryName,
-    int commentsCount,
-    LocalDateTime createdAt
-) {
-    public static PostSummaryResponse from(Post post) {
-        return new PostSummaryResponse(
-            post.getId(),
-            post.getTitle(),
-            post.getAuthor(),
-            post.getCategory().getName(),
-            post.getComments().size(),
-            post.getCreatedAt()
-        );
-    }
-}
-
-// CommentResponse.java
-public record CommentResponse(
-    Long id,
-    String text,
-    String author,
-    String email,
-    LocalDateTime createdAt
-) {
-    public static CommentResponse from(Comment comment) {
-        return new CommentResponse(
-            comment.getId(),
-            comment.getText(),
-            comment.getAuthor(),
-            comment.getEmail(),
-            comment.getCreatedAt()
-        );
-    }
-}
-
-// CategoryResponse.java
-public record CategoryResponse(
-    Long id,
-    String name,
-    String description
-) {
-    public static CategoryResponse from(Category category) {
-        return new CategoryResponse(
-            category.getId(),
-            category.getName(),
-            category.getDescription()
-        );
-    }
-}
-
-// TagResponse.java
-public record TagResponse(
-    Long id,
-    String name,
-    int postsCount
-) {
-    public static TagResponse from(Tag tag) {
-        return new TagResponse(
-            tag.getId(),
-            tag.getName(),
-            tag.getPosts().size()
-        );
-    }
-}
+```mermaid
+flowchart LR
+    A[Aplicação] --> B[(Banco de<br/>Dados)]
+    B --> C[Dados<br/>permanentes]
+    
+    A -.->|1. Salva| B
+    B -.->|2. Persiste<br/>em disco| C
+    A -.->|3. Pode ler<br/>a qualquer momento| B
+    
+    style C fill:#90EE90
 ```
 
 ---
 
-## 🎬 Passo 4: Services (15 min)
+## 🗃️ Modelo Relacional vs Orientação a Objetos
 
-### PostService.java
+### Impedância Objeto-Relacional
 
-```java
-@Service
-public class PostService {
-    
-    @Autowired
-    private PostRepository postRepository;
-    
-    @Autowired
-    private CategoryRepository categoryRepository;
-    
-    @Autowired
-    private TagRepository tagRepository;
-    
-    public PostResponse create(CreatePostRequest request) {
-        Category category = categoryRepository.findById(request.categoryId())
-            .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-        
-        Post post = new Post();
-        post.setTitle(request.title());
-        post.setContent(request.content());
-        post.setAuthor(request.author());
-        post.setCategory(category);
-        
-        // Processar tags
-        if (request.tags() != null && !request.tags().isEmpty()) {
-            Set<Tag> tags = getOrCreateTags(request.tags());
-            post.setTags(tags);
-        }
-        
-        Post saved = postRepository.save(post);
-        return PostResponse.from(saved);
-    }
-    
-    public PostResponse findById(Long id) {
-        Post post = postRepository.findWithTagsById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-        return PostResponse.from(post);
-    }
-    
-    public Page<PostSummaryResponse> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable)
-            .map(PostSummaryResponse::from);
-    }
-    
-    public Page<PostSummaryResponse> search(String keyword, String categoryName, Pageable pageable) {
-        if (categoryName != null) {
-            Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-            
-            if (keyword != null) {
-                return postRepository.searchByCategoryAndKeyword(category, keyword, pageable)
-                    .map(PostSummaryResponse::from);
-            } else {
-                return postRepository.findByCategory(category, pageable)
-                    .map(PostSummaryResponse::from);
-            }
-        } else if (keyword != null) {
-            return postRepository.searchByKeyword(keyword, pageable)
-                .map(PostSummaryResponse::from);
-        } else {
-            return findAll(pageable);
-        }
-    }
-    
-    public PostResponse update(Long id, UpdatePostRequest request) {
-        Post post = postRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-        
-        post.setTitle(request.title());
-        post.setContent(request.content());
-        
-        if (request.tags() != null) {
-            Set<Tag> tags = getOrCreateTags(request.tags());
-            post.setTags(tags);
-        }
-        
-        Post updated = postRepository.save(post);
-        return PostResponse.from(updated);
-    }
-    
-    public void delete(Long id) {
-        if (!postRepository.existsById(id)) {
-            throw new EntityNotFoundException("Post not found");
-        }
-        postRepository.deleteById(id);
-    }
-    
-    private Set<Tag> getOrCreateTags(Set<String> tagNames) {
-        Set<Tag> tags = new HashSet<>();
-        for (String tagName : tagNames) {
-            Tag tag = tagRepository.findByName(tagName)
-                .orElseGet(() -> {
-                    Tag newTag = new Tag();
-                    newTag.setName(tagName);
-                    return tagRepository.save(newTag);
-                });
-            tags.add(tag);
-        }
-        return tags;
-    }
-}
+```
+┌──────────────────────────────────────────────────────────┐
+│ MUNDO JAVA (Orientação a Objetos)                       │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  class Product {                                         │
+│      private Long id;                                    │
+│      private String name;                                │
+│      private BigDecimal price;                           │
+│      private Category category;  ← Objeto relacionado   │
+│      private List<Review> reviews;  ← Coleção           │
+│  }                                                       │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+                           ↕  ORM (JPA/Hibernate)
+┌──────────────────────────────────────────────────────────┐
+│ MUNDO SQL (Modelo Relacional)                           │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  CREATE TABLE products (                                 │
+│      id BIGSERIAL PRIMARY KEY,                           │
+│      name VARCHAR(100),                                  │
+│      price DECIMAL(10,2),                                │
+│      category_id BIGINT ← Foreign Key                    │
+│  );                                                      │
+│                                                          │
+│  CREATE TABLE reviews (...);                             │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### CommentService.java
+---
+
+## 🔧 ORM: Object-Relational Mapping
+
+### O que é JPA?
+
+```
+JPA (Jakarta Persistence API)
+│
+├─ Especificação (interface)
+│   │
+│   ├─ Define anotações (@Entity, @Id, etc)
+│   ├─ Define EntityManager (API)
+│   └─ Define comportamentos padrão
+│
+└─ Implementações
+    │
+    ├─ Hibernate ✅ (mais popular)
+    ├─ EclipseLink
+    └─ OpenJPA
+```
+
+**Spring Data JPA** = JPA + Repositories + Convenções Spring
+
+---
+
+## 📦 Arquitetura JPA/Hibernate
+
+```mermaid
+flowchart TB
+    A[Aplicação Java] --> B[Spring Data JPA]
+    B --> C[JPA API]
+    C --> D[Hibernate<br/>implementação]
+    D --> E[JDBC]
+    E --> F[(Database)]
+    
+    B -.-> G[Repositories<br/>Automáticos]
+    C -.-> H[Entity Manager]
+    D -.-> I[Session<br/>1st Level Cache<br/>Dirty Checking]
+    E -.-> J[Connection Pool<br/>HikariCP]
+    
+    style B fill:#87CEEB
+    style D fill:#90EE90
+    style F fill:#DDA0DD
+```
+
+---
+
+## ⚙️ Configuração: application.yml
+
+```yaml
+spring:
+  # Datasource - conexão com banco
+  datasource:
+    url: jdbc:postgresql://localhost:5432/java_training
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    
+    # Connection Pool (HikariCP)
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+  
+  # JPA Configuration
+  jpa:
+    # Hibernate specific
+    hibernate:
+      ddl-auto: update  # create, update, validate, none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    
+    # Mostrar SQL no console
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+    
+    # Dialeto do banco
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+```
+
+---
+
+## 🎯 hibernate.ddl-auto: Quando Usar?
+
+| Valor | Comportamento | Quando usar |
+|-------|---------------|-------------|
+| `none` | Não faz nada | Produção (sempre!) |
+| `validate` | Valida schema contra entities | Produção, CI/CD |
+| `update` | Adiciona colunas/tabelas faltantes | Dev (com cuidado!) |
+| `create` | DROP + CREATE tudo ao iniciar | Testes automatizados |
+| `create-drop` | DROP ao encerrar aplicação | Testes, demos |
+
+**⚠️ ATENÇÃO:**
+```java
+// ❌ NUNCA em produção:
+spring.jpa.hibernate.ddl-auto=create  // APAGA TUDO! 💥
+
+// ✅ Em produção:
+spring.jpa.hibernate.ddl-auto=none  ou validate
+// E use migrations (Flyway/Liquibase)
+```
+
+---
+
+## 🎬 DEMO: Primeira Entity
 
 ```java
-@Service
-public class CommentService {
+// src/main/java/com/example/model/Product.java
+package com.example.model;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity  // ← Marca como entidade JPA
+@Table(name = "products")  // ← Nome da tabela (opcional)
+public class Product {
     
-    @Autowired
-    private CommentRepository commentRepository;
+    @Id  // ← Primary Key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // ← Auto-increment
+    private Long id;
     
-    @Autowired
-    private PostRepository postRepository;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
     
-    public CommentResponse create(Long postId, CreateCommentRequest request) {
-        Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-        
-        Comment comment = new Comment();
-        comment.setText(request.text());
-        comment.setAuthor(request.author());
-        comment.setEmail(request.email());
-        comment.setPost(post);
-        
-        Comment saved = commentRepository.save(comment);
-        return CommentResponse.from(saved);
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+    
+    @Column(length = 50)
+    private String category;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    // Construtores
+    public Product() {}  // ← JPA precisa de construtor vazio!
+    
+    public Product(String name, BigDecimal price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
     }
     
-    public List<CommentResponse> findByPostId(Long postId) {
-        return commentRepository.findByPostId(postId).stream()
-            .map(CommentResponse::from)
-            .toList();
+    // Lifecycle Callbacks
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
     
-    public void delete(Long id) {
-        if (!commentRepository.existsById(id)) {
-            throw new EntityNotFoundException("Comment not found");
-        }
-        commentRepository.deleteById(id);
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
+    
+    // Getters e Setters (JPA precisa!)
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+    
+    // ... demais getters/setters
 }
 ```
 
 ---
 
-## 🎬 Passo 5: Controllers (15 min)
+## 🔍 Anotações JPA Essenciais
 
-### PostController.java
+### Entity & Table
 
-```java
-@RestController
-@RequestMapping("/api/posts")
-public class PostController {
-    
-    @Autowired
-    private PostService service;
-    
-    @GetMapping
-    public ResponseEntity<Page<PostSummaryResponse>> findAll(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String[] sort) {
-        
-        List<Sort.Order> orders = Arrays.stream(sort)
-            .map(s -> {
-                String[] parts = s.split(",");
-                return new Sort.Order(
-                    parts.length > 1 && parts[1].equalsIgnoreCase("desc")
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC,
-                    parts[0]
-                );
-            })
-            .toList();
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
-        Page<PostSummaryResponse> posts = service.search(keyword, category, pageable);
-        
-        return ResponseEntity.ok(posts);
-    }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> findById(@PathVariable Long id) {
-        PostResponse post = service.findById(id);
-        return ResponseEntity.ok(post);
-    }
-    
-    @PostMapping
-    public ResponseEntity<PostResponse> create(@Valid @RequestBody CreatePostRequest request) {
-        PostResponse post = service.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(post);
-    }
-    
-    @PutMapping("/{id}")
-    public ResponseEntity<PostResponse> update(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdatePostRequest request) {
-        PostResponse post = service.update(id, request);
-        return ResponseEntity.ok(post);
-    }
-    
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-}
-```
+| Anotação | Descrição | Exemplo |
+|----------|-----------|---------|
+| `@Entity` | Marca classe como entidade | `@Entity class Product` |
+| `@Table` | Customiza nome da tabela | `@Table(name="products")` |
+| `@Id` | Define primary key | `@Id private Long id` |
+| `@GeneratedValue` | Auto-increment | `@GeneratedValue(strategy=IDENTITY)` |
 
-### CommentController.java
+### Column Mapping
+
+| Anotação | Descrição | Exemplo |
+|----------|-----------|---------|
+| `@Column` | Customiza coluna | `@Column(name="product_name")` |
+| `nullable` | NOT NULL | `@Column(nullable=false)` |
+| `unique` | UNIQUE constraint | `@Column(unique=true)` |
+| `length` | VARCHAR tamanho | `@Column(length=100)` |
+| `precision/scale` | DECIMAL | `@Column(precision=10, scale=2)` |
+| `columnDefinition` | SQL customizado | `@Column(columnDefinition="TEXT")` |
+
+---
+
+## 🕐 Lifecycle Callbacks
 
 ```java
-@RestController
-@RequestMapping("/api")
-public class CommentController {
+@Entity
+public class Product {
     
-    @Autowired
-    private CommentService service;
-    
-    @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<List<CommentResponse>> findByPostId(@PathVariable Long postId) {
-        List<CommentResponse> comments = service.findByPostId(postId);
-        return ResponseEntity.ok(comments);
+    @PrePersist  // Antes de INSERT
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        log.info("Creating new product: {}", name);
     }
     
-    @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<CommentResponse> create(
-            @PathVariable Long postId,
-            @Valid @RequestBody CreateCommentRequest request) {
-        CommentResponse comment = service.create(postId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
+    @PostPersist  // Depois de INSERT
+    protected void afterCreate() {
+        log.info("Product created with ID: {}", id);
     }
     
-    @DeleteMapping("/comments/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    @PreUpdate  // Antes de UPDATE
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+        log.info("Updating product: {}", id);
+    }
+    
+    @PostUpdate  // Depois de UPDATE
+    protected void afterUpdate() {
+        log.info("Product updated: {}", id);
+    }
+    
+    @PreRemove  // Antes de DELETE
+    protected void onDelete() {
+        log.info("Deleting product: {}", id);
+    }
+    
+    @PostRemove  // Depois de DELETE
+    protected void afterDelete() {
+        log.info("Product deleted: {}", id);
+    }
+    
+    @PostLoad  // Depois de SELECT
+    protected void afterLoad() {
+        log.debug("Product loaded: {}", id);
     }
 }
 ```
 
 ---
 
-## ✅ Critérios de Avaliação
+## 🔄 GeneratedValue Strategies
 
-Verifique se você implementou:
+```java
+// 1. IDENTITY - Auto-increment do banco (PostgreSQL SERIAL, MySQL AUTO_INCREMENT)
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+// SQL: id BIGSERIAL PRIMARY KEY
 
-- [ ] Entities com relacionamentos corretos (@OneToMany, @ManyToMany)
-- [ ] Repositories com query methods customizados
-- [ ] DTOs separados para Request e Response
-- [ ] Validação com Bean Validation (@NotBlank, @Email, etc)
-- [ ] Services com lógica de negócio
-- [ ] Controllers retornando DTOs
-- [ ] Paginação funcionando
-- [ ] Busca por keyword funcionando
-- [ ] Exception handling (EntityNotFoundException)
-- [ ] Cascade e orphanRemoval corretos
+// 2. SEQUENCE - Sequence do banco (PostgreSQL, Oracle)
+@Id
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
+@SequenceGenerator(name = "product_seq", sequenceName = "product_sequence", allocationSize = 1)
+private Long id;
+// SQL: CREATE SEQUENCE product_sequence
 
----
+// 3. TABLE - Tabela separada para IDs (qualquer banco)
+@Id
+@GeneratedValue(strategy = GenerationType.TABLE, generator = "product_gen")
+@TableGenerator(name = "product_gen", table = "id_generator")
+private Long id;
+// SQL: CREATE TABLE id_generator (...)
 
-## 🧪 Testando com Postman
-
-### 1. Criar Categoria
-```http
-POST http://localhost:8080/api/categories
-Content-Type: application/json
-
-{
-  "name": "Tecnologia",
-  "description": "Posts sobre tecnologia"
-}
+// 4. AUTO - Hibernate decide (não recomendado)
+@Id
+@GeneratedValue(strategy = GenerationType.AUTO)
+private Long id;
 ```
 
-### 2. Criar Post
-```http
-POST http://localhost:8080/api/posts
-Content-Type: application/json
-
-{
-  "title": "Introdução ao Spring Boot",
-  "content": "Spring Boot é um framework...",
-  "author": "João Silva",
-  "categoryId": 1,
-  "tags": ["java", "spring", "tutorial"]
-}
-```
-
-### 3. Buscar Posts
-```http
-GET http://localhost:8080/api/posts?page=0&size=10&sort=createdAt,desc
-GET http://localhost:8080/api/posts/search?keyword=spring&category=Tecnologia
-```
-
-### 4. Adicionar Comentário
-```http
-POST http://localhost:8080/api/posts/1/comments
-Content-Type: application/json
-
-{
-  "text": "Ótimo artigo!",
-  "author": "Maria",
-  "email": "maria@example.com"
-}
-```
-
----
-
-**Próximo:** Review Final e Q&A →
+**Recomendação:** Use `IDENTITY` para PostgreSQL/MySQL moderno.

@@ -16,7 +16,7 @@ Ao final deste treinamento, o aluno será capaz de:
 - Implementar testes automatizados (unitários, integração, BDD)
 - Trabalhar com CI/CD e containerização
 - Aplicar padrões de projeto e princípios SOLID
-- Integrar serviços com bancos SQL, NoSQL e cache
+- Integrar serviços com bancos SQL e cache
 - Implementar observabilidade e boas práticas de produção
 
 ## 📚 Estrutura do Treinamento
@@ -25,7 +25,7 @@ Ao final deste treinamento, o aluno será capaz de:
 - Java 17/21: Novidades e recursos modernos
 - Introdução ao Spring Boot 3.x
 - Injeção de Dependências e IoC
-- Primeira API REST
+- Primeira API REST com Servlet
 
 ### [Dia 2 - Spring Framework Core](dia-02/README.md)
 - Spring Web: Controllers, RestControllers, Request/Response
@@ -66,12 +66,15 @@ Ao final deste treinamento, o aluno será capaz de:
 - Redis: Cache e estratégias
 - Transações e performance
 
-### [Dia 8 - CI/CD e Containers](dia-08/README.md)
-- Git: Workflows e Code Review
-- GitHub Actions: Pipelines CI/CD
-- Docker: Containerização de aplicações
-- Azure Container Registry
-- Deploy em Azure (Container Apps/App Service)
+### [Dia 8 - Evolução do Deploy Java: Desktop, Servidores de Aplicação e Containers](dia-08/README.md)
+- Evolução histórica do deploy Java
+- Aplicações Desktop (JAR executável)
+- Servidores de Aplicação (Tomcat, WildFly, WebLogic)
+- Containers com Docker
+- Kubernetes básico
+- Azure Container Instances
+- Docker Compose para desenvolvimento
+- Build e deploy de imagens Docker
 
 ### [Dia 9 - Observabilidade e Produção](dia-09/README.md)
 - Logs estruturados (SLF4J/Logback)
@@ -89,7 +92,6 @@ Durante o treinamento, será desenvolvido um **Sistema de E-commerce** com:
 - API de Pedidos
 - API de Usuários
 - Integração com pagamento (mock)
-- Cache com Redis
 - Testes completos
 - CI/CD configurado
 - Observabilidade implementada
@@ -109,10 +111,7 @@ Durante o treinamento, será desenvolvido um **Sistema de E-commerce** com:
 - Java 17 ou 21
 - Spring Boot 3.x
 - Maven/Gradle
-- PostgreSQL
-- MongoDB
-- Redis
-- Docker
+- H2 Database
 - Git/GitHub
 - Postman/Insomnia
 - IntelliJ IDEA / VS Code
@@ -131,6 +130,5 @@ Durante o treinamento, será desenvolvido um **Sistema de E-commerce** com:
 
 ---
 
-**Instrutor**: [Seu Nome]  
-**Contato**: [Seu Email]  
-**Repositório**: [Link do GitHub]
+**Instrutor**: Deusemar Chaves Junior  
+**Instrutor**: Fernando Dias Abrão

@@ -1,153 +1,191 @@
-# Slide 10: Criando Primeiro Projeto
+# Slide 10: Configurando o Projeto Servlet + JDBC
 
-**Horário:** 13:15 - 13:30
-
----
-
-## 🎬 DEMO AO VIVO: Spring Initializr
-
-**1. Acesse:** https://start.spring.io/
-
-**2. Configure:**
-```
-Project: Maven
-Language: Java
-Spring Boot: 3.2.x (última stable)
-Packaging: Jar
-Java: 17 ou 21
-
-Group: com.example
-Artifact: products-api
-Name: products-api
-Description: Products REST API
-Package name: com.example.products
-```
-
-**3. Dependências:**
-- Spring Web
-- Spring Data JPA
-- H2 Database (para começar)
-- Lombok (opcional)
-- Validation
-- Spring Boot DevTools
-
-**4. Generate → Download → Extrair → Abrir na IDE**
+**Horário:** 13:30 - 13:50
 
 ---
 
-## Estrutura Gerada
+## 🎬 DEMO: Criando o projeto products-api
+
+### Estrutura do Projeto
 
 ```
-products-api/
+06-products-api/
 ├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/example/products/
-│   │   │       └── ProductsApiApplication.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── static/
-│   │       └── templates/
-│   └── test/
-│       └── java/
-│           └── com/example/products/
-│               └── ProductsApiApplicationTests.java
+│   └── main/
+│       ├── java/
+│       │   └── com/example/products/
+│       │       ├── ProductsApp.java           # Main (Tomcat embedded)
+│       │       ├── servlet/
+│       │       │   ├── ProductServlet.java     # REST endpoints
+│       │       │   └── LocalDateTimeAdapter.java # Gson adapter
+│       │       ├── dao/
+│       │       │   └── ProductDAO.java         # Acesso a dados (JDBC)
+│       │       ├── model/
+│       │       │   └── Product.java            # Modelo de dados
+│       │       ├── dto/
+│       │       │   ├── CreateProductRequest.java
+│       │       │   └── ProductResponse.java
+│       │       └── config/
+│       │           └── DatabaseConfig.java     # Configuração do banco (DDL inline)
 ├── pom.xml
 └── README.md
 ```
 
 ---
 
-## Arquivo Principal
+## Maven (pom.xml)
+
+```xml
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>products-api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- Tomcat Embedded (servidor web) -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.18</version>
+        </dependency>
+
+        <!-- Servlet API (Jakarta) -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- H2 Database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+        </dependency>
+
+        <!-- Gson (JSON) -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+**Observe:**
+- ❌ SEM Spring Boot
+- ❌ SEM JPA/Hibernate
+- ❌ SEM Lombok
+- ✅ Tomcat embedded (mesma ideia do Spring Boot)
+- ✅ JDBC puro (H2 database)
+- ✅ Gson para JSON (sem Jackson)
+
+---
+
+## Classe Principal (Main)
 
 ```java
 package com.example.products;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.example.products.config.DatabaseConfig;
+import com.example.products.servlet.ProductServlet;
+import org.apache.catalina.Context;
+import org.apache.catalina.startup.Tomcat;
 
-@SpringBootApplication  // ← Mágica acontece aqui!
-public class ProductsApiApplication {
-    
-    public static void main(String[] args) {
-        SpringApplication.run(ProductsApiApplication.class, args);
+public class ProductsApp {
+
+    public static void main(String[] args) throws Exception {
+        // 1. Inicializar banco de dados
+        DatabaseConfig.initialize();
+        System.out.println("✅ Database initialized");
+
+        // 2. Configurar Tomcat embedded
+        Tomcat tomcat = new Tomcat();
+        tomcat.setPort(8080);
+        tomcat.getConnector(); // Ativa o conector HTTP
+
+        // 3. Criar contexto da aplicação
+        Context ctx = tomcat.addContext("", null);
+
+        // 4. Registrar Servlets
+        Tomcat.addServlet(ctx, "ProductServlet", new ProductServlet());
+        ctx.addServletMappingDecoded("/api/products/*", "ProductServlet");
+
+        // 5. Iniciar servidor
+        tomcat.start();
+        System.out.println("🚀 Server started on http://localhost:8080");
+        System.out.println("📡 Products API: http://localhost:8080/api/products");
+        tomcat.getServer().await();
     }
 }
 ```
 
-**O que @SpringBootApplication faz?**
+**Compare com Spring Boot:**
 ```java
-@SpringBootApplication = 
-    @Configuration +           // Classe de configuração
-    @EnableAutoConfiguration + // Auto-config mágica
-    @ComponentScan            // Escaneia @Component, @Service, etc
+// Spring Boot (mágica)
+@SpringBootApplication
+public class ProductsApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ProductsApiApplication.class, args);
+    }
+}
+// → Auto-configura Tomcat, Servlets, DataSource, JPA... tudo!
 ```
 
 ---
 
-## Configuração (application.yml)
+## Configuração do Banco (JDBC)
 
-```yaml
-# src/main/resources/application.yml
-spring:
-  application:
-    name: products-api
-  
-  # H2 Database (para desenvolvimento)
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-  
-  h2:
-    console:
-      enabled: true  # http://localhost:8080/h2-console
-  
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop  # Cria tabelas ao iniciar
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+```java
+package com.example.products.config;
 
-server:
-  port: 8080
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-logging:
-  level:
-    com.example.products: DEBUG
-    org.springframework.web: INFO
+public class DatabaseConfig {
+
+    private static final String URL = "jdbc:h2:mem:productsdb;DB_CLOSE_DELAY=-1";
+    private static final String USER = "sa";
+    private static final String PASSWORD = "";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    public static void initialize() {
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS products (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100) NOT NULL,
+                    description VARCHAR(500),
+                    price DECIMAL(10,2) NOT NULL,
+                    category VARCHAR(50),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """);
+            
+            System.out.println("✅ Table 'products' created");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+    }
+}
 ```
 
----
-
-## Rodando a aplicação
-
-```bash
-# Opção 1: Maven
-./mvnw spring-boot:run
-
-# Opção 2: Java (após build)
-./mvnw clean package
-java -jar target/products-api-0.0.1-SNAPSHOT.jar
-
-# Opção 3: IDE
-# Run ProductsApiApplication.java
-```
-
-**Output esperado:**
-```
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v3.2.0)
-
-Started ProductsApiApplication in 2.1 seconds
-Tomcat started on port(s): 8080 (http)
-```

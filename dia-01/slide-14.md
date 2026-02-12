@@ -1,106 +1,141 @@
-# Slide 14: Profiles - Dev vs Prod
+# Slide 14: Review e Q&A
 
-**Horário:** 15:00 - 15:15
-
----
-
-## Múltiplos Ambientes
-
-```
-application.yml           # Configurações comuns
-application-dev.yml       # Desenvolvimento
-application-test.yml      # Testes
-application-prod.yml      # Produção
-```
+**Horário:** 15:30 - 16:00
 
 ---
 
-## Configuração por Ambiente
+## ✅ O que aprendemos hoje
 
-```yaml
-# application.yml (comum)
-spring:
-  application:
-    name: products-api
+### Java Moderno (17/21)
+- ✓ Records (DTOs imutáveis)
+- ✓ Sealed Classes (hierarquias controladas)
+- ✓ Text Blocks (strings multilinha)
+- ✓ Pattern Matching (instanceof e switch)
+- ✓ Stream API (programação funcional)
+- ✓ Optional (lidar com null)
 
----
-# application-dev.yml (desenvolvimento)
-spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-  h2:
-    console:
-      enabled: true
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
+### Lombok vs Records
+- ✓ Records são preferíveis para DTOs
+- ✓ Lombok ainda útil para entidades JPA e logging
+- ✓ Guia de decisão: quando usar cada um
 
-logging:
-  level:
-    root: DEBUG
+### Fundamentos Web
+- ✓ HTTP (Request/Response, métodos, status codes)
+- ✓ Servlets (ciclo de vida, doGet, doPost, doPut, doDelete)
+- ✓ REST com Servlets
+- ✓ JSON com Gson
 
----
-# application-prod.yml (produção)
-spring:
-  datasource:
-    url: jdbc:postgresql://prod-server:5432/products_db
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    show-sql: false
-    hibernate:
-      ddl-auto: validate  # NUNCA use create-drop em prod!
+### JDBC - Acesso a Dados
+- ✓ Connection, PreparedStatement, ResultSet
+- ✓ CRUD completo com SQL puro
+- ✓ Padrão DAO (Data Access Object)
+- ✓ try-with-resources para gerenciar conexões
 
-logging:
-  level:
-    root: INFO
-```
+### Primeira API REST (Servlet + JDBC)
+- ✓ Tomcat embedded
+- ✓ Servlet para endpoints REST
+- ✓ DAO para acesso a dados
+- ✓ DTOs com Records
+- ✓ Validação manual
 
 ---
 
-## Ativar profile
+## 🔎 Servlet + JDBC vs Spring Boot
 
-```bash
-# Opção 1: Linha de comando
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
-
-# Opção 2: application.yml
-spring:
-  profiles:
-    active: dev
-
-# Opção 3: Variável de ambiente
-export SPRING_PROFILES_ACTIVE=prod
-./mvnw spring-boot:run
-
-# Opção 4: IDE (IntelliJ)
-Run → Edit Configurations → Active Profiles: dev
+```mermaid
+flowchart LR
+    subgraph "Hoje (Dia 1)"
+        A1[Servlet] --> B1[DAO]
+        B1 --> C1[JDBC]
+        C1 --> D1[(H2)]
+    end
+    
+    subgraph "Amanhã (Dia 2)"
+        A2["@RestController"] --> B2["@Service"]
+        B2 --> C2[JpaRepository]
+        C2 --> D2[(H2/PostgreSQL)]
+    end
+    
+    style A1 fill:#FFE4B5
+    style A2 fill:#87CEEB
 ```
 
+| O que você fez hoje | O que Spring Boot faz por você |
+|---------------------|-------------------------------|
+| `new Tomcat()` | Auto-configura servidor |
+| `req.getPathInfo()` | `@GetMapping("/{id}")` |
+| `gson.toJson(obj)` | Jackson automático |
+| `PreparedStatement` | JPA/Hibernate |
+| `mapRow(ResultSet)` | Mapeamento automático |
+| `new ProductDAO()` | Injeção de dependências |
+| Tratamento manual de erro | `@ControllerAdvice` |
+
 ---
 
-## Beans específicos por profile
+## 🤔 Perguntas Comuns
 
+**Q: Nunca mais vou usar Servlet/JDBC?**  
+A: Na maioria dos projetos, Spring Boot resolve. Mas entender a base ajuda a debugar problemas e trabalhar com sistemas legados.
+
+**Q: Quando usar JDBC direto?**  
+A: Queries muito complexas, performance crítica, procedures, ou quando JPA adiciona overhead desnecessário.
+
+**Q: Como funciona a validação no Spring Boot?**  
+A: Usa Bean Validation API (`@NotBlank`, `@Size`, etc) — veremos amanhã!
+
+**Q: O ProductDAO é o mesmo que Repository?**  
+A: Sim! O padrão DAO é o antecessor do Repository. Spring Data JPA cria a implementação automaticamente.
+
+---
+
+## 📝 Checklist de Aprendizado
+
+```
+[ ] Sei criar Records com validação no construtor
+[ ] Entendo o ciclo de vida de um Servlet
+[ ] Sei montar uma API REST com Servlet
+[ ] Consigo fazer CRUD com JDBC (PreparedStatement)
+[ ] Entendo o padrão DAO
+[ ] Sei usar try-with-resources com conexões
+[ ] Consigo testar API com Postman/cURL
+[ ] Entendo como Tomcat embedded funciona
+```
+
+---
+
+## 🏠 Tarefa de Casa
+
+### 1. Adicionar busca por nome (LIKE)
 ```java
-@Configuration
-public class AppConfig {
-    
-    @Bean
-    @Profile("dev")
-    public CommandLineRunner loadData(ProductRepository repo) {
-        return args -> {
-            // Carregar dados de teste apenas em dev
-            repo.save(new Product("Laptop", "Test", BigDecimal.valueOf(1000), "Electronics"));
-            repo.save(new Product("Mouse", "Test", BigDecimal.valueOf(50), "Electronics"));
-            System.out.println("✅ Test data loaded!");
-        };
-    }
-    
-    @Bean
-    @Profile("prod")
-    public SomeService prodService() {
-        return new ProductionService();
-    }
-}
+// No DAO:
+String sql = "SELECT * FROM products WHERE LOWER(name) LIKE ?";
+ps.setString(1, "%" + name.toLowerCase() + "%");
 ```
+
+### 2. Adicionar contador de produtos
+```
+GET /api/products/count → {"count": 5}
+```
+
+### 3. Preparação para Dia 2
+- Estudar os conceitos de IoC (Inversão de Controle) e DI (Injeção de Dependência)
+- Instalar PostgreSQL ou ter Docker pronto
+- Acessar https://start.spring.io/ e explorar
+
+---
+
+## 📚 Leitura Recomendada
+
+- [ ] [Jakarta Servlet Specification](https://jakarta.ee/specifications/servlet/)
+- [ ] [JDBC Tutorial - Oracle](https://docs.oracle.com/javase/tutorial/jdbc/)
+- [ ] [Java Records Tutorial](https://dev.java/learn/records/)
+- [ ] [Effective Java - Item 16](https://www.oreilly.com/library/view/effective-java/9780134686097/)
+
+---
+
+## 🎉 Parabéns!
+
+Você completou o Dia 1!
+
+Amanhã: **Spring Boot, Spring Data JPA, APIs RESTful com framework**
+

@@ -1,356 +1,123 @@
-# Slide 5: Fundamentos de Persistência & JPA
+# Slide 5: Testando a API Spring Boot
 
-**Horário:** 10:30 - 10:50
+**Horário:** 14:30 - 15:00
 
 ---
 
-## 💾 O que é Persistência?
+## 🎬 DEMO: Testando com Postman
 
-### Problema: Dados em Memória são Voláteis
-
-```mermaid
-flowchart LR
-    A[Aplicação<br/>inicia] --> B[Dados em<br/>memória RAM]
-    B --> C[Aplicação<br/>processa]
-    C --> D[Aplicação<br/>encerra]
-    D --> E[💥 Dados<br/>perdidos!]
-    
-    style E fill:#FF6B6B
-```
-
-### Solução: Persistir em Banco de Dados
-
-```mermaid
-flowchart LR
-    A[Aplicação] --> B[(Banco de<br/>Dados)]
-    B --> C[Dados<br/>permanentes]
-    
-    A -.->|1. Salva| B
-    B -.->|2. Persiste<br/>em disco| C
-    A -.->|3. Pode ler<br/>a qualquer momento| B
-    
-    style C fill:#90EE90
+### 1️⃣ Iniciar aplicação
+```bash
+./mvnw spring-boot:run
 ```
 
 ---
 
-## 🗃️ Modelo Relacional vs Orientação a Objetos
+### 2️⃣ Criar produto (POST)
+```http
+POST http://localhost:8080/api/products
+Content-Type: application/json
 
-### Impedância Objeto-Relacional
-
-```
-┌──────────────────────────────────────────────────────────┐
-│ MUNDO JAVA (Orientação a Objetos)                       │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  class Product {                                         │
-│      private Long id;                                    │
-│      private String name;                                │
-│      private BigDecimal price;                           │
-│      private Category category;  ← Objeto relacionado   │
-│      private List<Review> reviews;  ← Coleção           │
-│  }                                                       │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-                           ↕  ORM (JPA/Hibernate)
-┌──────────────────────────────────────────────────────────┐
-│ MUNDO SQL (Modelo Relacional)                           │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  CREATE TABLE products (                                 │
-│      id BIGSERIAL PRIMARY KEY,                           │
-│      name VARCHAR(100),                                  │
-│      price DECIMAL(10,2),                                │
-│      category_id BIGINT ← Foreign Key                    │
-│  );                                                      │
-│                                                          │
-│  CREATE TABLE reviews (...);                             │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
+{
+  "name": "Laptop Gaming",
+  "description": "High-end gaming laptop with RTX 4080",
+  "price": 7500.00,
+  "category": "Electronics"
+}
 ```
 
----
-
-## 🔧 ORM: Object-Relational Mapping
-
-### O que é JPA?
-
-```
-JPA (Jakarta Persistence API)
-│
-├─ Especificação (interface)
-│   │
-│   ├─ Define anotações (@Entity, @Id, etc)
-│   ├─ Define EntityManager (API)
-│   └─ Define comportamentos padrão
-│
-└─ Implementações
-    │
-    ├─ Hibernate ✅ (mais popular)
-    ├─ EclipseLink
-    └─ OpenJPA
-```
-
-**Spring Data JPA** = JPA + Repositories + Convenções Spring
-
----
-
-## 📦 Arquitetura JPA/Hibernate
-
-```mermaid
-flowchart TB
-    A[Aplicação Java] --> B[Spring Data JPA]
-    B --> C[JPA API]
-    C --> D[Hibernate<br/>implementação]
-    D --> E[JDBC]
-    E --> F[(Database)]
-    
-    B -.-> G[Repositories<br/>Automáticos]
-    C -.-> H[Entity Manager]
-    D -.-> I[Session<br/>1st Level Cache<br/>Dirty Checking]
-    E -.-> J[Connection Pool<br/>HikariCP]
-    
-    style B fill:#87CEEB
-    style D fill:#90EE90
-    style F fill:#DDA0DD
-```
-
----
-
-## ⚙️ Configuração: application.yml
-
-```yaml
-spring:
-  # Datasource - conexão com banco
-  datasource:
-    url: jdbc:postgresql://localhost:5432/java_training
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-    
-    # Connection Pool (HikariCP)
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 20000
-      idle-timeout: 300000
-  
-  # JPA Configuration
-  jpa:
-    # Hibernate specific
-    hibernate:
-      ddl-auto: update  # create, update, validate, none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    
-    # Mostrar SQL no console
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        jdbc:
-          batch_size: 20
-    
-    # Dialeto do banco
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-```
-
----
-
-## 🎯 hibernate.ddl-auto: Quando Usar?
-
-| Valor | Comportamento | Quando usar |
-|-------|---------------|-------------|
-| `none` | Não faz nada | Produção (sempre!) |
-| `validate` | Valida schema contra entities | Produção, CI/CD |
-| `update` | Adiciona colunas/tabelas faltantes | Dev (com cuidado!) |
-| `create` | DROP + CREATE tudo ao iniciar | Testes automatizados |
-| `create-drop` | DROP ao encerrar aplicação | Testes, demos |
-
-**⚠️ ATENÇÃO:**
-```java
-// ❌ NUNCA em produção:
-spring.jpa.hibernate.ddl-auto=create  // APAGA TUDO! 💥
-
-// ✅ Em produção:
-spring.jpa.hibernate.ddl-auto=none  ou validate
-// E use migrations (Flyway/Liquibase)
-```
-
----
-
-## 🎬 DEMO: Primeira Entity
-
-```java
-// src/main/java/com/example/model/Product.java
-package com.example.model;
-
-import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-@Entity  // ← Marca como entidade JPA
-@Table(name = "products")  // ← Nome da tabela (opcional)
-public class Product {
-    
-    @Id  // ← Primary Key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // ← Auto-increment
-    private Long id;
-    
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
-    
-    @Column(columnDefinition = "TEXT")
-    private String description;
-    
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
-    
-    @Column(length = 50)
-    private String category;
-    
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    // Construtores
-    public Product() {}  // ← JPA precisa de construtor vazio!
-    
-    public Product(String name, BigDecimal price, String category) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-    
-    // Lifecycle Callbacks
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-    
-    // Getters e Setters (JPA precisa!)
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
-    
-    // ... demais getters/setters
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "name": "Laptop Gaming",
+  "description": "High-end gaming laptop with RTX 4080",
+  "price": 7500.00,
+  "category": "Electronics",
+  "createdAt": "2026-02-03T14:35:22.123"
 }
 ```
 
 ---
 
-## 🔍 Anotações JPA Essenciais
+### 3️⃣ Listar todos (GET)
+```http
+GET http://localhost:8080/api/products
+```
 
-### Entity & Table
-
-| Anotação | Descrição | Exemplo |
-|----------|-----------|---------|
-| `@Entity` | Marca classe como entidade | `@Entity class Product` |
-| `@Table` | Customiza nome da tabela | `@Table(name="products")` |
-| `@Id` | Define primary key | `@Id private Long id` |
-| `@GeneratedValue` | Auto-increment | `@GeneratedValue(strategy=IDENTITY)` |
-
-### Column Mapping
-
-| Anotação | Descrição | Exemplo |
-|----------|-----------|---------|
-| `@Column` | Customiza coluna | `@Column(name="product_name")` |
-| `nullable` | NOT NULL | `@Column(nullable=false)` |
-| `unique` | UNIQUE constraint | `@Column(unique=true)` |
-| `length` | VARCHAR tamanho | `@Column(length=100)` |
-| `precision/scale` | DECIMAL | `@Column(precision=10, scale=2)` |
-| `columnDefinition` | SQL customizado | `@Column(columnDefinition="TEXT")` |
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "name": "Laptop Gaming",
+    "description": "High-end gaming laptop with RTX 4080",
+    "price": 7500.00,
+    "category": "Electronics",
+    "createdAt": "2026-02-03T14:35:22.123"
+  }
+]
+```
 
 ---
 
-## 🕐 Lifecycle Callbacks
+### 4️⃣ Buscar por ID (GET)
+```http
+GET http://localhost:8080/api/products/1
+```
 
-```java
-@Entity
-public class Product {
-    
-    @PrePersist  // Antes de INSERT
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        log.info("Creating new product: {}", name);
-    }
-    
-    @PostPersist  // Depois de INSERT
-    protected void afterCreate() {
-        log.info("Product created with ID: {}", id);
-    }
-    
-    @PreUpdate  // Antes de UPDATE
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-        log.info("Updating product: {}", id);
-    }
-    
-    @PostUpdate  // Depois de UPDATE
-    protected void afterUpdate() {
-        log.info("Product updated: {}", id);
-    }
-    
-    @PreRemove  // Antes de DELETE
-    protected void onDelete() {
-        log.info("Deleting product: {}", id);
-    }
-    
-    @PostRemove  // Depois de DELETE
-    protected void afterDelete() {
-        log.info("Product deleted: {}", id);
-    }
-    
-    @PostLoad  // Depois de SELECT
-    protected void afterLoad() {
-        log.debug("Product loaded: {}", id);
-    }
+---
+
+### 5️⃣ Atualizar (PUT)
+```http
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Laptop Gaming Pro",
+  "description": "Ultimate gaming laptop with RTX 4090",
+  "price": 9500.00,
+  "category": "Electronics"
 }
 ```
 
 ---
 
-## 🔄 GeneratedValue Strategies
-
-```java
-// 1. IDENTITY - Auto-increment do banco (PostgreSQL SERIAL, MySQL AUTO_INCREMENT)
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-private Long id;
-// SQL: id BIGSERIAL PRIMARY KEY
-
-// 2. SEQUENCE - Sequence do banco (PostgreSQL, Oracle)
-@Id
-@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
-@SequenceGenerator(name = "product_seq", sequenceName = "product_sequence", allocationSize = 1)
-private Long id;
-// SQL: CREATE SEQUENCE product_sequence
-
-// 3. TABLE - Tabela separada para IDs (qualquer banco)
-@Id
-@GeneratedValue(strategy = GenerationType.TABLE, generator = "product_gen")
-@TableGenerator(name = "product_gen", table = "id_generator")
-private Long id;
-// SQL: CREATE TABLE id_generator (...)
-
-// 4. AUTO - Hibernate decide (não recomendado)
-@Id
-@GeneratedValue(strategy = GenerationType.AUTO)
-private Long id;
+### 6️⃣ Deletar (DELETE)
+```http
+DELETE http://localhost:8080/api/products/1
 ```
 
-**Recomendação:** Use `IDENTITY` para PostgreSQL/MySQL moderno.
+**Response (204 No Content)**
+
+---
+
+## 🐞 Debugging - Ver logs no console
+
+```bash
+# SQL executado
+Hibernate: insert into products (category,created_at,description,name,price,updated_at) 
+values (?,?,?,?,?,?)
+
+# Request recebido
+2026-02-03 14:35:22.456 DEBUG --- [nio-8080-exec-1] c.e.p.controller.ProductController 
+: Creating product: Laptop Gaming
+```
+
+---
+
+## 🔍 H2 Console - Ver banco de dados
+
+1. Acessar: http://localhost:8080/h2-console
+2. JDBC URL: `jdbc:h2:mem:testdb`
+3. User: `sa`
+4. Password: (deixar vazio)
+
+```sql
+-- Ver todos os produtos
+SELECT * FROM PRODUCTS;
+
+-- Inserir via SQL
+INSERT INTO PRODUCTS (NAME, DESCRIPTION, PRICE, CATEGORY, CREATED_AT, UPDATED_AT)
+VALUES ('Mouse', 'Gaming mouse', 250.00, 'Electronics', NOW(), NOW());
+```
