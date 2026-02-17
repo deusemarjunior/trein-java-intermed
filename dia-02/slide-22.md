@@ -8,18 +8,30 @@
 
 ### 🌅 Manhã (09:00 - 12:00)
 
-**1. Review e Setup (09:00 - 10:00)**
-- ✓ Revisão conceitos Dia 1
-- ✓ PostgreSQL + Docker
-- ✓ Configuração Spring Data JPA
+**1. Ecossistema Spring & Fundamentos (09:00 - 09:15)**
+- ✓ O que é o Spring Framework (IoC, DI, AOP)
+- ✓ ApplicationContext e ciclo de vida dos Beans
+- ✓ Escopos de Beans (singleton, prototype, request, session)
+- ✓ Tipos de injeção (construtor, setter, field)
+- ✓ Spring Boot vs Spring Framework
+- ✓ Módulos e Starters
 
-**2. HTTP & REST Avançado (10:00 - 11:00)**
+**2. Spring no Contexto do Mercado**
+- ✓ Spring Boot vs Jakarta EE (anotações, filosofia, container)
+- ✓ Spring Boot vs Quarkus (performance, cloud-native)
+- ✓ Spring Boot vs Micronaut (DI compile-time vs runtime)
+- ✓ Quando escolher cada framework
+
+**3. Criação de Projeto & Primeira API REST (09:15 - 10:30)**
+- ✓ Spring Initializr e estrutura do projeto
+- ✓ @SpringBootApplication, @RestController, @Service, @Repository
+- ✓ CRUD completo com DTOs (Records)
+- ✓ Profiles, DevTools
+
+**4. HTTP & REST Avançado (10:30 - 12:00)**
 - ✓ Anatomia HTTP (method, headers, body, status)
 - ✓ Status codes (2xx, 3xx, 4xx, 5xx)
 - ✓ Princípios REST (stateless, recursos, representações)
-- ✓ CRUD com métodos HTTP corretos
-
-**3. Request/Response Handling (11:00 - 12:00)**
 - ✓ @PathVariable, @RequestParam, @RequestHeader, @RequestBody
 - ✓ Bean Validation (@NotBlank, @Email, @Size, etc)
 - ✓ @Valid para validar DTOs
@@ -33,54 +45,50 @@
 
 ### 🌆 Tarde (13:00 - 16:30)
 
-**4. Exception Handling Global (13:00 - 13:20)**
+**5. Exception Handling Global (13:00 - 13:30)**
 - ✓ @RestControllerAdvice
 - ✓ @ExceptionHandler
 - ✓ Exceções customizadas
 - ✓ ErrorResponse padronizado
 
-**5. JPA Fundamentals (parte da manhã)**
+**6. JPA Fundamentals & Relacionamentos (13:30 - 15:00)**
 - ✓ ORM e impedância objeto-relacional
 - ✓ Arquitetura JPA (EntityManager, Persistence Context)
 - ✓ Entity lifecycle (Transient, Managed, Detached, Removed)
 - ✓ @Entity, @Id, @GeneratedValue, @Column
-
-**6. Relacionamentos JPA**
-- ✓ @OneToOne
-- ✓ @OneToMany / @ManyToOne
-- ✓ @ManyToMany com @JoinTable
+- ✓ @OneToOne, @OneToMany / @ManyToOne, @ManyToMany
 - ✓ Cascade types (PERSIST, MERGE, REMOVE, ALL)
 - ✓ FetchType (LAZY vs EAGER)
 - ✓ N+1 problem e soluções (JOIN FETCH, @EntityGraph)
 
-**7. Spring Data Repositories (13:00 - 13:20)**
+**7. Spring Data Repositories & Queries**
 - ✓ Hierarquia: Repository → CrudRepository → JpaRepository
 - ✓ Query methods (findBy, existsBy, countBy, deleteBy)
 - ✓ Keywords (And, Or, Between, Like, Containing, etc)
-
-**8. JPQL & Queries (13:20 - 13:40)**
 - ✓ JPQL vs SQL (entidades vs tabelas)
-- ✓ @Query com JPQL
-- ✓ @Query com SQL nativo (nativeQuery = true)
+- ✓ @Query com JPQL e SQL nativo
 - ✓ @Modifying para UPDATE/DELETE
 - ✓ JOIN vs JOIN FETCH
 - ✓ Projeções (DTO e Interface)
+- ✓ Paginação (Pageable, PageRequest, Page<T>)
+- ✓ Ordenação (Sort, Sort.Order)
 
-**9. Paginação e Ordenação (13:40 - 14:00)**
-- ✓ Pageable e PageRequest
-- ✓ Sort e Sort.Order
-- ✓ Page<T> vs Slice<T> vs List<T>
-- ✓ Parsing de parâmetros de paginação
-
-**10. DTOs e Mapeamento (14:00 - 14:20)**
+**8. DTOs e Mapeamento**
 - ✓ Por que usar DTOs (segurança, performance, desacoplamento)
 - ✓ Request DTOs vs Response DTOs
 - ✓ Factory methods (from/to)
 - ✓ Validações em DTOs
 
-**11. Coffee Break ☕ (14:20 - 15:00)**
+**9. Conceitos Transversais do Spring** ⭐ NOVO!
+- ✓ AOP — @Aspect, @Around, @Before, @After
+- ✓ Spring Events — ApplicationEventPublisher, @EventListener
+- ✓ @Transactional — atomicidade, readOnly, propagation, rollback
+- ✓ Spring Actuator — /health, /metrics, /info, monitoramento
+- ✓ Profiles — application-dev.yml, @Profile
 
-**12-13. Exercício Blog API (15:00 - 16:15)**
+**10. Coffee Break ☕ (15:00 - 15:15)**
+
+**11. Exercício Blog API (15:15 - 16:15)**
 - ✓ Entities: Post, Comment, Category, Tag
 - ✓ Relacionamentos @OneToMany e @ManyToMany
 - ✓ Repositories com queries customizadas
@@ -97,6 +105,17 @@
 ```mermaid
 mindmap
   root((Dia 02))
+    Ecossistema Spring
+      IoC / DI
+      ApplicationContext
+      Bean Scopes
+      Spring Boot vs Spring Framework
+    
+    Comparação Frameworks
+      Jakarta EE
+      Quarkus
+      Micronaut
+    
     HTTP/REST
       Status Codes
       Métodos HTTP
@@ -120,6 +139,12 @@ mindmap
       Query Methods
       JPQL
       Paginação
+    
+    Conceitos Transversais
+      AOP / @Aspect
+      Spring Events
+      @Transactional
+      Spring Actuator
       
     DTOs
       Request/Response
@@ -135,6 +160,19 @@ mindmap
 ---
 
 ## 💡 Principais Lições
+
+### 0. Entenda o ecossistema
+```java
+// Spring Boot é opinativo — mas entender os conceitos por baixo é essencial
+// IoC, DI, AOP, ApplicationContext, Bean Lifecycle
+// Isso diferencia um dev junior de um senior!
+
+// Compare com outros frameworks para entender os trade-offs:
+// Spring Boot → produtividade + ecossistema
+// Quarkus → performance + cloud-native
+// Micronaut → compile-time DI + baixo consumo
+// Jakarta EE → especificações formais
+```
 
 ### 1. Sempre use DTOs
 ```java
@@ -188,7 +226,20 @@ public record CreatePostRequest(
 ) {}
 ```
 
-### 5. Trate exceções globalmente
+### 5. Use @Transactional corretamente
+```java
+// ✅ readOnly para consultas
+@Transactional(readOnly = true)
+public List<ProductResponse> findAll() { ... }
+
+// ✅ Transação para escrita
+@Transactional
+public ProductResponse create(CreateProductRequest req) { ... }
+
+// ⚠️ Cuidado com chamadas internas — proxy não intercepta!
+```
+
+### 6. Trate exceções globalmente
 ```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -292,12 +343,15 @@ Queremos sua opinião sobre o Dia 02:
 Você completou o **Dia 02** do curso de Java Intermediário!
 
 Hoje você aprendeu a criar APIs REST completas com Spring Data JPA, incluindo:
-- Persistência de dados
+- Ecossistema Spring (IoC, DI, AOP, ApplicationContext)
+- Comparação com outros frameworks (Jakarta EE, Quarkus, Micronaut)
+- Persistência de dados com JPA
 - Relacionamentos complexos
 - Queries customizadas
 - Paginação
 - Exception handling
 - DTOs e validações
+- Conceitos transversais (AOP, Events, @Transactional, Actuator)
 
 **Continue praticando! Amanhã vamos para o próximo nível! 🚀**
 

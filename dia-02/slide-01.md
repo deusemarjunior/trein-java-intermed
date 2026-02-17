@@ -1,6 +1,6 @@
-# Slide 1: Do Servlet ao Spring Boot
+# Slide 1: O Ecossistema Spring & Fundamentos
 
-**Horário:** 13:00 - 13:15
+**Horário:** 09:00 - 09:15
 
 ---
 
@@ -21,19 +21,17 @@ No Dia 1 aprendemos os **fundamentos** que o Spring Boot abstrai:
 
 ## A Evolução do Java Web
 
-```
-Spring Framework (2004)
-   ↓
-Configuração XML complexa 😫
-   ↓
-Spring 3.0 - Java Config
-   ↓
-Ainda precisa configurar TUDO manualmente
-   ↓
-Spring Boot (2014) 🎉
-   ↓
-"Convenção sobre Configuração"
-Zero XML, minimal config
+```mermaid
+flowchart TD
+    A["Spring Framework (2004)"] --> B["Configuração XML complexa 😫"]
+    B --> C["Spring 3.0 - Java Config"]
+    C --> D["Ainda precisa configurar TUDO manualmente"]
+    D --> E["Spring Boot (2014) 🎉"]
+    E --> F["Convenção sobre Configuração<br/>Zero XML, minimal config"]
+
+    style A fill:#FFD700
+    style E fill:#90EE90
+    style F fill:#87CEEB
 ```
 
 ---
@@ -153,9 +151,39 @@ public class ProductService {
 }
 ```
 
+| Tipo | Anotação | Recomendação |
+|------|----------|-------------|
+| **Construtor** | Implícita (único construtor) | ✅ **Recomendado** — imutável, testável |
+| **Setter** | `@Autowired` no setter | ⚠️ Dependências opcionais |
+| **Field** | `@Autowired` no campo | ❌ Evitar — dificulta testes |
+
 ---
 
-### 3. Auto-configuração Mágica ✨
+### 3. ApplicationContext e Ciclo de Vida dos Beans
+
+```java
+// O ApplicationContext é o container IoC do Spring
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+        // Todos os beans estão registrados e prontos
+    }
+}
+```
+
+**Escopos de Beans:**
+
+| Escopo | Descrição | Uso Típico |
+|--------|-----------|------------|
+| `singleton` (padrão) | Uma única instância por container | Services, Repositories |
+| `prototype` | Nova instância a cada injeção | Objetos com estado mutável |
+| `request` | Uma instância por request HTTP | Dados de request |
+| `session` | Uma instância por sessão HTTP | Dados de sessão |
+
+---
+
+### 4. Auto-configuração Mágica ✨
 
 ```java
 // Apenas adicionando dependência no pom.xml:
@@ -202,3 +230,35 @@ public interface ProductRepository extends JpaRepository<Product, Long> {}
 </dependency>
 <!-- Inclui: Bean Validation, Hibernate Validator -->
 ```
+
+---
+
+## 🏛️ Módulos Principais do Spring
+
+```mermaid
+block-beta
+    columns 3
+    block:boot:3
+        A["Spring Boot<br/>(Auto-configuração, Starters, Embedded Server)"]
+    end
+    B["Spring Web MVC<br/>(REST APIs)"] C["Spring Data<br/>(JPA, Mongo)"] D["Spring Security<br/>(Auth, OAuth2)"]
+    E["Spring AOP<br/>(Aspectos)"] F["Spring TX<br/>(Transações)"] G["Spring Cloud<br/>(Microservices)"]
+    block:core:3
+        H["Spring Framework Core<br/>(IoC Container, Beans, Context, SpEL)"]
+    end
+
+    style A fill:#90EE90
+    style H fill:#FFD700
+```
+
+---
+
+## 🆚 Spring Boot vs Spring Framework
+
+| Aspecto | Spring Framework | Spring Boot |
+|---------|-----------------|-------------|
+| Configuração | Manual (XML ou Java Config) | Auto-configuração |
+| Servidor | Requer servidor externo (Tomcat WAR) | Servidor embutido (JAR) |
+| Dependências | Gerenciamento manual de versões | Starters com versões compatíveis |
+| Produtividade | Mais controle, mais trabalho | Rápido para começar |
+| Monitoramento | Configuração manual | Actuator pronto |

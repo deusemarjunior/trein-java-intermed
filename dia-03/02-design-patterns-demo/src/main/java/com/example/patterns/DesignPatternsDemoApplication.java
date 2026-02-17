@@ -4,6 +4,9 @@ import com.example.patterns.builder.Order;
 import com.example.patterns.builder.User;
 import com.example.patterns.factory.NotificationFactory;
 import com.example.patterns.factory.NotificationType;
+import com.example.patterns.singleton.AppLogger;
+import com.example.patterns.singleton.ConfigurationManager;
+import com.example.patterns.singleton.DatabaseConnectionPool;
 import com.example.patterns.strategy.DiscountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -34,6 +37,7 @@ public class DesignPatternsDemoApplication {
             demoStrategy();
             demoFactory();
             demoBuilder();
+            demoSingleton();
 
             System.out.println("\n" + "=".repeat(80));
         };
@@ -88,6 +92,32 @@ public class DesignPatternsDemoApplication {
                 .build();
         
         System.out.println("Order criado: " + order);
+        System.out.println();
+    }
+
+    private void demoSingleton() {
+        System.out.println("🔒 SINGLETON PATTERN - Instância única");
+        System.out.println("-".repeat(80));
+
+        // Bill Pugh (Holder Pattern) - Recomendado
+        ConfigurationManager config1 = ConfigurationManager.getInstance();
+        ConfigurationManager config2 = ConfigurationManager.getInstance();
+        System.out.println("Mesma instância? " + (config1 == config2));  // true
+        System.out.println("Config: " + config1);
+
+        // Eager Initialization
+        DatabaseConnectionPool pool1 = DatabaseConnectionPool.getInstance();
+        DatabaseConnectionPool pool2 = DatabaseConnectionPool.getInstance();
+        System.out.println("Mesma instância? " + (pool1 == pool2));  // true
+        pool1.getConnection();
+        pool1.releaseConnection();
+
+        // Double-Checked Locking
+        AppLogger logger1 = AppLogger.getInstance();
+        AppLogger logger2 = AppLogger.getInstance();
+        System.out.println("Mesma instância? " + (logger1 == logger2));  // true
+        logger1.info("Singleton pattern demonstrado com sucesso!");
+
         System.out.println();
     }
 }

@@ -38,35 +38,34 @@ flowchart LR
 
 ### Impedância Objeto-Relacional
 
-```
-┌──────────────────────────────────────────────────────────┐
-│ MUNDO JAVA (Orientação a Objetos)                       │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  class Product {                                         │
-│      private Long id;                                    │
-│      private String name;                                │
-│      private BigDecimal price;                           │
-│      private Category category;  ← Objeto relacionado   │
-│      private List<Review> reviews;  ← Coleção           │
-│  }                                                       │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-                           ↕  ORM (JPA/Hibernate)
-┌──────────────────────────────────────────────────────────┐
-│ MUNDO SQL (Modelo Relacional)                           │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  CREATE TABLE products (                                 │
-│      id BIGSERIAL PRIMARY KEY,                           │
-│      name VARCHAR(100),                                  │
-│      price DECIMAL(10,2),                                │
-│      category_id BIGINT ← Foreign Key                    │
-│  );                                                      │
-│                                                          │
-│  CREATE TABLE reviews (...);                             │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph JAVA["MUNDO JAVA — Orientação a Objetos"]
+        direction TB
+        J1["class Product"]
+        J2["Long id"]
+        J3["String name"]
+        J4["BigDecimal price"]
+        J5["Category category ← Objeto relacionado"]
+        J6["List&lt;Review&gt; reviews ← Coleção"]
+        J1 --- J2 & J3 & J4 & J5 & J6
+    end
+
+    JAVA <-->|"ORM (JPA / Hibernate)"| SQL
+
+    subgraph SQL["MUNDO SQL — Modelo Relacional"]
+        direction TB
+        S1["TABLE products"]
+        S2["id BIGSERIAL PRIMARY KEY"]
+        S3["name VARCHAR(100)"]
+        S4["price DECIMAL(10,2)"]
+        S5["category_id BIGINT ← Foreign Key"]
+        S1 --- S2 & S3 & S4 & S5
+        S6["TABLE reviews (...)"]
+    end
+
+    style JAVA fill:#E8F4FD,stroke:#2196F3
+    style SQL fill:#FFF3E0,stroke:#FF9800
 ```
 
 ---
@@ -75,20 +74,21 @@ flowchart LR
 
 ### O que é JPA?
 
-```
-JPA (Jakarta Persistence API)
-│
-├─ Especificação (interface)
-│   │
-│   ├─ Define anotações (@Entity, @Id, etc)
-│   ├─ Define EntityManager (API)
-│   └─ Define comportamentos padrão
-│
-└─ Implementações
-    │
-    ├─ Hibernate ✅ (mais popular)
-    ├─ EclipseLink
-    └─ OpenJPA
+```mermaid
+flowchart TD
+    A["JPA<br/>(Jakarta Persistence API)"] --> B["Especificação (interface)"]
+    A --> C["Implementações"]
+
+    B --> B1["Define anotações<br/>@Entity, @Id, etc"]
+    B --> B2["Define EntityManager<br/>(API)"]
+    B --> B3["Define comportamentos padrão"]
+
+    C --> C1["Hibernate ✅<br/>(mais popular)"]
+    C --> C2["EclipseLink"]
+    C --> C3["OpenJPA"]
+
+    style A fill:#FFD700
+    style C1 fill:#90EE90
 ```
 
 **Spring Data JPA** = JPA + Repositories + Convenções Spring

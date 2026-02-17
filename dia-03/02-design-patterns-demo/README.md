@@ -26,9 +26,9 @@ Demonstração prática dos principais Design Patterns utilizados em aplicaçõe
 
 ### 4. Singleton Pattern (Criacional)
 **Gerenciamento de configuração**
-- Configuration Manager
-- Database Connection Pool
-- Logger
+- Configuration Manager (Bill Pugh / Holder Pattern)
+- Database Connection Pool (Eager Initialization)
+- Logger (Double-Checked Locking)
 
 ## 🚀 Como Executar
 
@@ -46,19 +46,24 @@ src/main/java/com/example/patterns/
 │   ├── DiscountStrategy.java
 │   ├── VipDiscountStrategy.java
 │   ├── RegularDiscountStrategy.java
+│   ├── PremiumDiscountStrategy.java
+│   ├── BlackFridayDiscountStrategy.java
 │   └── DiscountService.java
 ├── factory/
 │   ├── Notification.java
+│   ├── NotificationType.java
 │   ├── EmailNotification.java
 │   ├── SmsNotification.java
+│   ├── PushNotification.java
+│   ├── WhatsAppNotification.java
 │   └── NotificationFactory.java
 ├── builder/
 │   ├── User.java
-│   ├── Order.java
-│   └── Product.java
+│   └── Order.java
 └── singleton/
     ├── ConfigurationManager.java
-    └── DatabaseConnectionPool.java
+    ├── DatabaseConnectionPool.java
+    └── AppLogger.java
 ```
 
 ## 💡 Quando Usar Cada Pattern

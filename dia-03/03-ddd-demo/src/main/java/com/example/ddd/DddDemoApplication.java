@@ -2,7 +2,9 @@ package com.example.ddd;
 
 import com.example.ddd.domain.aggregate.Order;
 import com.example.ddd.domain.aggregate.OrderItem;
+import com.example.ddd.domain.entity.Customer;
 import com.example.ddd.domain.valueobject.Address;
+import com.example.ddd.domain.valueobject.CPF;
 import com.example.ddd.domain.valueobject.Email;
 import com.example.ddd.domain.valueobject.Money;
 import com.example.ddd.domain.service.OrderPricingService;
@@ -32,12 +34,20 @@ public class DddDemoApplication {
             // Value Objects
             Money price = new Money("100.00", "BRL");
             Email email = new Email("customer@example.com");
+            CPF cpf = new CPF("12345678901");
             Address address = new Address("Rua A", "São Paulo", "SP", "01000-000");
             
             System.out.println("💎 VALUE OBJECTS:");
             System.out.println("Money: " + price);
             System.out.println("Email: " + email);
+            System.out.println("CPF: " + cpf);
             System.out.println("Address: " + address);
+            System.out.println();
+
+            // Entity: Customer
+            Customer customer = new Customer(1L, "João Silva", email, cpf, address);
+            System.out.println("👤 ENTITY (Customer):");
+            System.out.println(customer);
             System.out.println();
 
             // Aggregate Root: Order

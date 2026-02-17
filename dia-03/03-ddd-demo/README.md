@@ -11,6 +11,7 @@ Demonstração prática dos conceitos táticos de Domain-Driven Design (DDD).
 ### Value Objects
 - **Money** - Valor monetário imutável
 - **Email** - Email validado
+- **CPF** - CPF com validação e formatação
 - **Address** - Endereço completo
 
 ### Aggregates
@@ -35,11 +36,11 @@ mvn clean install && mvn spring-boot:run
 ```
 domain/
 ├── entity/           # Entidades com identidade
-│   ├── Order.java
 │   └── Customer.java
 ├── valueobject/      # Objetos de valor imutáveis
 │   ├── Money.java
 │   ├── Email.java
+│   ├── CPF.java
 │   └── Address.java
 ├── aggregate/        # Agregados e raízes
 │   ├── Order.java    # Aggregate Root

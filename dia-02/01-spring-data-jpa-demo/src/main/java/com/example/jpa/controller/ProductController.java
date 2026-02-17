@@ -5,6 +5,10 @@ import com.example.jpa.dto.product.ProductResponse;
 import com.example.jpa.dto.product.ProductSummary;
 import com.example.jpa.dto.product.UpdateProductRequest;
 import com.example.jpa.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Products", description = "Gerenciamento de produtos com paginação, busca e projeções")
 public class ProductController {
     
     private final ProductService productService;
@@ -27,21 +32,23 @@ public class ProductController {
         this.productService = productService;
     }
     
-    // GET /api/products/{id}
+    @Operation(summary = "Buscar produto por ID", description = "Retorna um produto pelo seu identificador")
+    @ApiResponse(responseCode = "200", description = "Produto encontrado")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
         ProductResponse product = productService.findById(id);
         return ResponseEntity.ok(product);
     }
     
-    // GET /api/products
+    @Operation(summary = "Listar todos os produtos")
     @GetMapping
     public ResponseEntity<List<ProductResponse>> findAll() {
         List<ProductResponse> products = productService.findAll();
         return ResponseEntity.ok(products);
     }
     
-    // GET /api/products/paged?page=0&size=10&sort=name,asc
+    @Operation(summary = "Listar produtos com paginação", description = "Retorna produtos paginados com ordenação configurável")
     @GetMapping("/paged")
     public ResponseEntity<Page<ProductResponse>> findAllPaged(
             @RequestParam(defaultValue = "0") int page,
@@ -58,7 +65,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     
-    // GET /api/products/search?name=laptop&categoryId=1&minPrice=1000&maxPrice=5000&active=true&page=0&size=10
+    @Operation(summary = "Busca avançada de produtos", description = "Busca com filtros dinâmicos: nome, categoria, faixa de preço e status")
     @GetMapping("/search")
     public ResponseEntity<Page<ProductResponse>> search(
             @RequestParam(required = false) String name,
@@ -78,35 +85,38 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     
-    // GET /api/products/summaries
+    @Operation(summary = "Listar resumos de produtos", description = "Retorna projeções resumidas (Projection) dos produtos")
     @GetMapping("/summaries")
     public ResponseEntity<List<ProductSummary>> findAllSummaries() {
         List<ProductSummary> summaries = productService.findAllSummaries();
         return ResponseEntity.ok(summaries);
     }
     
-    // GET /api/products/category/{categoryId}
+    @Operation(summary = "Listar produtos por categoria")
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<ProductResponse>> findByCategory(@PathVariable Long categoryId) {
         List<ProductResponse> products = productService.findByCategory(categoryId);
         return ResponseEntity.ok(products);
     }
     
-    // GET /api/products/category/{categoryId}/average-price
+    @Operation(summary = "Preço médio por categoria", description = "Calcula o preço médio dos produtos de uma categoria")
     @GetMapping("/category/{categoryId}/average-price")
     public ResponseEntity<BigDecimal> getAveragePriceByCategory(@PathVariable Long categoryId) {
         BigDecimal average = productService.getAveragePriceByCategory(categoryId);
         return ResponseEntity.ok(average);
     }
     
-    // POST /api/products
+    @Operation(summary = "Criar produto", description = "Cria um novo produto validando os campos obrigatórios")
+    @ApiResponse(responseCode = "201", description = "Produto criado com sucesso")
     @PostMapping
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
         ProductResponse product = productService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
     
-    // PUT /api/products/{id}
+    @Operation(summary = "Atualizar produto")
+    @ApiResponse(responseCode = "200", description = "Produto atualizado")
+    @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> update(
             @PathVariable Long id,
@@ -116,14 +126,15 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
     
-    // DELETE /api/products/{id}
+    @Operation(summary = "Deletar produto")
+    @ApiResponse(responseCode = "204", description = "Produto deletado")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
     
-    // POST /api/products/deactivate-out-of-stock
+    @Operation(summary = "Desativar sem estoque", description = "Desativa todos os produtos sem estoque")
     @PostMapping("/deactivate-out-of-stock")
     public ResponseEntity<Integer> deactivateOutOfStock() {
         int count = productService.deactivateOutOfStock();

@@ -5,6 +5,9 @@ import com.example.tasks.dto.TaskResponse;
 import com.example.tasks.dto.UpdateTaskRequest;
 import com.example.tasks.model.Priority;
 import com.example.tasks.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
+@Tag(name = "Tasks", description = "Gerenciamento de tarefas com paginação, filtros e estatísticas")
 public class TaskController {
     
     private final TaskService taskService;
@@ -27,7 +31,7 @@ public class TaskController {
         this.taskService = taskService;
     }
     
-    // GET /api/tasks - Lista todas as tarefas (com paginação opcional)
+    @Operation(summary = "Listar tarefas", description = "Lista todas as tarefas com paginação e ordenação")
     @GetMapping
     public ResponseEntity<Page<TaskResponse>> getAllTasks(
         @RequestParam(defaultValue = "0") int page,
@@ -42,7 +46,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/search - Busca avançada com filtros
+    @Operation(summary = "Busca avançada", description = "Busca tarefas com filtros: palavra-chave, prioridade, status")
     @GetMapping("/search")
     public ResponseEntity<Page<TaskResponse>> searchTasks(
         @RequestParam(required = false) String keyword,
@@ -60,56 +64,59 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/{id} - Busca tarefa por ID
+    @Operation(summary = "Buscar tarefa por ID")
+    @ApiResponse(responseCode = "200", description = "Tarefa encontrada")
+    @ApiResponse(responseCode = "404", description = "Tarefa não encontrada")
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
         TaskResponse task = taskService.findById(id);
         return ResponseEntity.ok(task);
     }
     
-    // GET /api/tasks/pending - Lista tarefas pendentes
+    @Operation(summary = "Listar tarefas pendentes")
     @GetMapping("/pending")
     public ResponseEntity<List<TaskResponse>> getPendingTasks() {
         List<TaskResponse> tasks = taskService.findPending();
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/completed - Lista tarefas concluídas
+    @Operation(summary = "Listar tarefas concluídas")
     @GetMapping("/completed")
     public ResponseEntity<List<TaskResponse>> getCompletedTasks() {
         List<TaskResponse> tasks = taskService.findCompleted();
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/priority/{priority} - Filtra por prioridade
+    @Operation(summary = "Filtrar por prioridade")
     @GetMapping("/priority/{priority}")
     public ResponseEntity<List<TaskResponse>> getTasksByPriority(@PathVariable Priority priority) {
         List<TaskResponse> tasks = taskService.findByPriority(priority);
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/overdue - Lista tarefas atrasadas
+    @Operation(summary = "Listar tarefas atrasadas")
     @GetMapping("/overdue")
     public ResponseEntity<List<TaskResponse>> getOverdueTasks() {
         List<TaskResponse> tasks = taskService.findOverdue();
         return ResponseEntity.ok(tasks);
     }
     
-    // GET /api/tasks/statistics - Estatísticas
+    @Operation(summary = "Estatísticas", description = "Retorna contadores de tarefas por status")
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Long>> getStatistics() {
         Map<String, Long> stats = taskService.getStatistics();
         return ResponseEntity.ok(stats);
     }
     
-    // POST /api/tasks - Cria nova tarefa
+    @Operation(summary = "Criar tarefa")
+    @ApiResponse(responseCode = "201", description = "Tarefa criada")
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody CreateTaskRequest request) {
         TaskResponse created = taskService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
-    // PUT /api/tasks/{id} - Atualiza tarefa completamente
+    @Operation(summary = "Atualizar tarefa")
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(
         @PathVariable Long id,
@@ -119,7 +126,7 @@ public class TaskController {
         return ResponseEntity.ok(updated);
     }
     
-    // PATCH /api/tasks/{id} - Atualização parcial
+    @Operation(summary = "Atualização parcial")
     @PatchMapping("/{id}")
     public ResponseEntity<TaskResponse> partialUpdateTask(
         @PathVariable Long id,
@@ -129,14 +136,15 @@ public class TaskController {
         return ResponseEntity.ok(updated);
     }
     
-    // PATCH /api/tasks/{id}/complete - Marca tarefa como concluída
+    @Operation(summary = "Concluir tarefa")
     @PatchMapping("/{id}/complete")
     public ResponseEntity<TaskResponse> completeTask(@PathVariable Long id) {
         TaskResponse completed = taskService.complete(id);
         return ResponseEntity.ok(completed);
     }
     
-    // DELETE /api/tasks/{id} - Deleta tarefa
+    @Operation(summary = "Deletar tarefa")
+    @ApiResponse(responseCode = "204", description = "Tarefa deletada")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.delete(id);

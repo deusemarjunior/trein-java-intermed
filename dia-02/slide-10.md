@@ -8,28 +8,28 @@
 
 ### Anatomia de uma Requisição HTTP
 
-```
-┌─────────────────────────────────────────────────────┐
-│ REQUEST                                             │
-├─────────────────────────────────────────────────────┤
-│ POST /api/products HTTP/1.1                         │ ← Método + URL + Versão
-│ Host: localhost:8080                                │ ← Headers
-│ Content-Type: application/json                      │
-│ Authorization: Bearer eyJhbGc...                    │
-│ Accept: application/json                            │
-│                                                     │
-│ {"name": "Laptop", "price": 3500}                  │ ← Body
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph REQ["REQUEST"]
+        direction TB
+        R1["POST /api/products HTTP/1.1<br/><i>Método + URL + Versão</i>"]
+        R2["Host: localhost:8080<br/>Content-Type: application/json<br/>Authorization: Bearer eyJhbGc...<br/>Accept: application/json<br/><i>Headers</i>"]
+        R3["{name: Laptop, price: 3500}<br/><i>Body</i>"]
+        R1 --- R2 --- R3
+    end
 
-┌─────────────────────────────────────────────────────┐
-│ RESPONSE                                            │
-├─────────────────────────────────────────────────────┤
-│ HTTP/1.1 201 Created                                │ ← Status Code
-│ Content-Type: application/json                      │ ← Headers
-│ Location: /api/products/123                         │
-│                                                     │
-│ {"id": 123, "name": "Laptop", "price": 3500}       │ ← Body
-└─────────────────────────────────────────────────────┘
+    subgraph RES["RESPONSE"]
+        direction TB
+        S1["HTTP/1.1 201 Created<br/><i>Status Code</i>"]
+        S2["Content-Type: application/json<br/>Location: /api/products/123<br/><i>Headers</i>"]
+        S3["{id: 123, name: Laptop, price: 3500}<br/><i>Body</i>"]
+        S1 --- S2 --- S3
+    end
+
+    REQ -->|HTTP| RES
+
+    style REQ fill:#E8F4FD,stroke:#2196F3
+    style RES fill:#E8F5E9,stroke:#4CAF50
 ```
 
 ---

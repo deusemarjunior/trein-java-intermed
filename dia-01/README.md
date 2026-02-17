@@ -19,6 +19,13 @@
 | 15:00 - 15:30 | 30min | Testando a API | Prática |
 | 15:30 - 16:00 | 30min | Review e Q&A | Discussão |
 
+### Conteúdo Complementar (slides 15-17)
+| Tópico | Slide | Tipo |
+|--------|-------|------|
+| REST vs RESTful — Princípios e Maturidade | slide-15 | Teórico |
+| Swagger / OpenAPI — Documentando APIs | slide-16 | Teórico |
+| API First (Contract First) vs Code First | slide-17 | Teórico |
+
 ---
 
 ## 📦 Material Necessário (Checklist Instrutor)

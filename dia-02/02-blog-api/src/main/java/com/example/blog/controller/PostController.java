@@ -5,6 +5,8 @@ import com.example.blog.model.Post;
 import com.example.blog.model.Tag;
 import com.example.blog.repository.PostRepository;
 import com.example.blog.repository.TagRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/api/posts")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Posts", description = "Gerenciamento de posts do blog com relacionamentos JPA")
 public class PostController {
     
     private final PostRepository postRepository;
@@ -35,6 +38,7 @@ public class PostController {
      * ❌ DEMONSTRAÇÃO: Problema N+1
      * Use este endpoint e veja nos logs múltiplas queries!
      */
+    @Operation(summary = "Buscar post por ID", description = "❌ Demonstra problema N+1 - veja múltiplas queries nos logs")
     @GetMapping("/{id}")
     public ResponseEntity<Post> findById(@PathVariable Long id) {
         return postRepository.findById(id)
@@ -46,6 +50,7 @@ public class PostController {
      * ✅ SOLUÇÃO: JOIN FETCH
      * Use este endpoint e veja nos logs apenas 1 query!
      */
+    @Operation(summary = "Buscar post com detalhes", description = "✅ Usa JOIN FETCH - apenas 1 query nos logs")
     @GetMapping("/{id}/with-details")
     public ResponseEntity<Post> findByIdWithDetails(@PathVariable Long id) {
         return postRepository.findByIdWithCommentsAndTags(id)
@@ -53,26 +58,32 @@ public class PostController {
             .orElse(ResponseEntity.notFound().build());
     }
     
+    @Operation(summary = "Listar todos os posts")
     @GetMapping
     public ResponseEntity<List<Post>> findAll() {
         return ResponseEntity.ok(postRepository.findAll());
     }
     
+    @Operation(summary = "Buscar posts por autor")
     @GetMapping("/by-author/{author}")
     public ResponseEntity<List<Post>> findByAuthor(@PathVariable String author) {
         return ResponseEntity.ok(postRepository.findByAuthor(author));
     }
     
+    @Operation(summary = "Buscar posts por tag")
     @GetMapping("/by-tag/{tagName}")
     public ResponseEntity<List<Post>> findByTag(@PathVariable String tagName) {
         return ResponseEntity.ok(postRepository.findByTagName(tagName));
     }
     
+    @Operation(summary = "Posts mais comentados")
     @GetMapping("/most-commented")
     public ResponseEntity<List<Post>> findMostCommented() {
         return ResponseEntity.ok(postRepository.findMostCommented());
     }
     
+    @Operation(summary = "Criar novo post")
+    @ApiResponse(responseCode = "201", description = "Post criado")
     @PostMapping
     public ResponseEntity<Post> create(@RequestBody CreatePostRequest request) {
         Post post = new Post(request.title(), request.content(), request.author());
@@ -90,6 +101,8 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
     
+    @Operation(summary = "Adicionar comentário ao post")
+    @ApiResponse(responseCode = "201", description = "Comentário adicionado")
     @PostMapping("/{id}/comments")
     public ResponseEntity<Comment> addComment(
             @PathVariable Long id,
@@ -105,6 +118,8 @@ public class PostController {
             .orElse(ResponseEntity.notFound().build());
     }
     
+    @Operation(summary = "Deletar post")
+    @ApiResponse(responseCode = "204", description = "Post deletado")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!postRepository.existsById(id)) {

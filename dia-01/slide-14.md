@@ -25,6 +25,24 @@
 - ✓ REST com Servlets
 - ✓ JSON com Gson
 
+### REST e RESTful (Conteúdo Complementar)
+- ✓ REST vs RESTful — os 6 princípios
+- ✓ Richardson Maturity Model (Níveis 0-3)
+- ✓ HATEOAS
+- ✓ Boas práticas: versionamento, paginação, status codes
+
+### Swagger / OpenAPI (Conteúdo Complementar)
+- ✓ OpenAPI Specification vs Swagger (ferramentas)
+- ✓ Anatomia de um arquivo openapi.yaml
+- ✓ Swagger UI — documentação interativa
+- ✓ SpringDoc no Spring Boot
+
+### API First vs Code First (Conteúdo Complementar)
+- ✓ Code First: código gera o contrato
+- ✓ API First: contrato gera o código
+- ✓ OpenAPI Generator (Maven Plugin)
+- ✓ Trabalho paralelo entre times
+
 ### JDBC - Acesso a Dados
 - ✓ Connection, PreparedStatement, ResultSet
 - ✓ CRUD completo com SQL puro
@@ -99,6 +117,10 @@ A: Sim! O padrão DAO é o antecessor do Repository. Spring Data JPA cria a impl
 [ ] Sei usar try-with-resources com conexões
 [ ] Consigo testar API com Postman/cURL
 [ ] Entendo como Tomcat embedded funciona
+[ ] Sei a diferença entre REST e RESTful
+[ ] Conheço o Richardson Maturity Model
+[ ] Entendo o que é OpenAPI/Swagger
+[ ] Sei a diferença entre API First e Code First
 ```
 
 ---

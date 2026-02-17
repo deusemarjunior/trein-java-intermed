@@ -21,15 +21,15 @@ O Repository Pattern é uma camada de abstração entre a lógica de negócio e 
 
 ## 📚 Hierarquia de Interfaces
 
-```java
-Repository<T, ID>
-    ↓
-CrudRepository<T, ID>
-    ↓  + batch operations (saveAll, deleteAll)
-PagingAndSortingRepository<T, ID>
-    ↓  + pagination & sorting
-JpaRepository<T, ID>  ← Use este! ✅
-    ↓  + JPA specific (flush, batch delete, etc)
+```mermaid
+flowchart TD
+    A["Repository&lt;T, ID&gt;"] --> B["CrudRepository&lt;T, ID&gt;"]
+    B -->|"+ batch operations<br/>(saveAll, deleteAll)"| C["PagingAndSortingRepository&lt;T, ID&gt;"]
+    C -->|"+ pagination & sorting"| D["JpaRepository&lt;T, ID&gt; ← Use este! ✅"]
+    D -->|"+ JPA specific<br/>(flush, batch delete, etc)"| E(("Sua Interface<br/>Repository"))
+
+    style D fill:#90EE90
+    style E fill:#87CEEB
 ```
 
 **Por que usar JpaRepository?**
