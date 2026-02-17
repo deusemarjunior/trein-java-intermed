@@ -7,9 +7,8 @@
 ## 👨‍🏫 Apresentação do Instrutor
 
 ```
-👨‍🏫 [Seu Nome]
-📧 [email@example.com]
-💼 [Experiência com Java/Spring]
+👨‍🏫 Deusemar Chaves Junior
+👨‍🏫 Fernando Dias Abrão
 
 Regras da sala:
 ✓ Perguntas são bem-vindas a qualquer momento
