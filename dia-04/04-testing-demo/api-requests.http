@@ -1,0 +1,101 @@
+### Produtos API — Requisições HTTP
+### Porta: 8086
+
+### ============================================================
+### Listar todos os produtos
+### ============================================================
+GET http://localhost:8086/api/products
+Accept: application/json
+
+### ============================================================
+### Buscar produto por ID
+### ============================================================
+GET http://localhost:8086/api/products/1
+Accept: application/json
+
+### ============================================================
+### Buscar produto por SKU
+### ============================================================
+GET http://localhost:8086/api/products/sku/NTB-001
+Accept: application/json
+
+### ============================================================
+### Buscar por nome
+### ============================================================
+GET http://localhost:8086/api/products/search?name=notebook
+Accept: application/json
+
+### ============================================================
+### Buscar por faixa de preço
+### ============================================================
+GET http://localhost:8086/api/products/price-range?min=100&max=500
+Accept: application/json
+
+### ============================================================
+### Listar produtos em estoque (paginado)
+### ============================================================
+GET http://localhost:8086/api/products/in-stock?page=0&size=3&sort=name
+Accept: application/json
+
+### ============================================================
+### Criar produto
+### ============================================================
+POST http://localhost:8086/api/products
+Content-Type: application/json
+
+{
+  "name": "Webcam HD",
+  "sku": "WBC-006",
+  "price": 259.90,
+  "quantity": 20
+}
+
+### ============================================================
+### Criar produto — Validação (nome vazio)
+### ============================================================
+POST http://localhost:8086/api/products
+Content-Type: application/json
+
+{
+  "name": "",
+  "sku": "ERR-001",
+  "price": 100.00,
+  "quantity": 5
+}
+
+### ============================================================
+### Criar produto — SKU duplicado
+### ============================================================
+POST http://localhost:8086/api/products
+Content-Type: application/json
+
+{
+  "name": "Outro Notebook",
+  "sku": "NTB-001",
+  "price": 3999.90,
+  "quantity": 5
+}
+
+### ============================================================
+### Atualizar produto
+### ============================================================
+PUT http://localhost:8086/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Notebook Dell Atualizado",
+  "sku": "NTB-001",
+  "price": 4999.90,
+  "quantity": 8
+}
+
+### ============================================================
+### Deletar produto
+### ============================================================
+DELETE http://localhost:8086/api/products/5
+
+### ============================================================
+### Buscar produto inexistente (404)
+### ============================================================
+GET http://localhost:8086/api/products/999
+Accept: application/json

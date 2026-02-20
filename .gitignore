@@ -65,12 +65,8 @@ local.properties
 .loadpath
 .recommenders
 
-# VSCode
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# VSCode — ignorar apenas na raiz, permitir em subpastas dos projetos
+/.vscode/
 *.code-workspace
 .history/
 

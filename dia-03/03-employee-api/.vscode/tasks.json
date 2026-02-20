@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-employee-api",
+      "type": "shell",
+      "command": "./mvnw clean compile -DskipTests || mvn clean compile -DskipTests",
+      "windows": {
+        "command": "mvnw.cmd clean compile -DskipTests || mvn clean compile -DskipTests"
+      },
+      "group": "build",
+      "problemMatcher": ["$javac"],
+      "detail": "Compila o projeto Employee API"
+    },
+    {
+      "label": "test-employee-api",
+      "type": "shell",
+      "command": "./mvnw test || mvn test",
+      "windows": {
+        "command": "mvnw.cmd test || mvn test"
+      },
+      "group": "test",
+      "problemMatcher": ["$javac"],
+      "detail": "Executa os testes do Employee API"
+    },
+    {
+      "label": "run-employee-api",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run || mvn spring-boot:run",
+      "windows": {
+        "command": "mvnw.cmd spring-boot:run || mvn spring-boot:run"
+      },
+      "group": "none",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Inicia o Employee API na porta 8084"
+    },
+    {
+      "label": "package-employee-api",
+      "type": "shell",
+      "command": "./mvnw clean package -DskipTests || mvn clean package -DskipTests",
+      "windows": {
+        "command": "mvnw.cmd clean package -DskipTests || mvn clean package -DskipTests"
+      },
+      "group": "build",
+      "problemMatcher": ["$javac"],
+      "detail": "Gera o JAR do Employee API"
+    }
+  ]
+}

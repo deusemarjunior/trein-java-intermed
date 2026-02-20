@@ -1,0 +1,97 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "▶ 04-products-api (run)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/04-products-api"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Spring Boot - porta 8080"
+    },
+    {
+      "label": "🔨 04-products-api (build)",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/04-products-api"
+      },
+      "group": "build",
+      "problemMatcher": ["$java"],
+      "detail": "Maven clean package"
+    },
+    {
+      "label": "▶ 01-spring-data-jpa-demo (run)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/01-spring-data-jpa-demo"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Spring Boot - porta 8080"
+    },
+    {
+      "label": "🔨 01-spring-data-jpa-demo (build)",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/01-spring-data-jpa-demo"
+      },
+      "group": "build",
+      "problemMatcher": ["$java"],
+      "detail": "Maven clean package"
+    },
+    {
+      "label": "▶ 02-blog-api (run)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/02-blog-api"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Spring Boot - porta 8081"
+    },
+    {
+      "label": "🔨 02-blog-api (build)",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/02-blog-api"
+      },
+      "group": "build",
+      "problemMatcher": ["$java"],
+      "detail": "Maven clean package"
+    },
+    {
+      "label": "▶ 03-tasks-api (run)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/03-tasks-api"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Spring Boot - porta 8082"
+    },
+    {
+      "label": "🔨 03-tasks-api (build)",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "options": {
+        "cwd": "${workspaceFolder}/dia-02/03-tasks-api"
+      },
+      "group": "build",
+      "problemMatcher": ["$java"],
+      "detail": "Maven clean package"
+    }
+  ]
+}

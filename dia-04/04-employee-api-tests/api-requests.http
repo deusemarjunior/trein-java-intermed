@@ -1,0 +1,109 @@
+### Employee API — Requisições HTTP
+### Porta: 8087
+
+### ============================================================
+### Listar todos os funcionários
+### ============================================================
+GET http://localhost:8087/api/employees
+Accept: application/json
+
+### ============================================================
+### Buscar funcionário por ID
+### ============================================================
+GET http://localhost:8087/api/employees/1
+Accept: application/json
+
+### ============================================================
+### Criar funcionário — Sucesso
+### ============================================================
+POST http://localhost:8087/api/employees
+Content-Type: application/json
+
+{
+  "name": "Pedro Souza",
+  "email": "pedro.souza@email.com",
+  "cpf": "222.333.444-55",
+  "salary": 6500.00,
+  "departmentId": 1
+}
+
+### ============================================================
+### Criar funcionário — Salário abaixo do mínimo (422)
+### ============================================================
+POST http://localhost:8087/api/employees
+Content-Type: application/json
+
+{
+  "name": "Teste Salário",
+  "email": "teste.salario@email.com",
+  "cpf": "333.444.555-66",
+  "salary": 1000.00,
+  "departmentId": 1
+}
+
+### ============================================================
+### Criar funcionário — Email duplicado (409)
+### ============================================================
+POST http://localhost:8087/api/employees
+Content-Type: application/json
+
+{
+  "name": "Ana Duplicada",
+  "email": "ana.silva@email.com",
+  "cpf": "444.555.666-77",
+  "salary": 5000.00,
+  "departmentId": 1
+}
+
+### ============================================================
+### Criar funcionário — Validação (nome curto, email inválido) (400)
+### ============================================================
+POST http://localhost:8087/api/employees
+Content-Type: application/json
+
+{
+  "name": "AB",
+  "email": "email-invalido",
+  "cpf": "12345678900",
+  "salary": -100,
+  "departmentId": 1
+}
+
+### ============================================================
+### Criar funcionário — Departamento inexistente (404)
+### ============================================================
+POST http://localhost:8087/api/employees
+Content-Type: application/json
+
+{
+  "name": "Teste Departamento",
+  "email": "teste.dept@email.com",
+  "cpf": "555.666.777-88",
+  "salary": 5000.00,
+  "departmentId": 999
+}
+
+### ============================================================
+### Atualizar funcionário
+### ============================================================
+PUT http://localhost:8087/api/employees/1
+Content-Type: application/json
+
+{
+  "name": "Ana Silva Atualizada",
+  "email": "ana.silva@email.com",
+  "cpf": "123.456.789-09",
+  "salary": 9500.00,
+  "departmentId": 1
+}
+
+### ============================================================
+### Deletar funcionário
+### ============================================================
+DELETE http://localhost:8087/api/employees/5
+
+### ============================================================
+### Buscar funcionário inexistente (404)
+### ============================================================
+GET http://localhost:8087/api/employees/999
+Accept: application/json

@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run StreamApiDemo",
+            "request": "launch",
+            "mainClass": "com.example.stream.StreamApiDemo",
+            "projectName": "stream-api-demo",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}

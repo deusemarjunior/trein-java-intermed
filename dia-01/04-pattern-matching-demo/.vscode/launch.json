@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run PatternMatchingDemo",
+            "request": "launch",
+            "mainClass": "com.example.pattern.PatternMatchingDemo",
+            "projectName": "pattern-matching-demo",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}

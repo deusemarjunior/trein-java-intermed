@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-clean-architecture-demo",
+      "type": "shell",
+      "command": "./mvnw clean compile -DskipTests || mvn clean compile -DskipTests",
+      "windows": {
+        "command": "mvnw.cmd clean compile -DskipTests || mvn clean compile -DskipTests"
+      },
+      "group": "build",
+      "problemMatcher": ["$javac"],
+      "detail": "Compila o projeto Clean Architecture Demo"
+    },
+    {
+      "label": "test-clean-architecture-demo",
+      "type": "shell",
+      "command": "./mvnw test || mvn test",
+      "windows": {
+        "command": "mvnw.cmd test || mvn test"
+      },
+      "group": "test",
+      "problemMatcher": ["$javac"],
+      "detail": "Executa os testes do Clean Architecture Demo"
+    },
+    {
+      "label": "run-clean-architecture-demo",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run || mvn spring-boot:run",
+      "windows": {
+        "command": "mvnw.cmd spring-boot:run || mvn spring-boot:run"
+      },
+      "group": "none",
+      "problemMatcher": [],
+      "isBackground": true,
+      "detail": "Inicia o Clean Architecture Demo na porta 8083"
+    },
+    {
+      "label": "package-clean-architecture-demo",
+      "type": "shell",
+      "command": "./mvnw clean package -DskipTests || mvn clean package -DskipTests",
+      "windows": {
+        "command": "mvnw.cmd clean package -DskipTests || mvn clean package -DskipTests"
+      },
+      "group": "build",
+      "problemMatcher": ["$javac"],
+      "detail": "Gera o JAR do Clean Architecture Demo"
+    }
+  ]
+}

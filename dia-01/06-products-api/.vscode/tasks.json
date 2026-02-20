@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mvn: compile",
+      "type": "shell",
+      "command": "mvn compile -f ${workspaceFolder}/pom.xml",
+      "group": "build",
+      "problemMatcher": ["$javac"]
+    },
+    {
+      "label": "mvn: package",
+      "type": "shell",
+      "command": "mvn package -DskipTests -f ${workspaceFolder}/pom.xml",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$javac"]
+    },
+    {
+      "label": "mvn: clean",
+      "type": "shell",
+      "command": "mvn clean -f ${workspaceFolder}/pom.xml",
+      "problemMatcher": []
+    },
+    {
+      "label": "mvn: clean package",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests -f ${workspaceFolder}/pom.xml",
+      "group": "build",
+      "problemMatcher": ["$javac"]
+    },
+    {
+      "label": "mvn: exec:java (run)",
+      "type": "shell",
+      "command": "mvn exec:java -f ${workspaceFolder}/pom.xml",
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

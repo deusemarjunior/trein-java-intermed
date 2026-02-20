@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run SpringDataJpaDemoApplication",
+            "request": "launch",
+            "mainClass": "com.example.jpa.SpringDataJpaDemoApplication",
+            "projectName": "spring-data-jpa-demo",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}

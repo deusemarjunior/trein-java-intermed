@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Employee API Tests (8087)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiApplication",
+      "projectName": "employee-api-tests",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Employee API Tests (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiApplication",
+      "projectName": "employee-api-tests",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5087"
+    }
+  ]
+}

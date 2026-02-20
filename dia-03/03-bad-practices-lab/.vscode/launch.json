@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Bad Practices Lab",
+      "request": "launch",
+      "mainClass": "com.example.badpractices.BadPracticesLabApplication",
+      "projectName": "bad-practices-lab",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "preLaunchTask": "build-bad-practices-lab"
+    },
+    {
+      "type": "java",
+      "name": "Bad Practices Lab (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.badpractices.BadPracticesLabApplication",
+      "projectName": "bad-practices-lab",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    }
+  ]
+}
