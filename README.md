@@ -16,7 +16,7 @@ Ao final deste treinamento, o aluno será capaz de:
 - Implementar testes automatizados com Testcontainers e bancos reais
 - Trabalhar com Docker, observabilidade nativa (Actuator, logs estruturados) e entender conceitos de CI/CD
 - Consumir e documentar APIs com OpenAPI (Swagger) e Feign Client
-- Integrar serviços com bancos SQL, cache (Redis) e mensageria (Kafka/RabbitMQ)
+- Integrar serviços com bancos SQL, cache (Redis) e mensageria (RabbitMQ)
 - Realizar Code Review profissional e trabalhar com boas práticas de consultoria
 
 ## 📚 Estrutura do Treinamento
@@ -34,8 +34,27 @@ Ao final deste treinamento, o aluno será capaz de:
 - Configuração de banco de dados (H2, PostgreSQL)
 - DTOs e Mapeamento (MapStruct/ModelMapper)
 
-### [Dia 3 - Arquitetura, Clean Code e Padronização](dia-03/README.md)
+### [Dia 3 - Arquitetura, Clean Code, Refatoração e Padronização](dia-03/README.md)
 > **Foco**: Sair do "código que funciona" para o "código que escala".
+
+#### 🎯 Objetivos de Aprendizagem
+- Aplicar princípios de Clean Code: nomenclatura significativa, métodos coesos, DRY
+- Estruturar projetos com Arquitetura em Camadas e Arquitetura Hexagonal (Ports & Adapters)
+- Implementar tratamento de erros global com Problem Details (RFC 7807)
+- Validar dados com Bean Validation e Custom Validators
+- Identificar Code Smells e aplicar técnicas de refatoração segura
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Teoria | 2h | Tópicos 1-6 do Guia Conceitual |
+| Demo | 30min | Walkthrough `03-clean-architecture-demo` |
+| Exercício | 1h30 | `03-employee-api` (TODOs 1-7) |
+| Refatoração | 1h | `03-bad-practices-lab` (TODOs 1-9) |
+
+#### 📦 Entregáveis
+- `03-employee-api` com DTOs, validação, erro global e estrutura hexagonal
+- `03-bad-practices-lab` refatorado com todos os testes passando
 
 #### 📖 Guia Conceitual
 
@@ -68,6 +87,13 @@ Ao final deste treinamento, o aluno será capaz de:
    - Custom Validators: criando anotações como `@ValidCpf`, `@UniqueEmail`
    - Validação em cascata com `@Valid` em objetos aninhados (DTOs compostos)
 
+6. **Refactoring — Melhorando Código Existente**
+   - Retomando os Code Smells do tópico 1: agora vamos corrigir cada um na prática
+   - Técnicas: Extract Method, Extract Class, Rename, Inline, Move, Replace Conditional with Polymorphism
+   - Refatoração segura: sempre com testes passando — green → refactor → green
+   - Antes vs. depois: impacto na legibilidade, testabilidade e manutenção
+   - Ferramentas da IDE: atalhos do IntelliJ (`Ctrl+Alt+M` Extract, `Shift+F6` Rename, `Ctrl+Alt+N` Inline)
+
 #### 📦 Projeto Exemplo: `03-clean-architecture-demo`
 > API de Catálogo de Produtos — pronta e funcionando. O aluno roda e acompanha a explicação.
 
@@ -83,7 +109,7 @@ Projeto completo demonstrando todos os conceitos do dia:
 #### ✏️ Projeto Exercício: `03-employee-api`
 > API de Gestão de Funcionários — o aluno recebe a estrutura base e implementa os TODOs.
 
-**O que já vem pronto:** entidade `Employee`, `EmployeeRepository`, `application.yml` configurado, dependências no `pom.xml` e um `EmployeeController` básico retornando a entity diretamente.
+**O que já vem pronto:** entidades `Employee` e `Department` (com relacionamento `@ManyToOne`), `EmployeeRepository`, `DepartmentRepository`, `application.yml` configurado, dependências no `pom.xml` e um `EmployeeController` básico retornando a entity diretamente.
 
 **TODOs:**
 - `// TODO 1: Criar EmployeeRequest e EmployeeResponse (DTOs) para entrada e saída da API`
@@ -105,10 +131,65 @@ Projeto completo demonstrando todos os conceitos do dia:
   - `//   - Controller e DTOs para adapter/in/web/`
   - `//   - Repository e Entity JPA para adapter/out/persistence/`
 
+#### 🔧 Projeto Refatoração: `03-bad-practices-lab`
+> Código propositalmente ruim — o aluno identifica os problemas e refatora aplicando Clean Code e boas práticas.
+
+**O que já vem pronto:** uma API de Pedidos (`OrderController`, `OrderService`, `OrderRepository`) **funcionando**, mas repleta de más práticas. Todos os testes passam. O desafio é refatorar sem quebrar nada.
+
+**TODOs:**
+- `// TODO 1: OrderController tem um único método com 150 linhas (God Method):`
+  - `//   - Extrair lógica de validação para métodos privados`
+  - `//   - Mover regras de negócio para o Service`
+  - `//   - Controller deve apenas receber request e delegar`
+- `// TODO 2: OrderService é uma God Class com 500+ linhas:`
+  - `//   - Separar em OrderService, OrderValidationService e OrderCalculationService`
+  - `//   - Cada classe com responsabilidade única (SRP)`
+- `// TODO 3: Nomes de variáveis sem significado (x, temp, data, aux, flag):`
+  - `//   - Renomear para nomes descritivos: totalPrice, isExpired, customerEmail`
+  - `//   - Renomear métodos: process() → calculateOrderTotal()`
+- `// TODO 4: Código duplicado em 3 métodos diferentes (violação DRY):`
+  - `//   - Identificar trechos repetidos de cálculo de desconto`
+  - `//   - Extrair para método reutilizável: calculateDiscount(BigDecimal, DiscountType)`
+- `// TODO 5: Entity JPA exposta diretamente no Controller (sem DTO):`
+  - `//   - Criar OrderRequest e OrderResponse`
+  - `//   - Criar OrderMapper para conversão`
+  - `//   - Controller nunca mais recebe/retorna a Entity`
+- `// TODO 6: Cadeia de if/else com 8 condições para calcular frete:`
+  - `//   - Aplicar Replace Conditional with Polymorphism ou Strategy Pattern`
+  - `//   - Criar ShippingCalculator com implementações por região`
+- `// TODO 7: Tratamento de erros com try/catch genérico (catch Exception e):`
+  - `//   - Criar exceções específicas: OrderNotFoundException, InvalidQuantityException`
+  - `//   - Centralizar no GlobalExceptionHandler com Problem Details`
+- `// TODO 8: Números mágicos espalhados no código (0.1, 30, 1412.0, 5):`
+  - `//   - Extrair para constantes com nomes descritivos`
+  - `//   - Ex: MINIMUM_ORDER_VALUE, MAX_ITEMS_PER_ORDER, DEFAULT_DISCOUNT_RATE`
+- `// TODO 9: Após refatorar, garantir que TODOS os testes continuam passando`
+  - `//   - Rodar mvn test antes e depois de cada refatoração`
+  - `//   - Ciclo: green → refactor → green`
+
 ---
 
 ### [Dia 4 - Estratégias de Testes e Qualidade](dia-04/README.md)
 > **Foco**: Confiança para colocar em produção.
+
+#### 🎯 Objetivos de Aprendizagem
+- Compreender a Pirâmide de Testes e onde investir esforço
+- Escrever testes unitários com JUnit 5 e Mockito (padrão AAA, mocks, spies)
+- Implementar testes de integração com Testcontainers e PostgreSQL real
+- Criar Data Builders para massa de dados legível e reutilizável
+- Atingir cobertura >80% na camada Service
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Teoria | 1h30 | Pirâmide, JUnit 5, Mockito, Testcontainers, Builders |
+| Demo | 30min | Walkthrough `04-testing-demo` (testes passando ao vivo) |
+| Exercício | 2h30 | `04-employee-api-tests` (TODOs 1-7) |
+| Review | 30min | Revisão dos testes, cobertura e Q&A |
+
+#### 📦 Entregáveis
+- `04-employee-api-tests` com testes unitários e de integração passando
+- Cobertura de testes >80% na camada Service
 
 #### 📖 Guia Conceitual
 
@@ -188,6 +269,25 @@ Projeto completo demonstrando todos os conceitos do dia:
 
 ### [Dia 5 - Comunicação entre Sistemas e Segurança](dia-05/README.md)
 > **Foco**: O mundo dos Microsserviços.
+
+#### 🎯 Objetivos de Aprendizagem
+- Consumir APIs externas com Feign Client de forma declarativa
+- Implementar resiliência com Resilience4j (Retry, Circuit Breaker, Fallback)
+- Configurar CORS para permitir acesso de frontends
+- Proteger APIs com Spring Security + JWT (autenticação stateless)
+- Documentar endpoints com OpenAPI/Swagger e testar no Swagger UI
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Teoria 1 | 1h | Feign Client + Resilience4j + CORS |
+| Teoria 2 | 1h | Spring Security + JWT + OpenAPI/Swagger |
+| Demo | 30min | Walkthrough `05-integration-security-demo` |
+| Exercício | 2h | `05-employee-api-secure` (TODOs 1-8) |
+| Review | 30min | Teste integrado no Swagger UI + Q&A |
+
+#### 📦 Entregáveis
+- `05-employee-api-secure` com Feign Client, JWT, CORS e Swagger UI funcionando
 
 #### 📖 Guia Conceitual
 
@@ -274,6 +374,28 @@ Projeto completo demonstrando todos os conceitos do dia:
 
 ### [Dia 6 - Persistência Avançada e Mensageria](dia-06/README.md)
 > **Foco**: Performance e desacoplamento.
+>
+> **Pré-requisito**: Docker Compose básico para subir PostgreSQL + RabbitMQ + Redis (ver [guia-docker.md](dia-00/guia-docker.md)). Docker será aprofundado no Dia 7.
+
+#### 🎯 Objetivos de Aprendizagem
+- Identificar e resolver o problema N+1 com JOIN FETCH e @EntityGraph
+- Criar projeções DTO e implementar paginação com Pageable
+- Versionar esquema de banco com Flyway (migrations SQL)
+- Publicar e consumir mensagens com RabbitMQ (Producer/Consumer)
+- Implementar cache com Redis (@Cacheable, TTL, invalidação)
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Setup | 15min | `docker compose up` (PostgreSQL + RabbitMQ + Redis) |
+| Teoria | 1h30 | JPA N+1, Flyway, RabbitMQ, Redis |
+| Demo | 30min | Walkthrough `06-persistence-messaging-demo` |
+| Exercício | 2h15 | `06-employee-api-advanced` (TODOs 1-8) |
+| Review | 30min | Verificação: N+1 corrigido, fila funcionando, cache hit/miss |
+
+#### 📦 Entregáveis
+- `06-employee-api-advanced` com N+1 corrigido, Flyway, RabbitMQ e Redis funcionando
+- Logs SQL mostrando redução de queries após correção do N+1
 
 #### 📖 Guia Conceitual
 
@@ -357,6 +479,27 @@ Projeto completo demonstrando todos os conceitos do dia:
 
 ### [Dia 7 - Docker, Cloud Readiness e Observabilidade](dia-07/README.md)
 > **Foco**: "Na minha máquina funciona" não é desculpa.
+
+#### 🎯 Objetivos de Aprendizagem
+- Criar Dockerfiles otimizados com multi-stage build (imagem < 100MB)
+- Orquestrar stack completa com Docker Compose (app + banco + cache + fila)
+- Configurar Spring Actuator para health checks e métricas
+- Implementar logs estruturados (JSON) com Logback e MDC
+- Compreender conceitos de Observabilidade em produção e CI/CD
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Teoria 1 | 1h | Docker + Docker Compose (hands-on) |
+| Teoria 2 | 45min | Actuator + Logs Estruturados (hands-on) |
+| Teoria 3 | 15min | Observabilidade + CI/CD (conceitual) |
+| Demo | 30min | Walkthrough `07-docker-actuator-demo` (`docker compose up`) |
+| Exercício | 2h | `07-employee-api-production` (TODOs 1-7) |
+| Review | 30min | Validação: imagem < 100MB, Actuator respondendo, logs JSON |
+
+#### 📦 Entregáveis
+- `07-employee-api-production` dockerizada com Actuator e logs JSON
+- Stack completa subindo com `docker compose up` (app + PostgreSQL + Redis + RabbitMQ)
 
 #### 📖 Guia Conceitual
 
@@ -451,14 +594,36 @@ Projeto completo demonstrando os conceitos práticos do dia:
 ---
 
 ### [Dia 8 - Projeto Prático: O Desafio da Consultoria](dia-08/README.md)
-> **Hands-on**: O projeto será um **Sistema de Voucher de Compras**.
+> **Hands-on**: O projeto será um **Microsserviço de Filmes** integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started).
+
+#### 🎯 Objetivos de Aprendizagem
+- Desenvolver um microsserviço completo a partir de um contrato Swagger (Contract First)
+- Aplicar Arquitetura Hexagonal em um projeto real com integração externa
+- Consumir a API do TheMovieDB com Feign Client + Resilience4j
+- Trabalhar com ritos ágeis: Daily Scrum, Kanban, timeboxing
+- Praticar Git profissional: feature branches, commits semânticos, Code Review via PR
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Briefing | 30min | Entrega do contrato Swagger, análise, perguntas ao "cliente" |
+| Planning | 30min | Quebra de tarefas, setup Git (fork + branches) |
+| Desenvolvimento | 3h | Implementação dos TODOs 1-12 em times |
+| Code Review | 30min | PRs cruzados entre times + feedback |
+| Daily | 30min | Daily Scrum simulado + acompanhamento |
+
+#### 📦 Entregáveis
+- `08-movie-service` com arquitetura hexagonal e integração com TheMovieDB
+- Pull Request aberto com commits semânticos
+- Pelo menos endpoints de busca e favoritos funcionando com o frontend
 
 #### 📖 Guia Conceitual
 
-1. **Dinâmica de Consultoria**
-   - User Story com critérios de aceite propositalmente vagos — simulando cliente real
+1. **Dinâmica de Consultoria — Contract First**
+   - O instrutor entrega um **contrato Swagger/OpenAPI** que define os endpoints do microsserviço
+   - Um **frontend já pronto** consome esse contrato — o aluno desenvolve o backend que o alimenta
    - Fazer as perguntas certas antes de codar: escopar, negociar e priorizar
-   - Definição de "pronto": o que significa "funcionar" para o cliente vs. para o desenvolvedor
+   - Definição de "pronto": o backend funciona quando o frontend exibe os dados corretamente
 
 2. **Ritos Ágeis**
    - Daily Scrum simulado: o que fiz, o que vou fazer, quais impedimentos
@@ -471,82 +636,134 @@ Projeto completo demonstrando os conceitos práticos do dia:
    - Code Review via PR: checklist de nomenclatura, testes, tratamento de erros, segurança
    - Feedback construtivo: como apontar problemas sem ser ofensivo
 
-#### ✏️ Projeto Exercício: `08-voucher-system`
-> Sistema de Voucher de Compras — repositório template no GitHub com estrutura base pronta.
+#### ✏️ Projeto Exercício: `08-movie-service`
+> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. Um frontend já pronto consome esse contrato.
 
 **O que já vem pronto no template:**
-- Estrutura de pacotes (camadas ou hexagonal — à escolha do time)
-- `docker-compose.yml` com PostgreSQL + Redis + RabbitMQ
-- `application.yml` configurado para os containers
-- Migrations Flyway iniciais (`V1__create_vouchers.sql`, `V2__create_products.sql`)
+- Estrutura de pacotes hexagonal: `domain/`, `adapter/in/web/`, `adapter/out/rest/`, `adapter/out/persistence/`
+- `docker-compose.yml` com PostgreSQL + Redis
+- `application.yml` configurado para os containers e para a API do TheMovieDB
+- Migrations Flyway iniciais (`V1__create_favorites.sql`, `V2__create_watch_later.sql`)
 - `AbstractIntegrationTest` com Testcontainers
+- Contrato Swagger/OpenAPI (`openapi.yaml`) entregue pelo instrutor
 - `README.md` com a User Story e critérios de aceite
 
 **TODOs:**
-- `// TODO 1: Implementar VoucherService — criar, validar e resgatar vouchers`
-  - `//   - Gerar código único (UUID ou alfanumérico de 8 caracteres)`
-  - `//   - Definir data de expiração (padrão: 30 dias)`
-- `// TODO 2: Implementar regras de negócio:`
-  - `//   - Voucher expirado não pode ser resgatado → VoucherExpiredException`
-  - `//   - Voucher já utilizado não pode ser reutilizado → VoucherAlreadyRedeemedException`
-  - `//   - Valor mínimo do pedido para aplicar o voucher`
-- `// TODO 3: Criar VoucherController com endpoints REST:`
-  - `//   - POST /api/vouchers (criar) — protegido por role ADMIN`
-  - `//   - GET /api/vouchers/{code} (consultar)`
-  - `//   - POST /api/vouchers/{code}/redeem (resgatar)`
-  - `//   - GET /api/vouchers?status=ACTIVE&page=0&size=10 (listar com filtro e paginação)`
-- `// TODO 4: Adicionar validações com @Valid nos DTOs de entrada`
-- `// TODO 5: Implementar GlobalExceptionHandler com Problem Details (RFC 7807)`
-- `// TODO 6: Criar testes unitários para VoucherService (mínimo 5 cenários):`
-  - `//   - Criar voucher com sucesso`
-  - `//   - Resgatar voucher válido`
-  - `//   - Resgatar voucher expirado → exceção`
-  - `//   - Resgatar voucher já utilizado → exceção`
-  - `//   - Consultar voucher inexistente → exceção`
-- `// TODO 7: Criar testes de integração com Testcontainers para VoucherRepository`
-- `// TODO 8: Publicar evento VoucherRedeemedEvent no RabbitMQ ao resgatar voucher`
-- `// TODO 9: Cachear vouchers ativos com Redis (@Cacheable)`
-- `// TODO 10: Documentar endpoints com OpenAPI/Swagger`
-- `// TODO 11: Proteger endpoints de criação/deleção com JWT (role ADMIN)`
+- `// TODO 1: Criar o Port de saída (interface) MovieApiPort no domain/:`
+  - `//   - searchMovies(query, page): buscar filmes por texto`
+  - `//   - getMovieDetails(movieId): detalhes de um filme`
+  - `//   - getPopularMovies(page): listar filmes populares`
+  - `//   - getMovieCredits(movieId): elenco e equipe`
+- `// TODO 2: Implementar o Adapter REST TheMovieDbAdapter (adapter/out/rest/):`
+  - `//   - Usar Feign Client para consumir https://api.themoviedb.org/3/`
+  - `//   - Endpoints: /search/movie, /movie/{id}, /movie/popular, /movie/{id}/credits`
+  - `//   - Enviar API Key via header Authorization: Bearer {token}`
+  - `//   - Mapear resposta JSON do TheMovieDB para objetos do domínio`
+- `// TODO 3: Criar o Port de entrada (use case) MovieUseCasePort:`
+  - `//   - Definir operações de negócio: buscar, detalhar, listar populares, favoritar, marcar para assistir`
+- `// TODO 4: Implementar MovieService no domain/ (lógica de negócio):`
+  - `//   - Orquestrar chamadas ao MovieApiPort (TheMovieDB)`
+  - `//   - Gerenciar favoritos e lista "assistir depois" no banco local`
+  - `//   - Regra: máximo 20 filmes na lista de favoritos por usuário`
+- `// TODO 5: Criar MovieController (adapter/in/web/) seguindo o contrato Swagger:`
+  - `//   - GET /api/movies/search?query={q}&page={p} — buscar filmes`
+  - `//   - GET /api/movies/{id} — detalhes do filme (dados do TheMovieDB + status de favorito local)`
+  - `//   - GET /api/movies/popular?page={p} — filmes populares`
+  - `//   - POST /api/movies/{id}/favorite — favoritar filme`
+  - `//   - DELETE /api/movies/{id}/favorite — desfavoritar`
+  - `//   - POST /api/movies/{id}/watch-later — marcar para assistir depois`
+  - `//   - GET /api/movies/favorites?page=0&size=10 — listar favoritos (paginado)`
+- `// TODO 6: Configurar Resilience4j para chamadas ao TheMovieDB:`
+  - `//   - Retry: maxAttempts=3, waitDuration=500ms`
+  - `//   - CircuitBreaker: failureRateThreshold=50`
+  - `//   - Fallback: retornar lista vazia ou cached data quando TheMovieDB estiver fora`
+- `// TODO 7: Cachear filmes populares com Redis (@Cacheable, TTL 30 min)`
+- `// TODO 8: Implementar GlobalExceptionHandler com Problem Details (RFC 7807)`
+- `// TODO 9: Criar testes unitários para MovieService (mínimo 5 cenários):`
+  - `//   - Buscar filmes com sucesso`
+  - `//   - Favoritar filme com sucesso`
+  - `//   - Favoritar além do limite (20) → exceção`
+  - `//   - Detalhar filme inexistente → exceção`
+  - `//   - Fallback quando TheMovieDB indisponível`
+- `// TODO 10: Criar testes de integração com Testcontainers para FavoriteRepository`
+- `// TODO 11: Documentar endpoints com OpenAPI/Swagger (já definidos no contrato)`
+- `// TODO 12: Proteger endpoints de favoritos com JWT (usuário autenticado)`
 
 #### 📝 Dinâmica do Dia
-- **Manhã**: Recebimento da User Story, perguntas ao "cliente" (instrutor), planejamento e início do desenvolvimento
-- **Tarde**: Desenvolvimento ativo, code review entre times via Pull Request, acompanhamento dos instrutores
+- **Manhã**: Entrega do contrato Swagger pelo instrutor, análise dos endpoints, perguntas ao "cliente", planejamento e início do desenvolvimento com arquitetura hexagonal
+- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o frontend, code review entre times via Pull Request
 
 ---
 
-### [Dia 9 - Mentoria, Refatoração e Soft Skills](dia-09/README.md)
+### [Dia 9 - Finalização, Apresentação e Soft Skills](dia-09/README.md)
+> **Foco**: Consolidar o aprendizado e se preparar para a realidade da consultoria.
+
+#### 🎯 Objetivos de Aprendizagem
+- Finalizar o microsserviço `08-movie-service` com qualidade
+- Apresentar soluções técnicas de forma clara e objetiva
+- Receber e aplicar feedback de Code Review profissional
+- Desenvolver soft skills essenciais para consultoria
+- Compreender o caminho de evolução da carreira de desenvolvedor Java
+
+#### ⏱️ Distribuição Sugerida (5h)
+| Bloco | Duração | Conteúdo |
+|-------|---------|----------|
+| Finalização | 1h30 | Conclusão do `08-movie-service` + últimos ajustes |
+| Refactoring ao vivo | 45min | Instrutores refatoram código dos alunos (antes/depois) |
+| Soft Skills | 45min | Carreira, consultoria, certificações |
+| Apresentações | 1h30 | Cada time apresenta o projeto (15 min/time) |
+| Encerramento | 30min | Feedback, retrospectiva, próximos passos |
+
+#### 📦 Entregáveis
+- `08-movie-service` finalizado e funcionando com o frontend
+- Apresentação técnica do projeto (demo ao vivo + decisões arquiteturais)
+- Pull Request revisado e aprovado
 
 #### 📖 Guia Conceitual
 
-1. **Refactoring — Melhorando Código Existente**
-   - Code Smells: God Class, Long Method, Feature Envy, Data Clumps
-   - Técnicas: Extract Method, Extract Class, Replace Conditional with Polymorphism
-   - Refatoração segura: sempre com testes passando — green → refactor → green
-   - Antes vs. depois: impacto na legibilidade, testabilidade e manutenção
-
-2. **Soft Skills para Consultoria**
+1. **Soft Skills para Consultoria**
    - Como se destacar nos primeiros meses: proatividade, documentação e comunicação
    - Lidar com diferentes clientes: adaptar linguagem técnica ao nível do interlocutor
    - Especialista vs. generalista: vantagens, desvantagens, quando escolher cada caminho
    - Certificações, comunidades, open source e networking
 
-#### 🔄 Continuação do Projeto: `08-voucher-system`
+2. **Como Apresentar Soluções Técnicas**
+   - Estrutura de uma demo: contexto do problema → solução → decisões técnicas → aprendizados
+   - Mostrar código relevante (não todo): arquitetura, padrão aplicado, teste que prova
+   - Lidar com perguntas técnicas: "não sei, vou verificar" é melhor que inventar
+   - Tempo: respeitar o timebox de 15 minutos — praticar antes
+
+3. **Carreira e Próximos Passos**
+   - Roadmap do desenvolvedor Java: Spring → Cloud → Microsserviços → Arquitetura
+   - Certificações relevantes: Oracle Java, Spring Professional, AWS/Azure
+   - Comunidades: JUG (Java User Group), meetups, conferências (TDC, QCon)
+   - Open Source: como contribuir e por que isso importa no currículo
+
+#### 🔄 Continuação do Projeto: `08-movie-service`
 
 **Atividades do dia:**
+- **Finalização**: times completam os TODOs restantes e fazem últimos ajustes
 - **Refactoring ao vivo**: instrutores selecionam trechos de código dos alunos (com permissão) e refatoram ao vivo — antes/depois na tela
-- **Apresentação Final**: cada time demonstra o `08-voucher-system` (15 min por time — demo ao vivo + decisões técnicas + aprendizados)
-- **Feedback dos instrutores e encerramento do treinamento**
+- **Apresentação Final**: cada time apresenta o `08-movie-service` (15 min por time):
+  - Demo ao vivo com o frontend consumindo os endpoints
+  - Decisões arquiteturais: por que hexagonal, como organizaram os adapters
+  - Desafios encontrados: integração com TheMovieDB, resiliência, testes
+  - Aprendizados do treinamento
+- **Feedback dos instrutores**: pontos fortes, oportunidades de melhoria, dicas para o próximo nível
+- **Retrospectiva**: o que funcionou, o que melhorar (formato ágil)
+- **Encerramento do treinamento e entrega de certificados**
 
 ## 🚀 Projeto Integrador
 
-No Dia 8, os alunos receberão o desafio de desenvolver um **Sistema de Voucher de Compras**, simulando a dinâmica de uma consultoria real:
+No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de Filmes** com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta um frontend fornecido pelo instrutor:
 
-- Recebimento de User Story com critérios de aceite
-- Arquitetura em camadas / hexagonal
+- Contrato Swagger/OpenAPI entregue pelo instrutor (Contract First)
+- Arquitetura Hexagonal com Ports & Adapters
+- Integração com API externa (TheMovieDB) via Feign Client + Resilience4j
 - Testes automatizados com Testcontainers
 - Code Review via Pull Requests
 - Simulação de Daily Scrum
+- Validação com frontend real consumindo os endpoints
 - Apresentação técnica da solução (Dia 9)
 
 ## 📖 Pré-requisitos
