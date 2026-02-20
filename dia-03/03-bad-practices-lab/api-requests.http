@@ -1,0 +1,194 @@
+### =============================
+### 03-bad-practices-lab
+### Porta: 8085
+### =============================
+
+### ----- Listar Todos os Pedidos -----
+
+GET http://localhost:8085/api/orders
+Accept: application/json
+
+### ----- Buscar Pedido por ID -----
+
+GET http://localhost:8085/api/orders/1
+Accept: application/json
+
+### ----- Buscar Pedido — Não encontrado -----
+
+GET http://localhost:8085/api/orders/999
+Accept: application/json
+
+### ----- Criar Pedido — Sucesso -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Ana Costa",
+  "customerEmail": "ana.costa@email.com",
+  "shippingRegion": "SUDESTE",
+  "items": [
+    {"productId": 1, "quantity": 1},
+    {"productId": 2, "quantity": 2}
+  ]
+}
+
+### ----- Criar Pedido — Com Desconto 5% (qty >= 3) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Desconto 5%",
+  "customerEmail": "desconto5@email.com",
+  "shippingRegion": "SUL",
+  "items": [
+    {"productId": 5, "quantity": 3}
+  ]
+}
+
+### ----- Criar Pedido — Com Desconto 10% (qty >= 5) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Desconto 10%",
+  "customerEmail": "desconto10@email.com",
+  "shippingRegion": "NORDESTE",
+  "items": [
+    {"productId": 2, "quantity": 5}
+  ]
+}
+
+### ----- Criar Pedido — Com Desconto 15% (qty >= 10) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Desconto 15%",
+  "customerEmail": "desconto15@email.com",
+  "shippingRegion": "NORTE",
+  "items": [
+    {"productId": 2, "quantity": 10}
+  ]
+}
+
+### ----- Criar Pedido — Frete Grátis (total > 500) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Frete Grátis",
+  "customerEmail": "fretegratis@email.com",
+  "shippingRegion": "NORTE",
+  "items": [
+    {"productId": 1, "quantity": 1}
+  ]
+}
+
+### ----- Criar Pedido — Sem Nome (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerEmail": "sem.nome@email.com",
+  "shippingRegion": "SUDESTE",
+  "items": [
+    {"productId": 1, "quantity": 1}
+  ]
+}
+
+### ----- Criar Pedido — Email Inválido (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Email Invalido",
+  "customerEmail": "nao-e-email",
+  "shippingRegion": "SUDESTE",
+  "items": [
+    {"productId": 1, "quantity": 1}
+  ]
+}
+
+### ----- Criar Pedido — Sem Itens (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Sem Itens",
+  "customerEmail": "sem.itens@email.com",
+  "shippingRegion": "SUDESTE",
+  "items": []
+}
+
+### ----- Criar Pedido — Região Inválida (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Região Inv",
+  "customerEmail": "regiao@email.com",
+  "shippingRegion": "MARTE",
+  "items": [
+    {"productId": 1, "quantity": 1}
+  ]
+}
+
+### ----- Criar Pedido — Produto Inexistente (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Prod Inex",
+  "customerEmail": "prod@email.com",
+  "shippingRegion": "SUL",
+  "items": [
+    {"productId": 999, "quantity": 1}
+  ]
+}
+
+### ----- Criar Pedido — Quantidade Zero (Erro) -----
+
+POST http://localhost:8085/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Qty Zero",
+  "customerEmail": "qty@email.com",
+  "shippingRegion": "SUL",
+  "items": [
+    {"productId": 1, "quantity": 0}
+  ]
+}
+
+### ----- Consultar Custo de Frete — SUDESTE -----
+
+GET http://localhost:8085/api/orders/shipping/SUDESTE
+Accept: application/json
+
+### ----- Consultar Custo de Frete — NORTE -----
+
+GET http://localhost:8085/api/orders/shipping/NORTE
+Accept: application/json
+
+### ----- Resumo do Pedido -----
+
+GET http://localhost:8085/api/orders/1/summary
+Accept: text/plain
+
+### ----- Deletar Pedido -----
+
+DELETE http://localhost:8085/api/orders/2
+
+### ----- Deletar — Não encontrado -----
+
+DELETE http://localhost:8085/api/orders/999

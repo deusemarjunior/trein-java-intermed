@@ -1,0 +1,130 @@
+### ========================================
+### Clean Architecture Demo — Products API
+### Porta: 8083
+### ========================================
+
+### --------------------------------
+### 1. Listar todos os produtos
+### --------------------------------
+GET http://localhost:8083/api/products
+Content-Type: application/json
+
+### --------------------------------
+### 2. Buscar produto por ID
+### --------------------------------
+GET http://localhost:8083/api/products/1
+Content-Type: application/json
+
+### --------------------------------
+### 3. Criar produto (sucesso)
+### --------------------------------
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+{
+    "name": "Webcam Logitech C920",
+    "sku": "WEB-0001",
+    "price": 650.00,
+    "description": "Webcam Full HD 1080p com microfone integrado"
+}
+
+### --------------------------------
+### 4. Criar produto (outro)
+### --------------------------------
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+{
+    "name": "SSD Samsung 1TB",
+    "sku": "SSD-0001",
+    "price": 520.00,
+    "description": "SSD NVMe M.2, leitura 3500MB/s"
+}
+
+### --------------------------------
+### 5. Criar com SKU duplicado (esperar 409 Conflict)
+### --------------------------------
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+{
+    "name": "Outra Webcam",
+    "sku": "WEB-0001",
+    "price": 400.00,
+    "description": "Deveria falhar por SKU duplicado"
+}
+
+### --------------------------------
+### 6. Criar com dados inválidos (esperar 400 Bad Request)
+### --------------------------------
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+{
+    "name": "",
+    "sku": "invalido",
+    "price": -10.00,
+    "description": ""
+}
+
+### --------------------------------
+### 7. Criar com nome muito curto (esperar 400)
+### --------------------------------
+POST http://localhost:8083/api/products
+Content-Type: application/json
+
+{
+    "name": "AB",
+    "sku": "ABC-0001",
+    "price": 100.00
+}
+
+### --------------------------------
+### 8. Buscar produto inexistente (esperar 404)
+### --------------------------------
+GET http://localhost:8083/api/products/999
+Content-Type: application/json
+
+### --------------------------------
+### 9. Atualizar produto
+### --------------------------------
+PUT http://localhost:8083/api/products/1
+Content-Type: application/json
+
+{
+    "name": "Notebook Dell Inspiron Atualizado",
+    "sku": "NOT-0001",
+    "price": 4800.00,
+    "description": "Notebook Dell Inspiron 15, 32GB RAM, SSD 1TB"
+}
+
+### --------------------------------
+### 10. Atualizar com SKU de outro produto (esperar 409)
+### --------------------------------
+PUT http://localhost:8083/api/products/1
+Content-Type: application/json
+
+{
+    "name": "Notebook Dell",
+    "sku": "MOU-0001",
+    "price": 4500.00,
+    "description": "Tentando usar SKU de outro produto"
+}
+
+### --------------------------------
+### 11. Deletar produto
+### --------------------------------
+DELETE http://localhost:8083/api/products/5
+Content-Type: application/json
+
+### --------------------------------
+### 12. Deletar produto inexistente (esperar 404)
+### --------------------------------
+DELETE http://localhost:8083/api/products/999
+Content-Type: application/json
+
+### --------------------------------
+### 13. Verificar lista após operações
+### --------------------------------
+GET http://localhost:8083/api/products
+Content-Type: application/json
