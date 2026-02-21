@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Integration Security Demo API (8088)",
+      "request": "launch",
+      "mainClass": "com.example.demo.IntegrationSecurityDemoApplication",
+      "projectName": "integration-security-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Integration Security Demo API (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.demo.IntegrationSecurityDemoApplication",
+      "projectName": "integration-security-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5088"
+    }
+  ]
+}

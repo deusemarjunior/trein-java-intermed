@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Employee API Secure (8089)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiSecureApplication",
+      "projectName": "employee-api-secure",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Employee API Secure (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiSecureApplication",
+      "projectName": "employee-api-secure",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5089"
+    }
+  ]
+}
