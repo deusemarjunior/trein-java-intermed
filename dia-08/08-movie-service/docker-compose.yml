@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: movie-postgres
+    environment:
+      POSTGRES_DB: moviedb
+      POSTGRES_USER: movie
+      POSTGRES_PASSWORD: movie123
+    ports:
+      - "5435:5432"
+    volumes:
+      - movie-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movie -d moviedb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: movie-redis
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  themovie-web:
+    build: ../themovie-web
+    container_name: themovie-web
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://host.docker.internal:8080
+
+  # Alternativa: usar imagem publicada (quando disponível no registry)
+  # themovie-web:
+  #   image: ghcr.io/deusemar/themovie-web:latest
+  #   container_name: themovie-web
+  #   ports:
+  #     - "3000:80"
+  #   environment:
+  #     - API_URL=http://host.docker.internal:8080
+
+  # Descomente abaixo após implementar o Dockerfile (multi-stage build)
+  # app:
+  #   build: .
+  #   container_name: movie-service
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/moviedb
+  #     SPRING_DATASOURCE_USERNAME: movie
+  #     SPRING_DATASOURCE_PASSWORD: movie123
+  #     SPRING_DATA_REDIS_HOST: redis
+  #     SPRING_DATA_REDIS_PORT: 6379
+  #     TMDB_API_KEY: ${TMDB_API_KEY}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  movie-postgres-data:

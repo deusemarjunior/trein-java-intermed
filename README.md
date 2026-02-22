@@ -600,6 +600,7 @@ Projeto completo demonstrando os conceitos práticos do dia:
 - Desenvolver um microsserviço completo a partir de um contrato Swagger (Contract First)
 - Aplicar Arquitetura Hexagonal em um projeto real com integração externa
 - Consumir a API do TheMovieDB com Feign Client + Resilience4j
+- Validar o backend com um frontend React real (**TheMovie Web**) rodando via Docker
 - Trabalhar com ritos ágeis: Daily Scrum, Kanban, timeboxing
 - Praticar Git profissional: feature branches, commits semânticos, Code Review via PR
 
@@ -608,14 +609,66 @@ Projeto completo demonstrando os conceitos práticos do dia:
 |-------|---------|----------|
 | Briefing | 30min | Entrega do contrato Swagger, análise, perguntas ao "cliente" |
 | Planning | 30min | Quebra de tarefas, setup Git (fork + branches) |
-| Desenvolvimento | 3h | Implementação dos TODOs 1-12 em times |
-| Code Review | 30min | PRs cruzados entre times + feedback |
+| Desenvolvimento | 3h | Implementação dos TODOs 1-12 individualmente |
+| Code Review | 30min | PRs cruzados entre colegas + feedback |
 | Daily | 30min | Daily Scrum simulado + acompanhamento |
 
 #### 📦 Entregáveis
 - `08-movie-service` com arquitetura hexagonal e integração com TheMovieDB
 - Pull Request aberto com commits semânticos
-- Pelo menos endpoints de busca e favoritos funcionando com o frontend
+- Pelo menos endpoints de busca e favoritos funcionando com o frontend **TheMovie Web**
+
+#### 🖥️ Frontend: TheMovie Web (React)
+
+> O frontend é uma aplicação **React** pré-construída e entregue como **imagem Docker**. O aluno **não precisa ter Node.js instalado** — basta rodar o container e apontar para o seu backend.
+
+**Como executar:**
+
+```bash
+# Rodar o frontend apontando para o backend local (porta 8080)
+docker run -d \
+  --name themovie-web \
+  -p 3000:80 \
+  -e REACT_APP_API_URL=http://localhost:8080 \
+  ghcr.io/deusemar/themovie-web:latest
+```
+
+Após subir, acessar **http://localhost:3000** no navegador.
+
+**Variáveis de ambiente:**
+| Variável | Descrição | Default |
+|----------|-----------|----------|
+| `REACT_APP_API_URL` | URL base do backend (API do aluno) | `http://localhost:8080` |
+
+**Endpoints que o frontend consome:**
+| Método | Endpoint | Funcionalidade no frontend |
+|--------|----------|----------------------------|
+| `GET` | `/api/movies/search?query={q}&page={p}` | Busca de filmes |
+| `GET` | `/api/movies/{id}` | Página de detalhes do filme |
+| `GET` | `/api/movies/popular?page={p}` | Carrossel de filmes populares |
+| `POST` | `/api/movies/{id}/favorite` | Botão de favoritar |
+| `DELETE` | `/api/movies/{id}/favorite` | Botão de desfavoritar |
+| `POST` | `/api/movies/{id}/watch-later` | Botão "assistir depois" |
+| `GET` | `/api/movies/favorites?page=0&size=10` | Página de favoritos |
+| `POST` | `/auth/login` | Tela de login (JWT) |
+
+**Dica:** inclua o frontend no `docker-compose.yml` do projeto para subir tudo junto:
+
+```yaml
+services:
+  # ... PostgreSQL, Redis, etc.
+
+  themovie-web:
+    image: ghcr.io/deusemar/themovie-web:latest
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - app
+```
+
+> **Critério de aceite**: o backend está "pronto" quando o frontend exibe os dados corretamente — buscar filmes, ver detalhes, favoritar e listar favoritos.
 
 #### 📖 Guia Conceitual
 
@@ -623,7 +676,7 @@ Projeto completo demonstrando os conceitos práticos do dia:
    - O instrutor entrega um **contrato Swagger/OpenAPI** que define os endpoints do microsserviço
    - Um **frontend já pronto** consome esse contrato — o aluno desenvolve o backend que o alimenta
    - Fazer as perguntas certas antes de codar: escopar, negociar e priorizar
-   - Definição de "pronto": o backend funciona quando o frontend exibe os dados corretamente
+   - Definição de "pronto": o backend funciona quando o **TheMovie Web** (frontend React via Docker) exibe os dados corretamente
 
 2. **Ritos Ágeis**
    - Daily Scrum simulado: o que fiz, o que vou fazer, quais impedimentos
@@ -637,11 +690,11 @@ Projeto completo demonstrando os conceitos práticos do dia:
    - Feedback construtivo: como apontar problemas sem ser ofensivo
 
 #### ✏️ Projeto Exercício: `08-movie-service`
-> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. Um frontend já pronto consome esse contrato.
+> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. O frontend **TheMovie Web** (React) roda via Docker e consome esse contrato.
 
 **O que já vem pronto no template:**
 - Estrutura de pacotes hexagonal: `domain/`, `adapter/in/web/`, `adapter/out/rest/`, `adapter/out/persistence/`
-- `docker-compose.yml` com PostgreSQL + Redis
+- `docker-compose.yml` com PostgreSQL + Redis + **TheMovie Web** (frontend React)
 - `application.yml` configurado para os containers e para a API do TheMovieDB
 - Migrations Flyway iniciais (`V1__create_favorites.sql`, `V2__create_watch_later.sql`)
 - `AbstractIntegrationTest` com Testcontainers
@@ -691,7 +744,7 @@ Projeto completo demonstrando os conceitos práticos do dia:
 
 #### 📝 Dinâmica do Dia
 - **Manhã**: Entrega do contrato Swagger pelo instrutor, análise dos endpoints, perguntas ao "cliente", planejamento e início do desenvolvimento com arquitetura hexagonal
-- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o frontend, code review entre times via Pull Request
+- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o **TheMovie Web** (`docker compose up` → http://localhost:3000), code review entre colegas via Pull Request
 
 ---
 
@@ -711,11 +764,11 @@ Projeto completo demonstrando os conceitos práticos do dia:
 | Finalização | 1h30 | Conclusão do `08-movie-service` + últimos ajustes |
 | Refactoring ao vivo | 45min | Instrutores refatoram código dos alunos (antes/depois) |
 | Soft Skills | 45min | Carreira, consultoria, certificações |
-| Apresentações | 1h30 | Cada time apresenta o projeto (15 min/time) |
+| Apresentações | 1h30 | Cada aluno apresenta o projeto (10-15 min/aluno) |
 | Encerramento | 30min | Feedback, retrospectiva, próximos passos |
 
 #### 📦 Entregáveis
-- `08-movie-service` finalizado e funcionando com o frontend
+- `08-movie-service` finalizado e funcionando com o frontend **TheMovie Web** via Docker
 - Apresentação técnica do projeto (demo ao vivo + decisões arquiteturais)
 - Pull Request revisado e aprovado
 
@@ -742,11 +795,11 @@ Projeto completo demonstrando os conceitos práticos do dia:
 #### 🔄 Continuação do Projeto: `08-movie-service`
 
 **Atividades do dia:**
-- **Finalização**: times completam os TODOs restantes e fazem últimos ajustes
+- **Finalização**: alunos completam os TODOs restantes individualmente e fazem últimos ajustes
 - **Refactoring ao vivo**: instrutores selecionam trechos de código dos alunos (com permissão) e refatoram ao vivo — antes/depois na tela
-- **Apresentação Final**: cada time apresenta o `08-movie-service` (15 min por time):
-  - Demo ao vivo com o frontend consumindo os endpoints
-  - Decisões arquiteturais: por que hexagonal, como organizaram os adapters
+- **Apresentação Final**: cada aluno apresenta o seu `08-movie-service` (10-15 min por aluno):
+  - Demo ao vivo com o **TheMovie Web** (frontend React) consumindo os endpoints
+  - Decisões arquiteturais: por que hexagonal, como organizou os adapters
   - Desafios encontrados: integração com TheMovieDB, resiliência, testes
   - Aprendizados do treinamento
 - **Feedback dos instrutores**: pontos fortes, oportunidades de melhoria, dicas para o próximo nível
@@ -755,15 +808,16 @@ Projeto completo demonstrando os conceitos práticos do dia:
 
 ## 🚀 Projeto Integrador
 
-No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de Filmes** com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta um frontend fornecido pelo instrutor:
+No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de Filmes** com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta o frontend **TheMovie Web** (React) fornecido pelo instrutor como imagem Docker:
 
 - Contrato Swagger/OpenAPI entregue pelo instrutor (Contract First)
 - Arquitetura Hexagonal com Ports & Adapters
 - Integração com API externa (TheMovieDB) via Feign Client + Resilience4j
+- Frontend **TheMovie Web** (React) via Docker — `docker run -p 3000:80 ghcr.io/deusemar/themovie-web:latest`
 - Testes automatizados com Testcontainers
 - Code Review via Pull Requests
 - Simulação de Daily Scrum
-- Validação com frontend real consumindo os endpoints
+- Validação com frontend real consumindo os endpoints (http://localhost:3000)
 - Apresentação técnica da solução (Dia 9)
 
 ## 📖 Pré-requisitos

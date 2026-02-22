@@ -1,0 +1,895 @@
+################################################################################
+#                                                                              #
+#   CONTRATO DE API — Movie Service                                            #
+#   Versão: 1.0.0                                                              #
+#   Data: 2026-02-22                                                           #
+#                                                                              #
+#   Este documento é o contrato oficial entregue pelo "cliente" (instrutor).    #
+#   Todos os endpoints devem ser implementados conforme descrito aqui.         #
+#   O frontend TheMovie Web (React) consome esta API.                          #
+#                                                                              #
+#   Critério de aceite: o frontend deve funcionar corretamente quando           #
+#   conectado ao backend implementado pelo aluno.                              #
+#                                                                              #
+################################################################################
+
+openapi: 3.0.3
+
+info:
+  title: Movie Service API
+  description: |
+    ## Microsserviço de Filmes — Desafio Consultoria
+
+    API REST para busca, visualização e gerenciamento de filmes, integrando
+    com a API do [TheMovieDB](https://developer.themoviedb.org/) como fonte
+    de dados de filmes.
+
+    ### Funcionalidades principais
+    - **Busca de filmes** por texto (integração com TheMovieDB)
+    - **Filmes populares** com paginação
+    - **Detalhes do filme** incluindo elenco e equipe técnica
+    - **Favoritos** — adicionar, remover e listar (máximo 20 por usuário)
+    - **Assistir depois** — marcar filmes para ver depois
+    - **Autenticação JWT** — login com email/senha
+
+    ### Regras de negócio
+    | Regra | Descrição |
+    |-------|-----------|
+    | RN-01 | Cada usuário pode ter no **máximo 20 filmes favoritos** |
+    | RN-02 | Não é possível favoritar o **mesmo filme duas vezes** |
+    | RN-03 | Quando o serviço externo (TheMovieDB) estiver indisponível, o endpoint de filmes populares deve retornar dados do **cache** ou uma **lista vazia** (fallback) |
+    | RN-04 | Endpoints de favoritos e watch-later exigem **autenticação JWT** |
+    | RN-05 | O campo `favorite` e `watchLater` nos detalhes do filme devem refletir o status do **usuário autenticado** |
+    | RN-06 | Filmes populares devem ser **cacheados por 30 minutos** |
+
+    ### Stack obrigatória
+    - Java 21 + Spring Boot 3.2
+    - Spring Cloud OpenFeign (integração TheMovieDB)
+    - Spring Data JPA + PostgreSQL (favoritos, watch-later, usuários)
+    - Redis (cache de filmes populares)
+    - Resilience4j (retry + circuit breaker)
+    - JWT (autenticação)
+    - Arquitetura Hexagonal (Ports & Adapters)
+
+    ### Infraestrutura fornecida (Docker Compose)
+    | Serviço | Porta | Descrição |
+    |---------|-------|-----------|
+    | PostgreSQL 16 | 5435 | Banco de dados |
+    | Redis 7 | 6382 | Cache |
+    | TheMovie Web | 3000 | Frontend React (validação visual) |
+
+    ### Usuários pré-cadastrados (seed)
+    | Email | Senha | Role |
+    |-------|-------|------|
+    | `user@movie.com` | `123456` | USER |
+    | `admin@movie.com` | `123456` | ADMIN |
+
+  version: 1.0.0
+  contact:
+    name: Equipe de Treinamento
+  license:
+    name: Uso interno — Treinamento
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor de desenvolvimento local
+
+tags:
+  - name: Filmes
+    description: |
+      Endpoints para busca, detalhes, filmes populares e créditos.
+      Dados provenientes da API do TheMovieDB.
+  - name: Favoritos
+    description: |
+      Gerenciamento de filmes favoritos do usuário.
+      Requer autenticação JWT. Máximo de 20 favoritos por usuário.
+  - name: Watch Later
+    description: |
+      Marcar filmes para assistir depois.
+      Requer autenticação JWT.
+  - name: Autenticação
+    description: |
+      Login com email/senha para obtenção de token JWT.
+      O token deve ser enviado no header `Authorization: Bearer {token}`.
+
+################################################################################
+#                              ENDPOINTS                                       #
+################################################################################
+
+paths:
+
+  # ─────────────────────────────────────────────────
+  #  FILMES — Busca, Populares, Detalhes, Créditos
+  # ─────────────────────────────────────────────────
+
+  /api/movies/search:
+    get:
+      tags: [Filmes]
+      summary: Buscar filmes por texto
+      description: |
+        Realiza busca de filmes na API do TheMovieDB pelo texto informado.
+        Retorna resultados paginados conforme a API externa.
+
+        **Exemplo de uso no frontend:** barra de pesquisa na página principal.
+      operationId: searchMovies
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Texto de busca (ex. "Matrix", "Vingadores", "Interestelar")
+          schema:
+            type: string
+            minLength: 1
+          example: "Matrix"
+        - name: page
+          in: query
+          required: false
+          description: Número da página (inicia em 1, padrão 1)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+      responses:
+        '200':
+          description: Lista paginada de filmes correspondentes à busca
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoviePage'
+              example:
+                movies:
+                  - id: 603
+                    title: "The Matrix"
+                    overview: "Um programador de computadores descobre que a realidade como ele a conhece é uma simulação criada por máquinas..."
+                    posterPath: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg"
+                    backdropPath: "/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg"
+                    releaseDate: "1999-03-31"
+                    voteAverage: 8.2
+                    voteCount: 24521
+                    popularity: 78.456
+                    favorite: false
+                    watchLater: false
+                  - id: 604
+                    title: "The Matrix Reloaded"
+                    overview: "Neo e os líderes rebeldes estimam que têm 72 horas..."
+                    posterPath: "/aA5qHS0FbGguGSEqMmHDYBJEMPJ.jpg"
+                    backdropPath: "/pdTt0hliNYShFKaJVlfBHrgyMPi.jpg"
+                    releaseDate: "2003-05-15"
+                    voteAverage: 7.0
+                    voteCount: 11234
+                    popularity: 45.123
+                    favorite: false
+                    watchLater: false
+                page: 1
+                totalPages: 2
+                totalResults: 12
+        '503':
+          description: Serviço externo (TheMovieDB) indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Service Unavailable"
+                status: 503
+                detail: "Serviço externo TheMovieDB está temporariamente indisponível"
+                instance: "/api/movies/search"
+
+  /api/movies/popular:
+    get:
+      tags: [Filmes]
+      summary: Listar filmes populares
+      description: |
+        Retorna os filmes mais populares do momento, consumidos da API do TheMovieDB.
+
+        **Regra RN-06:** Este endpoint deve utilizar cache Redis com TTL de 30 minutos
+        para evitar chamadas desnecessárias à API externa.
+
+        **Regra RN-03:** Caso o TheMovieDB esteja indisponível e não haja cache,
+        retornar uma lista vazia como fallback.
+
+        **Exemplo de uso no frontend:** página inicial exibindo filmes populares.
+      operationId: getPopularMovies
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Número da página (inicia em 1, padrão 1)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+      responses:
+        '200':
+          description: Lista paginada de filmes populares
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MoviePage'
+              example:
+                movies:
+                  - id: 912649
+                    title: "Venom: The Last Dance"
+                    overview: "Eddie Brock e Venom estão em fuga..."
+                    posterPath: "/aosm8NMQ3UyoBVpSxyimorCQykC.jpg"
+                    backdropPath: "/3V4kLQg0kSqPLctI5ziYWabAZYF.jpg"
+                    releaseDate: "2024-10-22"
+                    voteAverage: 6.5
+                    voteCount: 1823
+                    popularity: 321.789
+                    favorite: false
+                    watchLater: false
+                page: 1
+                totalPages: 500
+                totalResults: 10000
+
+  /api/movies/{id}:
+    get:
+      tags: [Filmes]
+      summary: Obter detalhes de um filme
+      description: |
+        Retorna os detalhes completos de um filme específico, incluindo sinopse,
+        nota, data de lançamento e caminhos para imagens.
+
+        **Regra RN-05:** Os campos `favorite` e `watchLater` devem refletir
+        o status do usuário autenticado. Se não houver usuário autenticado,
+        ambos devem ser `false`.
+
+        **Exemplo de uso no frontend:** página de detalhes de um filme.
+      operationId: getMovieDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do filme no TheMovieDB
+          schema:
+            type: integer
+            format: int64
+          example: 603
+      responses:
+        '200':
+          description: Detalhes completos do filme
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+              example:
+                id: 603
+                title: "The Matrix"
+                overview: "Um programador de computadores descobre que a realidade como ele a conhece é uma simulação criada por máquinas inteligentes, e se junta a um grupo de rebeldes para lutar contra os controladores."
+                posterPath: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg"
+                backdropPath: "/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg"
+                releaseDate: "1999-03-31"
+                voteAverage: 8.2
+                voteCount: 24521
+                popularity: 78.456
+                favorite: true
+                watchLater: false
+        '404':
+          description: Filme não encontrado no TheMovieDB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Not Found"
+                status: 404
+                detail: "Filme não encontrado com ID: 999999"
+                instance: "/api/movies/999999"
+        '503':
+          description: Serviço externo indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /api/movies/{id}/credits:
+    get:
+      tags: [Filmes]
+      summary: Obter elenco e equipe técnica de um filme
+      description: |
+        Retorna o elenco (cast) e a equipe técnica (crew) de um filme específico.
+
+        **Exemplo de uso no frontend:** seção de elenco na página de detalhes.
+      operationId: getMovieCredits
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do filme no TheMovieDB
+          schema:
+            type: integer
+            format: int64
+          example: 603
+      responses:
+        '200':
+          description: Créditos do filme (elenco e equipe)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieCredits'
+              example:
+                movieId: 603
+                cast:
+                  - id: 6384
+                    name: "Keanu Reeves"
+                    character: "Thomas A. Anderson / Neo"
+                    profilePath: "/4D0PpNI0kmP58hgrwGC3wCjxhnm.jpg"
+                  - id: 2975
+                    name: "Laurence Fishburne"
+                    character: "Morpheus"
+                    profilePath: "/8suOhUmPbfKqDQ17jQ1Gy0mI3P4.jpg"
+                  - id: 530
+                    name: "Carrie-Anne Moss"
+                    character: "Trinity"
+                    profilePath: "/xD4jTO1ciwGMumJGfBRfTBjurHi.jpg"
+                crew:
+                  - id: 9340
+                    name: "Lana Wachowski"
+                    job: "Director"
+                    department: "Directing"
+                    profilePath: "/cDOz753DKwkLR4sDPHOHhJXSmry.jpg"
+                  - id: 9339
+                    name: "Lilly Wachowski"
+                    job: "Director"
+                    department: "Directing"
+                    profilePath: "/mOCNvJFGNCAMjhMEFiRxfJTwjHu.jpg"
+        '404':
+          description: Filme não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  # ─────────────────────────────────────────────────
+  #  FAVORITOS — Adicionar, Remover, Listar
+  # ─────────────────────────────────────────────────
+
+  /api/movies/{id}/favorite:
+    post:
+      tags: [Favoritos]
+      summary: Favoritar um filme
+      description: |
+        Adiciona um filme à lista de favoritos do usuário autenticado.
+
+        **Regra RN-01:** Cada usuário pode ter no máximo **20 filmes favoritos**.
+        Se o limite for atingido, retorna HTTP 422.
+
+        **Regra RN-02:** Não é possível favoritar o mesmo filme duas vezes.
+        Se já estiver nos favoritos, retorna HTTP 409.
+      operationId: addFavorite
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do filme no TheMovieDB
+          schema:
+            type: integer
+            format: int64
+          example: 603
+      responses:
+        '201':
+          description: Filme adicionado aos favoritos com sucesso
+        '401':
+          description: Token JWT ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Unauthorized"
+                status: 401
+                detail: "Token JWT ausente ou inválido"
+                instance: "/api/movies/603/favorite"
+        '409':
+          description: Filme já está nos favoritos (RN-02)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Conflict"
+                status: 409
+                detail: "Filme 603 já está nos favoritos"
+                instance: "/api/movies/603/favorite"
+        '422':
+          description: Limite máximo de 20 favoritos atingido (RN-01)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Unprocessable Entity"
+                status: 422
+                detail: "Limite máximo de 20 favoritos atingido"
+                instance: "/api/movies/603/favorite"
+      security:
+        - BearerAuth: []
+
+    delete:
+      tags: [Favoritos]
+      summary: Remover filme dos favoritos
+      description: |
+        Remove um filme da lista de favoritos do usuário autenticado.
+        Retorna 204 mesmo que o filme não estivesse nos favoritos (idempotente).
+      operationId: removeFavorite
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do filme no TheMovieDB
+          schema:
+            type: integer
+            format: int64
+          example: 603
+      responses:
+        '204':
+          description: Filme removido dos favoritos (ou já não estava)
+        '401':
+          description: Token JWT ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+        - BearerAuth: []
+
+  /api/movies/favorites:
+    get:
+      tags: [Favoritos]
+      summary: Listar filmes favoritos do usuário
+      description: |
+        Retorna a lista paginada de filmes favoritos do usuário autenticado.
+        Os dados do filme (título, poster, etc.) são enriquecidos via TheMovieDB.
+
+        **Exemplo de uso no frontend:** página "Meus Favoritos".
+      operationId: getFavorites
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Número da página (inicia em 0, padrão 0)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          required: false
+          description: Quantidade de itens por página (padrão 10, máximo 50)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+          example: 10
+      responses:
+        '200':
+          description: Lista paginada de filmes favoritos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritePage'
+              example:
+                content:
+                  - id: 603
+                    title: "The Matrix"
+                    overview: "Um programador de computadores descobre..."
+                    posterPath: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg"
+                    backdropPath: "/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg"
+                    releaseDate: "1999-03-31"
+                    voteAverage: 8.2
+                    voteCount: 24521
+                    popularity: 78.456
+                    favorite: true
+                    watchLater: false
+                page: 0
+                size: 10
+                totalElements: 3
+                totalPages: 1
+        '401':
+          description: Token JWT ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+        - BearerAuth: []
+
+  # ─────────────────────────────────────────────────
+  #  WATCH LATER — Assistir Depois
+  # ─────────────────────────────────────────────────
+
+  /api/movies/{id}/watch-later:
+    post:
+      tags: [Watch Later]
+      summary: Marcar filme para assistir depois
+      description: |
+        Adiciona um filme à lista de "assistir depois" do usuário autenticado.
+      operationId: addWatchLater
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do filme no TheMovieDB
+          schema:
+            type: integer
+            format: int64
+          example: 603
+      responses:
+        '201':
+          description: Filme marcado para assistir depois
+        '401':
+          description: Token JWT ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+      security:
+        - BearerAuth: []
+
+  # ─────────────────────────────────────────────────
+  #  AUTENTICAÇÃO — Login JWT
+  # ─────────────────────────────────────────────────
+
+  /auth/login:
+    post:
+      tags: [Autenticação]
+      summary: Autenticar e obter token JWT
+      description: |
+        Autentica o usuário com email e senha, retornando um token JWT
+        que deve ser enviado nos headers das requisições protegidas.
+
+        **Uso:** `Authorization: Bearer {token}`
+
+        **Validade:** 1 hora (3600 segundos)
+
+        ### Usuários disponíveis (seed)
+        | Email | Senha |
+        |-------|-------|
+        | `user@movie.com` | `123456` |
+        | `admin@movie.com` | `123456` |
+      operationId: login
+      requestBody:
+        required: true
+        description: Credenciais do usuário
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              user:
+                summary: Login como usuário
+                value:
+                  email: "user@movie.com"
+                  password: "123456"
+              admin:
+                summary: Login como administrador
+                value:
+                  email: "admin@movie.com"
+                  password: "123456"
+      responses:
+        '200':
+          description: Token JWT gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              example:
+                token: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQG1vdmllLmNvbSIsImlhdCI6MTcwOTQ5MDAwMCwiZXhwIjoxNzA5NDkzNjAwfQ.abc123"
+                type: "Bearer"
+                expiresIn: 3600
+        '401':
+          description: Email ou senha inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+              example:
+                type: "about:blank"
+                title: "Unauthorized"
+                status: 401
+                detail: "Email ou senha inválidos"
+                instance: "/auth/login"
+
+################################################################################
+#                           COMPONENTES (SCHEMAS)                              #
+################################################################################
+
+components:
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT obtido via `POST /auth/login`.
+        Enviar no header: `Authorization: Bearer {token}`
+
+  schemas:
+
+    # ─── Filme ────────────────────────────────────
+
+    Movie:
+      type: object
+      description: Representação completa de um filme
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID do filme no TheMovieDB
+          example: 603
+        title:
+          type: string
+          description: Título do filme
+          example: "The Matrix"
+        overview:
+          type: string
+          description: Sinopse/descrição do filme
+          example: "Um programador de computadores descobre que a realidade como ele a conhece é uma simulação criada por máquinas inteligentes."
+        posterPath:
+          type: string
+          nullable: true
+          description: Caminho relativo do poster (prefixar com `https://image.tmdb.org/t/p/w500`)
+          example: "/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg"
+        backdropPath:
+          type: string
+          nullable: true
+          description: Caminho relativo do backdrop (prefixar com `https://image.tmdb.org/t/p/original`)
+          example: "/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg"
+        releaseDate:
+          type: string
+          description: Data de lançamento (formato YYYY-MM-DD)
+          example: "1999-03-31"
+        voteAverage:
+          type: number
+          format: double
+          description: Nota média (0 a 10)
+          example: 8.2
+        voteCount:
+          type: integer
+          description: Quantidade de votos
+          example: 24521
+        popularity:
+          type: number
+          format: double
+          description: Índice de popularidade no TheMovieDB
+          example: 78.456
+        favorite:
+          type: boolean
+          description: Se o filme está nos favoritos do usuário autenticado
+          example: false
+        watchLater:
+          type: boolean
+          description: Se o filme está na lista "assistir depois" do usuário
+          example: false
+      required:
+        - id
+        - title
+        - favorite
+        - watchLater
+
+    # ─── Página de Filmes ─────────────────────────
+
+    MoviePage:
+      type: object
+      description: Resultado paginado de filmes (formato TheMovieDB)
+      properties:
+        movies:
+          type: array
+          description: Lista de filmes da página atual
+          items:
+            $ref: '#/components/schemas/Movie'
+        page:
+          type: integer
+          description: Página atual (inicia em 1)
+          example: 1
+        totalPages:
+          type: integer
+          description: Total de páginas disponíveis
+          example: 5
+        totalResults:
+          type: integer
+          format: int64
+          description: Total de resultados encontrados
+          example: 96
+      required:
+        - movies
+        - page
+        - totalPages
+        - totalResults
+
+    # ─── Página de Favoritos ──────────────────────
+
+    FavoritePage:
+      type: object
+      description: Resultado paginado de favoritos (formato Spring Data Page)
+      properties:
+        content:
+          type: array
+          description: Lista de filmes favoritos da página atual
+          items:
+            $ref: '#/components/schemas/Movie'
+        page:
+          type: integer
+          description: Página atual (inicia em 0)
+          example: 0
+        size:
+          type: integer
+          description: Quantidade de itens por página
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          description: Total de favoritos do usuário
+          example: 3
+        totalPages:
+          type: integer
+          description: Total de páginas
+          example: 1
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+
+    # ─── Créditos do Filme ────────────────────────
+
+    MovieCredits:
+      type: object
+      description: Elenco e equipe técnica de um filme
+      properties:
+        movieId:
+          type: integer
+          format: int64
+          description: ID do filme no TheMovieDB
+          example: 603
+        cast:
+          type: array
+          description: Lista de atores/atrizes
+          items:
+            $ref: '#/components/schemas/CastMember'
+        crew:
+          type: array
+          description: Lista de membros da equipe técnica
+          items:
+            $ref: '#/components/schemas/CrewMember'
+      required:
+        - movieId
+        - cast
+        - crew
+
+    CastMember:
+      type: object
+      description: Membro do elenco
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID da pessoa no TheMovieDB
+          example: 6384
+        name:
+          type: string
+          description: Nome real do ator/atriz
+          example: "Keanu Reeves"
+        character:
+          type: string
+          description: Nome do personagem interpretado
+          example: "Thomas A. Anderson / Neo"
+        profilePath:
+          type: string
+          nullable: true
+          description: Caminho relativo da foto (prefixar com `https://image.tmdb.org/t/p/w185`)
+          example: "/4D0PpNI0kmP58hgrwGC3wCjxhnm.jpg"
+
+    CrewMember:
+      type: object
+      description: Membro da equipe técnica
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID da pessoa no TheMovieDB
+          example: 9340
+        name:
+          type: string
+          description: Nome do profissional
+          example: "Lana Wachowski"
+        job:
+          type: string
+          description: Função (ex. Director, Producer, Writer)
+          example: "Director"
+        department:
+          type: string
+          description: Departamento (ex. Directing, Production, Writing)
+          example: "Directing"
+        profilePath:
+          type: string
+          nullable: true
+          description: Caminho relativo da foto
+          example: "/cDOz753DKwkLR4sDPHOHhJXSmry.jpg"
+
+    # ─── Autenticação ─────────────────────────────
+
+    LoginRequest:
+      type: object
+      description: Credenciais de login
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email do usuário cadastrado
+          example: "user@movie.com"
+        password:
+          type: string
+          description: Senha do usuário
+          example: "123456"
+      required:
+        - email
+        - password
+
+    TokenResponse:
+      type: object
+      description: Resposta de autenticação com token JWT
+      properties:
+        token:
+          type: string
+          description: Token JWT para autenticação nas requisições
+          example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQG1vdmllLmNvbSIsImlhdCI6MTcwOTQ5MDAwMCwiZXhwIjoxNzA5NDkzNjAwfQ.abc123"
+        type:
+          type: string
+          description: Tipo do token (sempre "Bearer")
+          example: "Bearer"
+        expiresIn:
+          type: integer
+          format: int64
+          description: Tempo de expiração em segundos
+          example: 3600
+      required:
+        - token
+        - type
+        - expiresIn
+
+    # ─── Erro padrão (RFC 7807) ──────────────────
+
+    ProblemDetail:
+      type: object
+      description: |
+        Formato padrão de erro conforme [RFC 7807 — Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc7807).
+        O Spring Boot 3 gera este formato nativamente via `ProblemDetail`.
+      properties:
+        type:
+          type: string
+          description: URI que identifica o tipo do problema
+          example: "about:blank"
+        title:
+          type: string
+          description: Resumo curto e legível do problema
+          example: "Not Found"
+        status:
+          type: integer
+          description: Código HTTP do erro
+          example: 404
+        detail:
+          type: string
+          description: Explicação detalhada e específica do erro
+          example: "Filme não encontrado com ID: 999999"
+        instance:
+          type: string
+          description: URI da requisição que causou o erro
+          example: "/api/movies/999999"
+      required:
+        - type
+        - title
+        - status
+        - detail

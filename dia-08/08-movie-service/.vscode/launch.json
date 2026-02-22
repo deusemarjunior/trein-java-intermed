@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Movie Service (8080)",
+      "request": "launch",
+      "mainClass": "com.example.movieservice.MovieServiceApplication",
+      "projectName": "movie-service",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Movie Service (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.movieservice.MovieServiceApplication",
+      "projectName": "movie-service",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5080"
+    }
+  ]
+}

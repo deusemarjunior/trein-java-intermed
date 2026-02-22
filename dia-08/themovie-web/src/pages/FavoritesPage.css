@@ -1,0 +1,46 @@
+.favorites-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+.favorites-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.5rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.favorites-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.favorites-count {
+  background: rgba(99, 102, 241, 0.1);
+  color: #a5b4fc;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.favorites-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem 0;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 0.875rem;
+}
