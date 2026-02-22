@@ -1,0 +1,33 @@
+# Build
+target/
+!target/*.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Docs
+README.md
+api-requests.http
+*.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

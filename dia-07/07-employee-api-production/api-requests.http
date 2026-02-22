@@ -1,0 +1,117 @@
+### ========================================
+### 07-employee-api-production
+### API Requests — Exercício Dia 7
+### ========================================
+
+### ── Funcionários ──
+
+### Listar todos os funcionários
+GET http://localhost:8092/api/employees
+Content-Type: application/json
+
+###
+
+### Buscar funcionário por ID
+GET http://localhost:8092/api/employees/1
+Content-Type: application/json
+
+###
+
+### Criar funcionário (dispara evento no RabbitMQ)
+POST http://localhost:8092/api/employees
+Content-Type: application/json
+
+{
+  "name": "Maria Teste",
+  "email": "maria.teste@empresa.com",
+  "cpf": "123.456.789-00",
+  "salary": 7500.00,
+  "departmentId": 1
+}
+
+###
+
+### Atualizar funcionário
+PUT http://localhost:8092/api/employees/1
+Content-Type: application/json
+
+{
+  "name": "Ana Silva Atualizada",
+  "email": "ana.atualizada@empresa.com",
+  "cpf": "111.111.111-11",
+  "salary": 9200.00,
+  "departmentId": 2
+}
+
+###
+
+### Deletar funcionário
+DELETE http://localhost:8092/api/employees/11
+
+###
+
+### ── Departamentos (Redis Cache) ──
+
+### Listar departamentos (1ª vez = CACHE MISS, 2ª vez = CACHE HIT)
+GET http://localhost:8092/api/departments
+Content-Type: application/json
+
+###
+
+### Buscar departamento por ID
+GET http://localhost:8092/api/departments/1
+Content-Type: application/json
+
+###
+
+### ── Teste de Validação ──
+
+### Criar funcionário com dados inválidos
+POST http://localhost:8092/api/employees
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "email-invalido",
+  "cpf": "",
+  "salary": -100,
+  "departmentId": null
+}
+
+###
+
+### ── Actuator (TODO 4) ──
+
+### Health — deve mostrar detalhes de cada componente
+GET http://localhost:8092/actuator/health
+Content-Type: application/json
+
+###
+
+### Info — informações da aplicação
+GET http://localhost:8092/actuator/info
+Content-Type: application/json
+
+###
+
+### Métricas disponíveis
+GET http://localhost:8092/actuator/metrics
+Content-Type: application/json
+
+###
+
+### Memória JVM usada
+GET http://localhost:8092/actuator/metrics/jvm.memory.used
+Content-Type: application/json
+
+###
+
+### Total de requisições HTTP
+GET http://localhost:8092/actuator/metrics/http.server.requests
+Content-Type: application/json
+
+###
+
+### Flyway migrations executadas
+GET http://localhost:8092/actuator/flyway
+Content-Type: application/json

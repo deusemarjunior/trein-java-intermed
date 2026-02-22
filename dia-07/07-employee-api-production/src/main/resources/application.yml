@@ -1,0 +1,86 @@
+server:
+  port: 8092
+
+spring:
+  application:
+    name: employee-api-production
+
+  # PostgreSQL (porta 5434 para não conflitar com outros projetos)
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5434}/employeedb
+    username: ${SPRING_DATASOURCE_USERNAME:employee}
+    password: ${SPRING_DATASOURCE_PASSWORD:employee123}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  # Flyway
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # RabbitMQ (porta 5674 para não conflitar)
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5674}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+
+  # Redis (porta 6381 para não conflitar)
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6381}
+
+  # Cache
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+
+# ── TODO 4: Configure o Spring Boot Actuator ──────────────────
+#
+# Adicione a configuração abaixo para expor os endpoints do Actuator:
+#
+# management:
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info,metrics,env,flyway
+#   endpoint:
+#     health:
+#       show-details: always
+#       show-components: always
+#   info:
+#     env:
+#       enabled: true
+#
+# info:
+#   app:
+#     name: Employee API Production
+#     description: API de Funcionários com Docker e Observabilidade
+#     version: 1.0.0
+#     java: 21
+#     spring-boot: 3.2.2
+#   team:
+#     name: Treinamento Java
+
+# TODO 4: Descomente as linhas acima e verifique:
+# curl http://localhost:8092/actuator/health | jq .
+# curl http://localhost:8092/actuator/info | jq .
+# curl http://localhost:8092/actuator/metrics | jq .
+
+logging:
+  level:
+    com.example.employee: DEBUG
+    org.hibernate.SQL: DEBUG

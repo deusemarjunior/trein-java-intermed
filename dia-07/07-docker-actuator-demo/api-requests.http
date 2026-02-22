@@ -1,0 +1,118 @@
+### ========================================
+### 07-docker-actuator-demo
+### API Requests — Demonstração Dia 7
+### ========================================
+
+### ── Produtos ──
+
+### Listar todos os produtos (1ª vez = CACHE MISS, 2ª vez = CACHE HIT)
+GET http://localhost:8080/api/products
+Content-Type: application/json
+
+###
+
+### Buscar produto por ID
+GET http://localhost:8080/api/products/1
+Content-Type: application/json
+
+###
+
+### Buscar por categoria
+GET http://localhost:8080/api/products/category/Eletrônicos
+Content-Type: application/json
+
+###
+
+### Criar produto (dispara evento no RabbitMQ)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Fone de Ouvido JBL",
+  "description": "Fone intra-auricular com cancelamento de ruído",
+  "price": 349.90,
+  "stock": 35,
+  "category": "Periféricos"
+}
+
+###
+
+### Atualizar produto
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Notebook Dell Inspiron Atualizado",
+  "description": "Notebook 15.6\" i7 32GB RAM 1TB SSD",
+  "price": 5299.90,
+  "stock": 20,
+  "category": "Eletrônicos"
+}
+
+###
+
+### Deletar produto
+DELETE http://localhost:8080/api/products/10
+
+###
+
+### Criar produto com dados inválidos (testar validação)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": -10,
+  "stock": -5,
+  "category": ""
+}
+
+###
+
+### ── Actuator ──
+
+### Health (mostra status de todos os componentes)
+GET http://localhost:8080/actuator/health
+Content-Type: application/json
+
+###
+
+### Info (informações da aplicação)
+GET http://localhost:8080/actuator/info
+Content-Type: application/json
+
+###
+
+### Métricas disponíveis
+GET http://localhost:8080/actuator/metrics
+Content-Type: application/json
+
+###
+
+### Memória JVM usada
+GET http://localhost:8080/actuator/metrics/jvm.memory.used
+Content-Type: application/json
+
+###
+
+### Total de requisições HTTP
+GET http://localhost:8080/actuator/metrics/http.server.requests
+Content-Type: application/json
+
+###
+
+### Uptime da JVM
+GET http://localhost:8080/actuator/metrics/process.uptime
+Content-Type: application/json
+
+###
+
+### Flyway migrations executadas
+GET http://localhost:8080/actuator/flyway
+Content-Type: application/json
+
+###
+
+### Variáveis de ambiente
+GET http://localhost:8080/actuator/env
+Content-Type: application/json

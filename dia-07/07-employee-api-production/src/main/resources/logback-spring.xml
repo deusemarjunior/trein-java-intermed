@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+        TODO 6a: Adicione o profile prod com logs JSON estruturados.
+
+        Atualmente, apenas o profile default/dev está configurado (logs texto).
+        Você precisa adicionar um segundo <springProfile name="prod"> com:
+
+        1. Appender JSON_CONSOLE usando LogstashEncoder
+        2. includeMdcKeyName para: traceId, method, uri, employeeId
+
+        Exemplo:
+
+        <springProfile name="prod">
+            <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <includeMdcKeyName>traceId</includeMdcKeyName>
+                    <includeMdcKeyName>method</includeMdcKeyName>
+                    <includeMdcKeyName>uri</includeMdcKeyName>
+                    <includeMdcKeyName>employeeId</includeMdcKeyName>
+                </encoder>
+            </appender>
+
+            <root level="INFO">
+                <appender-ref ref="JSON_CONSOLE"/>
+            </root>
+        </springProfile>
+    -->
+
+    <!-- ── Profile: dev (console text legível) ──────────────── -->
+    <springProfile name="default,dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- TODO 6a: Adicione o profile prod com JSON aqui -->
+
+</configuration>

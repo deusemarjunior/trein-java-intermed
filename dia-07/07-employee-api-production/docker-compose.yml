@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  # ── TODO 3: Complete o docker-compose.yml ──────────────────
+  #
+  # Este arquivo já tem o PostgreSQL configurado.
+  # Você precisa adicionar:
+  #
+  # 1. Serviço "rabbitmq" com:
+  #    - image: rabbitmq:3-management-alpine
+  #    - container_name: employee-prod-rabbitmq
+  #    - environment: RABBITMQ_DEFAULT_USER=guest, RABBITMQ_DEFAULT_PASS=guest
+  #    - ports: "5674:5672" e "15674:15672"
+  #    - volumes: rabbitmq_data:/var/lib/rabbitmq
+  #    - healthcheck: rabbitmq-diagnostics check_port_connectivity
+  #    - networks: employee-network
+  #
+  # 2. Serviço "redis" com:
+  #    - image: redis:7-alpine
+  #    - container_name: employee-prod-redis
+  #    - ports: "6381:6379"
+  #    - volumes: redis_data:/data
+  #    - healthcheck: redis-cli ping
+  #    - networks: employee-network
+  #
+  # 3. Serviço "app" com:
+  #    - build: .
+  #    - container_name: employee-prod-app
+  #    - ports: "8092:8092"
+  #    - environment: todas as variáveis (SPRING_PROFILES_ACTIVE=prod, datasource, rabbitmq, redis)
+  #    - depends_on: postgres, rabbitmq, redis (todos com condition: service_healthy)
+  #    - networks: employee-network
+  #
+  # 4. Volumes: adicionar rabbitmq_data e redis_data
+  #
+  # 5. Networks: employee-network com driver bridge
+
+  # ── PostgreSQL (já configurado) ────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: employee-prod-postgres
+    environment:
+      POSTGRES_DB: employeedb
+      POSTGRES_USER: employee
+      POSTGRES_PASSWORD: employee123
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U employee -d employeedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # TODO 3: Adicione networks: employee-network
+
+  # TODO 3: Adicione os serviços rabbitmq, redis e app aqui
+
+volumes:
+  pg_data:
+  # TODO 3: Adicione rabbitmq_data e redis_data
+
+# TODO 3: Adicione a seção networks com employee-network
