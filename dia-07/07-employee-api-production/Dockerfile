@@ -1,10 +1,10 @@
-# ── TODO 1: Transforme este Dockerfile em multi-stage build ──
+# ── TODO 1: Transforme este Containerfile em multi-stage build ──
 #
-# Atualmente este Dockerfile usa uma imagem JDK completa (~800MB).
+# Atualmente este Containerfile usa uma imagem JDK completa (~800MB).
 # Transforme em multi-stage build para reduzir para ~200MB:
 #
 # Stage 1 (build):
-#   FROM eclipse-temurin:21-jdk-alpine AS build
+#   FROM docker.io/library/eclipse-temurin:21-jdk-alpine AS build
 #   WORKDIR /app
 #   COPY pom.xml .
 #   COPY .mvn .mvn
@@ -15,7 +15,7 @@
 #   RUN ./mvnw clean package -DskipTests -q
 #
 # Stage 2 (runtime):
-#   FROM eclipse-temurin:21-jre-alpine
+#   FROM docker.io/library/eclipse-temurin:21-jre-alpine
 #   WORKDIR /app
 #   RUN addgroup -S spring && adduser -S spring -G spring
 #   COPY --from=build /app/target/*.jar app.jar
@@ -26,7 +26,7 @@
 #   ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # ❌ Versão atual (NÃO otimizada — ~800MB)
-FROM eclipse-temurin:21-jdk
+FROM docker.io/library/eclipse-temurin:21-jdk
 
 WORKDIR /app
 

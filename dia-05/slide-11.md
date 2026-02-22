@@ -157,7 +157,7 @@ flowchart LR
     end
 
     subgraph "Dia 7"
-        D7["Dockerfile<br/>Docker Compose<br/>Actuator Health<br/>Logs Estruturados"]
+        D7["Containerfile<br/>Podman Compose<br/>Actuator Health<br/>Logs Estruturados"]
     end
 
     subgraph "Dia 8"
@@ -184,7 +184,7 @@ flowchart LR
 | 6 | Feign Client + JWT | Propagar token JWT entre microsserviços via `RequestInterceptor` |
 | 6 | Resilience4j | Cache com Redis como alternativa ao fallback |
 | 7 | SecurityFilterChain | Actuator protegido com role `ACTUATOR` |
-| 7 | Swagger/OpenAPI | Documentação no Docker Compose |
+| 7 | Swagger/OpenAPI | Documentação no Podman Compose |
 | 8 | Tudo junto | Pipeline CI/CD: build → test → deploy da API segura |
 
 ---
@@ -285,7 +285,7 @@ flowchart LR
 📌 RabbitMQ: comunicação assíncrona (Producer/Consumer)
 📌 Redis: cache com @Cacheable e TTL
 
-⚠️ Pré-requisito: Docker Desktop funcionando!
+⚠️ Pré-requisito: Podman Desktop funcionando!
    → PostgreSQL, RabbitMQ e Redis serão executados em containers
 ```
 

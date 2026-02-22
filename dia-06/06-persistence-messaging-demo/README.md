@@ -9,20 +9,20 @@ Projeto demonstração do **Dia 6** — Persistência Avançada e Mensageria.
 - **RabbitMQ** — Mensageria assíncrona com Spring AMQP
 - **Redis** — Cache com Spring Cache (@Cacheable, @CacheEvict, @CachePut)
 - **PostgreSQL 16** — Banco de dados relacional
-- **Docker Compose** — Infraestrutura local
+- **Podman Compose** — Infraestrutura local
 
 ## Pré-requisitos
 
 - Java 21
 - Maven 3.9+
-- Docker Desktop
+- Podman Desktop
 
 ## Como executar
 
 ### 1. Subir infraestrutura
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 Isso inicia:
@@ -99,7 +99,7 @@ src/main/java/com/example/demo/
 ## Verificação Redis (CLI)
 
 ```bash
-docker exec -it demo-redis redis-cli
+podman exec -it demo-redis redis-cli
 KEYS *
 GET categories::1
 TTL categories::1
@@ -108,5 +108,5 @@ TTL categories::1
 ## Parar infraestrutura
 
 ```bash
-docker compose down
+podman compose down
 ```

@@ -76,15 +76,15 @@ flowchart LR
 psql --version
 psql -U postgres -c "SELECT version();"
 
-# Opção 2: Docker
-docker run --name postgres-dev \
+# Opção 2: Podman
+podman run --name postgres-dev \
   -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=java_training \
   -p 5432:5432 \
-  -d postgres:15
+  -d docker.io/library/postgres:15
 
 # Testar conexão
-docker exec -it postgres-dev psql -U postgres
+podman exec -it postgres-dev psql -U postgres
 ```
 
 ---

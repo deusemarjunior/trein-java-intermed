@@ -3,19 +3,19 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Docker Actuator Demo (8080)",
+      "name": "Podman Actuator Demo (8080)",
       "request": "launch",
-      "mainClass": "com.example.demo.DockerActuatorDemoApplication",
-      "projectName": "docker-actuator-demo",
+      "mainClass": "com.example.demo.PodmanActuatorDemoApplication",
+      "projectName": "podman-actuator-demo",
       "envFile": "${workspaceFolder}/.env",
       "vmArgs": "-Dspring.profiles.active=default"
     },
     {
       "type": "java",
-      "name": "Docker Actuator Demo (Debug)",
+      "name": "Podman Actuator Demo (Debug)",
       "request": "launch",
-      "mainClass": "com.example.demo.DockerActuatorDemoApplication",
-      "projectName": "docker-actuator-demo",
+      "mainClass": "com.example.demo.PodmanActuatorDemoApplication",
+      "projectName": "podman-actuator-demo",
       "envFile": "${workspaceFolder}/.env",
       "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5080"
     }

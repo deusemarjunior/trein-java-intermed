@@ -33,7 +33,7 @@
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
 - [ ] IDE com suporte a Java (IntelliJ ou VS Code)
-- [ ] Docker Desktop rodando
+- [ ] Podman Desktop rodando
 - [ ] Projetor/tela para apresentações
 
 ### Preparação
@@ -128,7 +128,7 @@ Cada aluno apresentará individualmente seu projeto seguindo esta estrutura:
 
 ## 📦 Entregáveis Finais
 
-- [ ] `08-movie-service` finalizado e funcionando com o frontend **TheMovie Web** via Docker
+- [ ] `08-movie-service` finalizado e funcionando com o frontend **TheMovie Web** via Podman
 - [ ] Apresentação técnica do projeto (demo ao vivo + decisões arquiteturais)
 - [ ] Pull Request revisado e aprovado
 - [ ] Code Review realizado em pelo menos 1 projeto de colega

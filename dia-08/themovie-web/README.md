@@ -20,17 +20,17 @@ Frontend React para o **Movie Service** — exibe filmes populares, busca, detal
 
 ## 🚀 Como executar
 
-### Opção 1: Docker (recomendada para alunos)
+### Opção 1: Podman (recomendada para alunos)
 
 ```bash
 # Build da imagem
-docker build -t themovie-web .
+podman build -t themovie-web .
 
 # Rodar apontando para o backend local
-docker run -d \
+podman run -d \
   --name themovie-web \
   -p 3000:80 \
-  -e API_URL=http://host.docker.internal:8080 \
+  -e API_URL=http://host.podman.internal:8080 \
   themovie-web
 ```
 
@@ -38,13 +38,13 @@ Acesse: http://localhost:3000
 
 > O Nginx faz **proxy reverso**: as chamadas `/api/*` e `/auth/*` são redirecionadas ao backend automaticamente.
 
-### Opção 2: Docker Compose (já incluso no 08-movie-service)
+### Opção 2: Podman Compose (já incluso no 08-movie-service)
 
-O `docker-compose.yml` do projeto backend já inclui o frontend:
+O `podman-compose.yml` do projeto backend já inclui o frontend:
 
 ```bash
 cd ../08-movie-service
-docker compose up -d
+podman compose up -d
 ```
 
 ### Opção 3: Dev local (com Node.js)
@@ -96,7 +96,7 @@ src/
 | Variável | Contexto | Descrição | Default |
 |----------|----------|-----------|---------|
 | `VITE_API_URL` | Dev (Vite) | URL base da API | _(vazio — usa proxy)_ |
-| `API_URL` | Docker (Nginx) | URL de proxy reverso | `http://host.docker.internal:8080` |
+| `API_URL` | Podman (Nginx) | URL de proxy reverso | `http://host.podman.internal:8080` |
 
 ## 🎨 Design
 

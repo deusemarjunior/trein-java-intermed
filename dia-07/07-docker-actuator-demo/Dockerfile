@@ -1,5 +1,5 @@
 # ── Stage 1: Build ──────────────────────────────────────────
-FROM eclipse-temurin:21-jdk-alpine AS build
+FROM docker.io/library/eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests -q
 
 # ── Stage 2: Runtime ───────────────────────────────────────
-FROM eclipse-temurin:21-jre-alpine
+FROM docker.io/library/eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 

@@ -44,7 +44,7 @@ graph TD
 ## Checklist Final Antes da Apresentação
 
 ```
-□ docker compose up -d  → todos os containers rodando?
+□ podman compose up -d  → todos os containers rodando?
 □ mvn spring-boot:run   → aplicação sobe sem erros?
 □ curl /api/movies/popular → retorna JSON com filmes?
 □ http://localhost:3000  → frontend carrega e mostra filmes?
@@ -60,11 +60,11 @@ graph TD
 
 | Sintoma | Solução |
 |---------|---------|
-| `docker compose up` falha | `docker compose down -v` e subir de novo |
+| `podman compose up` falha | `podman compose down -v` e subir de novo |
 | App não conecta no PostgreSQL | Verificar `SPRING_DATASOURCE_URL` no compose |
 | CORS bloqueando o frontend | Adicionar `@CrossOrigin("*")` no Controller |
 | TheMovieDB retorna 401 | Verificar API Key no `application.yml` |
-| Flyway falha na migration | `docker compose down -v` limpa o volume do banco |
+| Flyway falha na migration | `podman compose down -v` limpa o volume do banco |
 | Redis connection refused | Verificar se o container Redis está rodando |
 
 ---

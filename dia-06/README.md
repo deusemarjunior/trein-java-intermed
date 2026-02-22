@@ -3,7 +3,7 @@
 **Duração**: 5 horas  
 **Objetivo**: Performance e desacoplamento — resolvendo o problema N+1, versionando banco com Flyway, desacoplando processos com RabbitMQ e acelerando consultas com Redis
 
-> **Pré-requisito**: Docker Compose básico para subir PostgreSQL + RabbitMQ + Redis (ver [guia-docker.md](../dia-00/guia-docker.md)). Docker será aprofundado no Dia 7.
+> **Pré-requisito**: Podman Compose básico para subir PostgreSQL + RabbitMQ + Redis (ver [guia-podman.md](../dia-00/guia-podman.md)). Podman será aprofundado no Dia 7.
 
 ---
 
@@ -12,7 +12,7 @@
 | Horário | Duração | Tópico | Tipo |
 |---------|---------|--------|------|
 | 09:00 - 09:15 | 15min | Recap Dia 5 e Introdução ao Dia 6 | Discussão |
-| 09:15 - 09:45 | 30min | `docker compose up` — Setup PostgreSQL + RabbitMQ + Redis | Setup |
+| 09:15 - 09:45 | 30min | `podman compose up` — Setup PostgreSQL + RabbitMQ + Redis | Setup |
 | 09:45 - 10:15 | 30min | JPA Avançado — Problema N+1, JOIN FETCH, @EntityGraph | Teórico |
 | 10:15 - 10:45 | 30min | JPA Avançado — Projeções DTO e Paginação | Teórico |
 | 10:45 - 11:00 | 15min | ☕ Coffee Break | - |
@@ -33,11 +33,11 @@
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
 - [ ] IDE com suporte a Java (IntelliJ ou VS Code)
-- [ ] Docker Desktop rodando (PostgreSQL + RabbitMQ + Redis)
+- [ ] Podman Desktop rodando (PostgreSQL + RabbitMQ + Redis)
 - [ ] _(Opcional)_ Postman ou extensão REST Client no VS Code
 
 ### Preparação
-- [ ] Executar `docker compose up` no projeto `06-persistence-messaging-demo` e verificar:
+- [ ] Executar `podman compose up` no projeto `06-persistence-messaging-demo` e verificar:
   - [ ] PostgreSQL acessível na porta 5432
   - [ ] RabbitMQ Management UI em http://localhost:15672 (guest/guest)
   - [ ] Redis acessível na porta 6379
@@ -433,7 +433,7 @@ spring:
 
 ### `06-persistence-messaging-demo` (Projeto Completo — Demonstração)
 
-> API de Pedidos com JPA otimizado, Flyway, RabbitMQ e Redis — tudo rodando via Docker Compose.
+> API de Pedidos com JPA otimizado, Flyway, RabbitMQ e Redis — tudo rodando via Podman Compose.
 
 Projeto completo demonstrando todos os conceitos:
 - Queries propositalmente com N+1 + versão corrigida com `JOIN FETCH` e `@EntityGraph`
@@ -443,7 +443,7 @@ Projeto completo demonstrando todos os conceitos:
 - Producer: publica `OrderCreatedEvent` no RabbitMQ ao criar pedido
 - Consumer: escuta o evento e atualiza estoque (simulado com log)
 - Cache Redis: `@Cacheable` na listagem de categorias com TTL de 10 minutos
-- `docker-compose.yml` com PostgreSQL + RabbitMQ + Redis
+- `podman-compose.yml` com PostgreSQL + RabbitMQ + Redis
 
 **Porta**: `8090`
 
@@ -462,7 +462,7 @@ Projeto completo demonstrando todos os conceitos:
 | Slide | Tópico |
 |-------|--------|
 | [slide-01](slide-01.md) | Abertura e Recap do Dia 5 |
-| [slide-02](slide-02.md) | Docker Compose — Setup do Ambiente |
+| [slide-02](slide-02.md) | Podman Compose — Setup do Ambiente |
 | [slide-03](slide-03.md) | JPA N+1 — O Problema e Diagnóstico |
 | [slide-04](slide-04.md) | JPA N+1 — Soluções (JOIN FETCH, @EntityGraph) |
 | [slide-05](slide-05.md) | Projeções DTO e Paginação |

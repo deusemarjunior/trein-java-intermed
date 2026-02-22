@@ -9,12 +9,12 @@
 ```mermaid
 mindmap
   root((Dia 7))
-    Docker
-      Dockerfile
+    Podman
+      Containerfile
       Multi-stage Build
-      .dockerignore
+      .containerignore
       Camadas e Cache
-    Docker Compose
+    Podman Compose
       Orquestração
       Health Checks
       Volumes
@@ -46,7 +46,7 @@ mindmap
 
 ```mermaid
 graph TB
-    subgraph "Docker Compose"
+    subgraph "Podman Compose"
         subgraph "App Container"
             APP["Spring Boot 3.2<br/>Java 21 + JRE Alpine"]
             ACT["Actuator<br/>/health /metrics /info"]
@@ -75,7 +75,7 @@ graph TB
     subgraph "CI/CD"
         GH["GitHub Actions"]
         GH -->|build + test| APP
-        GH -->|docker build| APP
+        GH -->|podman build| APP
     end
 
     style APP fill:#27ae60,color:#fff
@@ -92,10 +92,10 @@ graph TB
 
 | Conceito | O que aprendemos | Por que importa |
 |----------|------------------|-----------------|
-| **Dockerfile** | Multi-stage build com JRE Alpine | Imagens menores (~200MB vs ~800MB) |
-| **Docker Compose** | Orquestrar app + dependências | Ambiente local reproduzível |
+| **Containerfile** | Multi-stage build com JRE Alpine | Imagens menores (~200MB vs ~800MB) |
+| **Podman Compose** | Orquestrar app + dependências | Ambiente local reproduzível |
 | **Health Checks** | `depends_on` + `healthcheck` | Startup ordenado e confiável |
-| **.dockerignore** | Excluir arquivos desnecessários | Build mais rápido e seguro |
+| **.containerignore** | Excluir arquivos desnecessários | Build mais rápido e seguro |
 | **Actuator** | Endpoints /health, /metrics, /info | Monitoramento em produção |
 | **Custom Health** | HealthIndicator personalizado | Verificar dependências específicas |
 | **Logback JSON** | LogstashEncoder por profile | Logs legíveis (dev) e parseáveis (prod) |
@@ -109,9 +109,9 @@ graph TB
 
 | TODO | Descrição | Arquivo |
 |------|-----------|---------|
-| 1 | Multi-stage Dockerfile | `Dockerfile` |
-| 2 | .dockerignore completo | `.dockerignore` |
-| 3 | Docker Compose (app + DB + Redis + RMQ) | `docker-compose.yml` |
+| 1 | Multi-stage Containerfile | `Containerfile` |
+| 2 | .containerignore completo | `.containerignore` |
+| 3 | Podman Compose (app + DB + Redis + RMQ) | `podman-compose.yml` |
 | 4 | Configurar Actuator | `application.yml` |
 | 5 | Custom HealthIndicator para RabbitMQ | `RabbitMQHealthIndicator.java` |
 | 6 | Logs estruturados + MdcFilter | `logback-spring.xml` + `MdcFilter.java` |
@@ -122,11 +122,11 @@ graph TB
 ## Checklist de Verificação Final
 
 ```bash
-# 1. Build e subir com Docker Compose
-docker compose up --build -d
+# 1. Build e subir com Podman Compose
+podman compose up --build -d
 
 # 2. Verificar containers rodando
-docker compose ps
+podman compose ps
 
 # 3. Testar health endpoint
 curl http://localhost:8092/actuator/health | jq .
@@ -138,10 +138,10 @@ curl http://localhost:8092/actuator/metrics/jvm.memory.used | jq .
 curl http://localhost:8092/api/employees | jq .
 
 # 6. Verificar logs JSON
-docker compose logs app --tail=20
+podman compose logs app --tail=20
 
 # 7. Verificar tamanho da imagem
-docker images | grep employee
+podman images | grep employee
 ```
 
 ---
@@ -150,7 +150,7 @@ docker images | grep employee
 
 ```mermaid
 graph LR
-    D7["Dia 7<br/>Docker & Observabilidade<br/>✅ Concluído"] --> D8["Dia 8<br/>Monitoramento &<br/>Performance"]
+    D7["Dia 7<br/>Podman & Observabilidade<br/>✅ Concluído"] --> D8["Dia 8<br/>Monitoramento &<br/>Performance"]
 
     D8 --> T1["Prometheus<br/>Coleta de métricas"]
     D8 --> T2["Grafana<br/>Dashboards"]
@@ -168,8 +168,8 @@ graph LR
 > **"Containerização é garantir que o software funciona da mesma forma em qualquer lugar — do notebook do dev ao cluster de produção."**
 
 ### Links Úteis
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Reference](https://docs.docker.com/compose/compose-file/)
+- [Podman Documentation](https://docs.podman.com/)
+- [Podman Compose Reference](https://docs.podman.com/compose/compose-file/)
 - [Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html)
 - [Logback Documentation](https://logback.qos.ch/documentation.html)
 - [12-Factor App](https://12factor.net/)

@@ -88,7 +88,7 @@ Após implementar o Controller, é hora de **validar com o TheMovie Web**:
 
 ```bash
 # 1. Subir a stack completa
-docker compose up -d
+podman compose up -d
 
 # 2. Verificar que o backend responde
 curl http://localhost:8080/api/movies/popular

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: docker-actuator-demo
+    name: podman-actuator-demo
 
   # PostgreSQL
   datasource:
@@ -65,8 +65,8 @@ management:
 # ── Info do Actuator ─────────────────────────────────────────
 info:
   app:
-    name: Docker Actuator Demo
-    description: Demonstração de Docker, Actuator e Logs Estruturados
+    name: Podman Actuator Demo
+    description: Demonstração de Podman, Actuator e Logs Estruturados
     version: 1.0.0
     java: 21
     spring-boot: 3.2.2

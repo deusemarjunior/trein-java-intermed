@@ -1,17 +1,17 @@
-# TODO 2: Crie um .dockerignore adequado
+# TODO 2: Crie um .containerignore adequado
 #
-# Exclua os seguintes tipos de arquivo do contexto Docker:
+# Exclua os seguintes tipos de arquivo do contexto Podman:
 # - Diretório target/ (exceto JARs): target/ e !target/*.jar
 # - Wrapper Maven JAR: .mvn/wrapper/maven-wrapper.jar
 # - Arquivos de IDE: .idea/, *.iml, .vscode/, *.swp, *.swo
 # - Arquivos Git: .git/, .gitignore
-# - Arquivos Docker (evitar recursão): docker-compose.yml, Dockerfile, .dockerignore
+# - Arquivos Podman (evitar recursão): podman-compose.yml, Containerfile, .containerignore
 # - Documentação: README.md, api-requests.http, *.md
 # - Arquivos OS: .DS_Store, Thumbs.db
 # - Logs: *.log, logs/
 #
-# Um .dockerignore bem feito:
-# 1. Reduz o tamanho do contexto enviado ao Docker daemon
+# Um .containerignore bem feito:
+# 1. Reduz o tamanho do contexto enviado ao Podman engine
 # 2. Acelera o build
 # 3. Evita enviar dados sensíveis (configs, secrets)
 # 4. Previne cache busting desnecessário

@@ -64,7 +64,7 @@ graph TB
         CACHE["Cache Layer<br/>@Cacheable/@CacheEvict"]
     end
 
-    subgraph "Infraestrutura Docker"
+    subgraph "Infraestrutura Podman"
         PG[("PostgreSQL :5432<br/>+ Flyway migrations")]
         RMQ["RabbitMQ :5672<br/>Exchange → Queue"]
         RMQUI["RabbitMQ UI :15672"]
@@ -316,8 +316,8 @@ flowchart LR
     end
 
     subgraph "Dia 7 — Amanhã 🚀"
-        D7A["🐳 Dockerfile<br/>Multi-stage build"]
-        D7B["📦 Docker Compose<br/>App + PG + RMQ + Redis"]
+        D7A["🐳 Containerfile<br/>Multi-stage build"]
+        D7B["📦 Podman Compose<br/>App + PG + RMQ + Redis"]
         D7C["🏥 Actuator<br/>Health, Metrics, Info"]
         D7D["📋 Logs Estruturados<br/>JSON + MDC (traceId)"]
         D7E["🔄 CI/CD<br/>Pipeline conceitual"]
@@ -344,13 +344,13 @@ flowchart LR
 
 | Tópico | O que é | Conexão com Dia 6 |
 |--------|---------|-------------------|
-| **Dockerfile** | Multi-stage build (build stage + runtime stage) | Empacotar a API que construímos hoje |
-| **Docker Compose v2** | Orquestrar app + 3 serviços | Adicionar a app ao compose com PG, RMQ, Redis |
+| **Containerfile** | Multi-stage build (build stage + runtime stage) | Empacotar a API que construímos hoje |
+| **Podman Compose v2** | Orquestrar app + 3 serviços | Adicionar a app ao compose com PG, RMQ, Redis |
 | **Spring Actuator** | `/actuator/health`, `/actuator/metrics` | Health check para PG, RabbitMQ e Redis |
 | **Logs Estruturados** | JSON com Logback + MDC | traceId para rastrear fluxo Producer→Consumer |
-| **CI/CD Conceitual** | GitHub Actions / Jenkins pipeline | Build → Test → Docker → Deploy |
+| **CI/CD Conceitual** | GitHub Actions / Jenkins pipeline | Build → Test → Podman → Deploy |
 
-> **Preparação**: Certifiquem-se de que o **Docker Desktop** está funcionando. Amanhã vamos usar bastante!
+> **Preparação**: Certifiquem-se de que o **Podman Desktop** está funcionando. Amanhã vamos usar bastante!
 
 ---
 

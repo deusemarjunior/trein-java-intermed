@@ -22,7 +22,7 @@
 ║   • Segurança — Spring Security, JWT                         ║
 ║   • Integrações — Feign Client, Resilience4j, Redis           ║
 ║   • Observabilidade — Actuator, Micrometer, Prometheus       ║
-║   • CI/CD — GitHub Actions, Docker, Docker Compose           ║
+║   • CI/CD — GitHub Actions, Podman, Podman Compose           ║
 ║   • Projeto Final — Microserviço completo individual         ║
 ║                                                              ║
 ║   Data: ___/___/______                                       ║
@@ -45,7 +45,7 @@
 | 04 | Testes | JUnit 5, Mockito, Testcontainers, TDD |
 | 05 | Segurança & Integrações | Spring Security, JWT, Feign Client |
 | 06 | Observabilidade | Actuator, Micrometer, Prometheus, Grafana |
-| 07 | CI/CD & Deploy | GitHub Actions, Docker, Docker Compose |
+| 07 | CI/CD & Deploy | GitHub Actions, Podman, Podman Compose |
 | 08 | Desafio Consultoria | Projeto individual completo (TheMovieDB) |
 | 09 | Apresentação & Encerramento | Soft Skills, Carreira, Certificação |
 

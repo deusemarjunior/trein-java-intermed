@@ -1,5 +1,5 @@
 # ──── Build stage ────
-FROM node:20-alpine AS build
+FROM docker.io/library/node:20-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -9,7 +9,7 @@ COPY . .
 RUN npm run build
 
 # ──── Production stage ────
-FROM nginx:1.25-alpine
+FROM docker.io/library/nginx:1.25-alpine
 
 # Remove config padrão
 RUN rm /etc/nginx/conf.d/default.conf
@@ -20,8 +20,8 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 # Copia build do React
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Variável de ambiente (pode ser sobrescrita no docker run / docker-compose)
-ENV API_URL=http://host.docker.internal:8080
+# Variável de ambiente (pode ser sobrescrita no podman run / podman-compose)
+ENV API_URL=http://host.containers.internal:8080
 
 EXPOSE 80
 

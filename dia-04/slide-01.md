@@ -89,7 +89,7 @@ mindmap
       @Spy — comportamento real parcial
       Matchers — any, eq, anyLong
     Testcontainers
-      PostgreSQL real em Docker
+      PostgreSQL real em Podman
       @Container — gerenciamento automático
       @DynamicPropertySource — config dinâmica
       AbstractIntegrationTest — classe base
@@ -255,12 +255,12 @@ API de Gestão de Funcionários — **você vai adicionar os testes!**
 
 ## 🔧 Pré-requisitos do Dia
 
-> **IMPORTANTE**: Docker Desktop precisa estar rodando para os testes de integração com Testcontainers!
+> **IMPORTANTE**: Podman Desktop precisa estar rodando para os testes de integração com Testcontainers!
 
 ```bash
-# Verificar Docker
-docker --version
-docker run hello-world
+# Verificar Podman
+podman --version
+podman run docker.io/library/hello-world
 
 # Verificar Java
 java --version
@@ -273,10 +273,10 @@ mvn --version
 
 ```mermaid
 flowchart LR
-    A["Docker<br/>instalado?"] -->|Sim| B["Docker<br/>rodando?"]
-    A -->|Não| A1["❗ Instalar<br/>Docker Desktop"]
+    A["Podman<br/>instalado?"] -->|Sim| B["Podman<br/>rodando?"]
+    A -->|Não| A1["❗ Instalar<br/>Podman Desktop"]
     B -->|Sim| C["JDK 21<br/>instalado?"]
-    B -->|Não| B1["❗ Iniciar<br/>Docker Desktop"]
+    B -->|Não| B1["❗ Iniciar<br/>Podman Desktop"]
     C -->|Sim| D["Maven 3.8+<br/>instalado?"]
     C -->|Não| C1["❗ Instalar JDK 21"]
     D -->|Sim| E["✅ Pronto<br/>para começar!"]

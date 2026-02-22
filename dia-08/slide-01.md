@@ -14,7 +14,7 @@ Nos últimos 7 dias construímos uma **base sólida de desenvolvimento Java prof
 - ✓ **Dia 4** — Testes: JUnit 5, Mockito, Testcontainers, Data Builders
 - ✓ **Dia 5** — Feign Client, Resilience4j, JWT, CORS, Swagger
 - ✓ **Dia 6** — N+1, Flyway, RabbitMQ, Redis
-- ✓ **Dia 7** — Docker, Docker Compose, Actuator, Logs Estruturados
+- ✓ **Dia 7** — Podman, Podman Compose, Actuator, Logs Estruturados
 
 > **Hoje e amanhã: tudo junto em um projeto real — O Desafio da Consultoria!**
 
@@ -30,7 +30,7 @@ Nos últimos 7 dias construímos uma **base sólida de desenvolvimento Java prof
 | **Dia 4** | Testes Automatizados | JUnit 5, Mockito, Testcontainers — confiança para evoluir |
 | **Dia 5** | Integração e Segurança | Feign, JWT, Swagger — API de produção |
 | **Dia 6** | Persistência e Mensageria | N+1, Flyway, RabbitMQ, Redis — performance |
-| **Dia 7** | Docker e Observabilidade | Containers, Actuator, Logs JSON — pronto para produção |
+| **Dia 7** | Podman e Observabilidade | Containers, Actuator, Logs JSON — pronto para produção |
 | **Dia 8** | **Desafio da Consultoria** | **Tudo junto em um projeto real!** |
 
 ---
@@ -45,7 +45,7 @@ flowchart TD
     D4["<b>Dia 4 — Testes</b><br/>🧪 JUnit, Mockito, Testcontainers"]
     D5["<b>Dia 5 — Integração/Segurança</b><br/>🔒 Feign, JWT, Swagger"]
     D6["<b>Dia 6 — Performance</b><br/>⚡ N+1, Flyway, RabbitMQ, Redis"]
-    D7["<b>Dia 7 — Produção</b><br/>🐳 Docker, Actuator, Logs JSON"]
+    D7["<b>Dia 7 — Produção</b><br/>🐳 Podman, Actuator, Logs JSON"]
     D8["<b>⭐ Dia 8 — Desafio da Consultoria</b><br/>🎯 Microsserviço de Filmes<br/>Tudo aplicado em um projeto real"]
 
     D1 --> D2 --> D3 --> D4 --> D5 --> D6 --> D7 --> D8

@@ -72,13 +72,13 @@ flowchart TD
 
 ### Conceito
 
-**Testcontainers** é uma biblioteca Java que **sobe containers Docker** automaticamente durante os testes e os **destrói** ao terminar.
+**Testcontainers** é uma biblioteca Java que **sobe containers Podman** automaticamente durante os testes e os **destrói** ao terminar.
 
 ```mermaid
 mindmap
   root((Testcontainers))
     O que faz
-      Sobe container Docker
+      Sobe container Podman
       Porta aleatória
       Destrói ao final
     Bancos suportados
@@ -94,7 +94,7 @@ mindmap
       Isolamento total
       CI/CD friendly
     Requisitos
-      Docker Desktop
+      Podman Desktop
       Conexão para pull
 ```
 
@@ -104,7 +104,7 @@ mindmap
 sequenceDiagram
     participant JUnit as JUnit 5
     participant TC as Testcontainers
-    participant Docker as Docker Engine
+    participant Podman as Podman Engine
     participant PG as PostgreSQL Container
     participant Spring as Spring Boot
     participant Test as Classe de Teste
@@ -112,9 +112,9 @@ sequenceDiagram
     rect rgb(240, 248, 255)
         Note over JUnit,PG: FASE 1 — Setup (antes dos testes)
         JUnit->>TC: @Testcontainers — iniciar gerenciamento
-        TC->>Docker: docker pull postgres:16-alpine (se necessário)
-        TC->>Docker: docker run -p RANDOM:5432 postgres:16-alpine
-        Docker->>PG: Container pronto ✅
+        TC->>Podman: podman pull postgres:16-alpine (se necessário)
+        TC->>Podman: podman run -p RANDOM:5432 postgres:16-alpine
+        Podman->>PG: Container pronto ✅
         TC->>TC: Detectar porta aleatória (ex: 54321)
         TC->>Spring: @DynamicPropertySource → url=jdbc:postgresql://localhost:54321/testdb
         Spring->>Spring: Subir contexto com datasource apontando para container
@@ -133,9 +133,9 @@ sequenceDiagram
     rect rgb(255, 240, 240)
         Note over JUnit,PG: FASE 3 — Cleanup (após todos os testes)
         JUnit->>TC: @AfterAll (automático)
-        TC->>Docker: docker stop container
-        TC->>Docker: docker rm container
-        Note over Docker: Container destruído 🗑️
+        TC->>Podman: podman stop container
+        TC->>Podman: podman rm container
+        Note over Podman: Container destruído 🗑️
     end
 ```
 
@@ -304,7 +304,7 @@ flowchart LR
 | `@SpringBootTest` | Sobe o contexto Spring completo | Para ter `@Autowired` nos repositories |
 | `@Testcontainers` | Gerencia lifecycle dos containers | Para auto-start e auto-stop |
 | `@Container` + `static` | Marca e compartilha o container | `static` = um container para todos os testes da classe |
-| `PostgreSQLContainer` | Container Docker com PostgreSQL | Banco real idêntico à produção |
+| `PostgreSQLContainer` | Container Podman com PostgreSQL | Banco real idêntico à produção |
 | `@DynamicPropertySource` | Injeta url/user/pass dinâmicos | A porta muda a cada execução (aleatória) |
 | `abstract class` | Herança para reuso | Toda classe `IT` herda configuração pronta |
 
@@ -525,10 +525,10 @@ flowchart TD
 ```
 
 ```bash
-# Rodar apenas unitários (sem Docker)
+# Rodar apenas unitários (sem Podman)
 mvn test
 
-# Rodar apenas integração (precisa Docker)
+# Rodar apenas integração (precisa Podman)
 mvn verify -DskipTests
 
 # Rodar todos
@@ -552,11 +552,11 @@ mvn verify
 
 ## 💡 Dica do Instrutor
 
-> Abra o **Docker Desktop** durante a demo e mostre o container PostgreSQL subindo e sendo destruído. Os alunos ficam impressionados ao ver que é um banco **real** de verdade.
+> Abra o **Podman Desktop** durante a demo e mostre o container PostgreSQL subindo e sendo destruído. Os alunos ficam impressionados ao ver que é um banco **real** de verdade.
 
 ```bash
 # Em outro terminal, enquanto os testes rodam:
-docker ps
+podman ps
 # CONTAINER ID  IMAGE              PORTS                     STATUS
 # a1b2c3d4e5f6  postgres:16-alpine 0.0.0.0:54321->5432/tcp   Up 3 seconds
 ```

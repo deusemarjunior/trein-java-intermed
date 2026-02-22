@@ -77,6 +77,6 @@ mvn spring-boot:run      # Roda a aplicação
 |-----------|-------------|
 | JDK 21 | `java --version` |
 | Maven 3.8+ | `mvn --version` |
-| Docker Desktop | `docker --version` |
+| Podman Desktop | `podman --version` |
 
 > **DICA**: Use o arquivo `api-requests.http` de cada projeto para testar os endpoints diretamente no VS Code (extensão REST Client).

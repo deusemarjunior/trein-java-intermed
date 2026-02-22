@@ -40,7 +40,7 @@ mindmap
       @Spy — comportamento real parcial
       Matchers — any anyLong eq
     Testcontainers
-      PostgreSQL real em Docker
+      PostgreSQL real em Podman
       @Container @DynamicPropertySource
       AbstractIntegrationTest — classe base
       deleteAll no BeforeEach — isolamento
@@ -58,7 +58,7 @@ mindmap
       SonarQube — análise estática
         Bugs, Vulnerabilidades, Code Smells
         Quality Gate — critério mínimo
-        Docker: sonarqube:lts-community
+        Podman: sonarqube:lts-community
         mvn sonar:sonar
       SonarLint — no VS Code
         Análise em tempo real
@@ -199,7 +199,7 @@ flowchart LR
 <details>
 <summary>Resposta</summary>
 
-- **Unitário**: para lógica de negócio pura (Service, Mapper, Validator) — isolado com mocks, sem Docker
+- **Unitário**: para lógica de negócio pura (Service, Mapper, Validator) — isolado com mocks, sem Podman
 - **Integração**: quando depende de recurso externo (banco, API, fila) — teste com o recurso real via Testcontainers
 
 ```mermaid
@@ -307,7 +307,7 @@ flowchart TD
 |----------|----------|
 | **Qual a cobertura ideal?** | 80% no Service é um bom alvo. 100% geralmente não vale o esforço de manter. |
 | **TDD vale a pena?** | Para regras de negócio complexas, sim. Para CRUD simples, escrever depois é OK. |
-| **Quando Testcontainers é lento?** | Na primeira execução (download da imagem Docker). Depois, o container sobe em ~2-3s. |
+| **Quando Testcontainers é lento?** | Na primeira execução (download da imagem Podman). Depois, o container sobe em ~2-3s. |
 | **Devo testar Controller?** | Com `@WebMvcTest` (teste de integração leve) se tiver lógica de roteamento/validação complexa. |
 | **AssertJ ou JUnit assertions?** | AssertJ é mais expressivo e legível. Prefira sempre que possível. |
 | **Quantos testes por método?** | Pelo menos 1 para o caminho feliz + 1 para cada cenário de erro. |
@@ -381,7 +381,7 @@ mindmap
 
 ### O que preparar para amanhã
 
-- [ ] Docker rodando (`docker run hello-world`)
+- [ ] Podman rodando (`podman run docker.io/library/hello-world`)
 - [ ] Projeto `04-employee-api-tests` com todos os testes passando
 - [ ] Revisar conceito de **HTTP Headers** (`Authorization`, `Content-Type`)
 - [ ] Entender o que é uma **API REST** que consome outra API

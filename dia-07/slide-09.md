@@ -51,7 +51,7 @@ sequenceDiagram
 
     alt Tudo passou ✅
         CI-->>GIT: ✅ Status: Success
-        CI->>CI: 7. docker build → push image
+        CI->>CI: 7. podman build → push image
     else Algo falhou ❌
         CI-->>GIT: ❌ Status: Failed
         CI-->>TEAM: 🔔 Notificação: "Build failed"
@@ -100,8 +100,8 @@ graph LR
     E2 --> E3["🧪 Testes Unitários<br/>mvn test"]
     E3 --> E4["🔬 Testes Integração<br/>Testcontainers"]
     E4 --> E5["📊 Análise Estática<br/>SonarQube"]
-    E5 --> E6["🐳 Docker Build<br/>docker build -t app"]
-    E6 --> E7["📦 Push Image<br/>Docker Registry"]
+    E5 --> E6["🐳 Podman Build<br/>podman build -t app"]
+    E6 --> E7["📦 Push Image<br/>Podman Registry"]
     E7 --> E8["🚀 Deploy<br/>Staging → Prod"]
 
     style E1 fill:#3498db,color:#fff
@@ -174,8 +174,8 @@ jobs:
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
 
-      - name: Build Docker Image
-        run: docker build -t my-app:${{ github.sha }} .
+      - name: Build Podman Image
+        run: podman build -t my-app:${{ github.sha }} .
 ```
 
 ---

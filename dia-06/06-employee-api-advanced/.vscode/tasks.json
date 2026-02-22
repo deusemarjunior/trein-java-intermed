@@ -41,16 +41,16 @@
       "problemMatcher": []
     },
     {
-      "label": "docker: compose up",
+      "label": "podman: compose up",
       "type": "shell",
-      "command": "docker compose up -d",
+      "command": "podman compose up -d",
       "group": "none",
       "problemMatcher": []
     },
     {
-      "label": "docker: compose down",
+      "label": "podman: compose down",
       "type": "shell",
-      "command": "docker compose down",
+      "command": "podman compose down",
       "group": "none",
       "problemMatcher": []
     }

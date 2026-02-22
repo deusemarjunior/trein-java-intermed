@@ -2,7 +2,7 @@
 
 ## 📋 Descrição
 
-Microsserviço de Filmes com **Arquitetura Hexagonal**, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e alimentando o frontend **TheMovie Web** (React) fornecido como imagem Docker.
+Microsserviço de Filmes com **Arquitetura Hexagonal**, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e alimentando o frontend **TheMovie Web** (React) fornecido como imagem Podman.
 
 ## 🏗️ Arquitetura
 
@@ -47,7 +47,7 @@ export TMDB_API_KEY=seu_token_aqui
 ### 2. Subir a infraestrutura
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 Isso sobe:
@@ -93,9 +93,9 @@ TODO 1 → TODO 2 → TODO 3 → TODO 4 → TODO 5 → (testar frontend)
 
 ## 🖥️ Frontend: TheMovie Web
 
-O frontend é uma aplicação React pré-construída, entregue como imagem Docker.
+O frontend é uma aplicação React pré-construída, entregue como imagem Podman.
 
-**Já sobe automaticamente com `docker compose up -d`.**
+**Já sobe automaticamente com `podman compose up -d`.**
 
 Acesse: http://localhost:3000
 
@@ -131,8 +131,8 @@ Acesse: http://localhost:3000
 - ✅ `JwtUtil`: geração e validação de tokens JWT
 - ✅ Flyway migrations: tabelas `favorites`, `watch_later`, `users`
 - ✅ `AbstractIntegrationTest`: base Testcontainers com PostgreSQL
-- ✅ `docker-compose.yml`: PostgreSQL + Redis + TheMovie Web
-- ✅ `Dockerfile`: multi-stage build otimizado
+- ✅ `podman-compose.yml`: PostgreSQL + Redis + TheMovie Web
+- ✅ `Containerfile`: multi-stage build otimizado
 - ✅ `openapi.yaml`: contrato Swagger completo
 - ✅ `api-requests.http`: requisições prontas para teste
 - ✅ Usuários seed: `user@movie.com` / `admin@movie.com` (senha: `123456`)
@@ -147,5 +147,5 @@ Acesse: http://localhost:3000
 | 4 | Testes | `MovieServiceTest` (Mockito), `FavoriteRepositoryIT` (Testcontainers) |
 | 5 | Feign + JWT + Swagger | `TheMovieDbClient`, `JwtUtil`, `SwaggerConfig` |
 | 6 | Redis Cache + Flyway | `@Cacheable`, migrations SQL |
-| 7 | Docker + Actuator | `Dockerfile`, `docker-compose.yml`, `application.yml` |
+| 7 | Podman + Actuator | `Containerfile`, `podman-compose.yml`, `application.yml` |
 | 8 | Integração completa | Tudo junto em um projeto real! |

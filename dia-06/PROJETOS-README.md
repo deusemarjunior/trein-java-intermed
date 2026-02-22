@@ -13,7 +13,7 @@
 - Producer: publica `OrderCreatedEvent` no RabbitMQ ao criar pedido
 - Consumer: escuta o evento e atualiza estoque (simulado com log)
 - Cache Redis: `@Cacheable` na listagem de categorias com TTL de 10 minutos
-- `docker-compose.yml` com PostgreSQL + RabbitMQ + Redis
+- `podman-compose.yml` com PostgreSQL + RabbitMQ + Redis
 
 **Porta**: 8090  
 **Arquivo de Testes**: `api-requests.http`
@@ -21,7 +21,7 @@
 ```bash
 # 1. Subir os containers (PostgreSQL + RabbitMQ + Redis)
 cd 06-persistence-messaging-demo
-docker compose up -d
+podman compose up -d
 
 # 2. Rodar a aplicação
 mvn spring-boot:run
@@ -49,7 +49,7 @@ mvn spring-boot:run
 ```bash
 # 1. Subir os containers (PostgreSQL + RabbitMQ + Redis)
 cd 06-employee-api-advanced
-docker compose up -d
+podman compose up -d
 
 # 2. Rodar a aplicação
 mvn spring-boot:run
@@ -62,7 +62,7 @@ mvn spring-boot:run
 ## 🚀 Como Usar
 
 ### 1. **Estude primeiro o projeto completo** (06-persistence-messaging-demo)
-   - Suba os containers: `cd 06-persistence-messaging-demo && docker compose up -d`
+   - Suba os containers: `cd 06-persistence-messaging-demo && podman compose up -d`
    - Execute a aplicação: `mvn spring-boot:run`
    - Observe os logs SQL: veja o N+1 acontecendo e a versão corrigida
    - Crie um pedido via POST e veja o evento no RabbitMQ Management UI
@@ -72,7 +72,7 @@ mvn spring-boot:run
 ### 2. **Pratique com o exercício** (06-employee-api-advanced)
    ```bash
    cd 06-employee-api-advanced
-   docker compose up -d   # sobe PostgreSQL + RabbitMQ + Redis
+   podman compose up -d   # sobe PostgreSQL + RabbitMQ + Redis
    mvn spring-boot:run    # verificar que sobe
    ```
    - Implemente os TODOs 1-8 na ordem
@@ -87,9 +87,9 @@ mvn spring-boot:run
 |-----------|-------------|
 | JDK 21 | `java --version` |
 | Maven 3.8+ | `mvn --version` |
-| Docker Desktop | `docker --version` |
-| Docker Compose | `docker compose version` |
+| Podman Desktop | `podman --version` |
+| Podman Compose | `podman compose version` |
 
-> **IMPORTANTE**: Os projetos deste dia dependem de containers Docker (PostgreSQL, RabbitMQ, Redis). Certifique-se de que o Docker Desktop está rodando antes de iniciar.
+> **IMPORTANTE**: Os projetos deste dia dependem de containers Podman (PostgreSQL, RabbitMQ, Redis). Certifique-se de que o Podman Desktop está rodando antes de iniciar.
 
 > **DICA**: Use o arquivo `api-requests.http` de cada projeto para testar os endpoints diretamente no VS Code (extensão REST Client).

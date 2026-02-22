@@ -68,7 +68,7 @@ spring:
 # info:
 #   app:
 #     name: Employee API Production
-#     description: API de Funcionários com Docker e Observabilidade
+#     description: API de Funcionários com Podman e Observabilidade
 #     version: 1.0.0
 #     java: 21
 #     spring-boot: 3.2.2

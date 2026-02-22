@@ -50,7 +50,7 @@ Este projeto demonstra:
 ### Pré-requisitos
 - Java 21+
 - Maven 3.6+
-- (Opcional) PostgreSQL 15+ ou Docker
+- (Opcional) PostgreSQL 15+ ou Podman
 
 ### Opção 1: H2 Database (Em Memória)
 
@@ -79,12 +79,12 @@ H2 Console: **http://localhost:8080/h2-console**
 1. **Criar banco de dados:**
 
 ```bash
-# Com Docker
-docker run --name postgres-jpa \
+# Com Podman
+podman run --name postgres-jpa \
   -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=java_training \
   -p 5432:5432 \
-  -d postgres:15
+  -d docker.io/library/postgres:15
 
 # Ou com PostgreSQL instalado
 psql -U postgres

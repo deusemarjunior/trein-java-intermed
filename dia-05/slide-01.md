@@ -11,7 +11,7 @@ No Dia 4 aprendemos a **garantir qualidade com testes automatizados**:
 - ✓ **Pirâmide de Testes** — Unitários (70%) + Integração (20%) + E2E (10%)
 - ✓ **JUnit 5** — Padrão AAA, @Test, @DisplayName, @ParameterizedTest
 - ✓ **Mockito** — @Mock, @InjectMocks, when/thenReturn, verify, ArgumentCaptor
-- ✓ **Testcontainers** — PostgreSQL real em Docker, @DynamicPropertySource
+- ✓ **Testcontainers** — PostgreSQL real em Podman, @DynamicPropertySource
 - ✓ **Data Builders** — EmployeeBuilder fluente com defaults sensatos
 - ✓ **Cobertura** — >80% na camada Service
 

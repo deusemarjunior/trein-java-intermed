@@ -107,7 +107,7 @@ void shouldRejectSalaryBelowMinimum() {
 - ✅ Roda em **milissegundos** (sem banco, sem rede)
 - ✅ Isola a classe testada com **mocks**
 - ✅ Feedback **imediato** no IDE
-- ✅ Não precisa de Docker, servidor, ou infraestrutura
+- ✅ Não precisa de Podman, servidor, ou infraestrutura
 
 ### 🔶 Testes de Integração (Meio da Pirâmide)
 
@@ -143,7 +143,7 @@ void shouldSaveAndFindEmployeeInDatabase() {
 - ✅ Verifica **queries JPQL**, constraints, migrations
 - ✅ Usa banco **real** (PostgreSQL via Testcontainers)
 - ⚠️ Mais lento que unitário (2-5 segundos)
-- ⚠️ Requer Docker rodando
+- ⚠️ Requer Podman rodando
 
 ### 🔴 Testes E2E (Topo da Pirâmide)
 

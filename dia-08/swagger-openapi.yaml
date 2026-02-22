@@ -51,7 +51,7 @@ info:
     - JWT (autenticação)
     - Arquitetura Hexagonal (Ports & Adapters)
 
-    ### Infraestrutura fornecida (Docker Compose)
+    ### Infraestrutura fornecida (Podman Compose)
     | Serviço | Porta | Descrição |
     |---------|-------|-----------|
     | PostgreSQL 16 | 5435 | Banco de dados |

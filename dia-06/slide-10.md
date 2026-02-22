@@ -26,7 +26,7 @@ graph TB
         CONS["OrderNotificationConsumer<br/>@RabbitListener"]
     end
 
-    subgraph "Docker Compose"
+    subgraph "Podman Compose"
         DB[("PostgreSQL :5432<br/>+ Flyway Migrations")]
         MQ["RabbitMQ :5672<br/>Exchange: order-events"]
         REDIS[("Redis :6379<br/>Cache: categories")]
@@ -86,19 +86,19 @@ graph LR
 
 ---
 
-## Demo 1: Docker Compose — Setup
+## Demo 1: Podman Compose — Setup
 
 ```bash
 cd 06-persistence-messaging-demo
-docker compose up -d
-docker compose ps  # verificar 3 containers healthy
+podman compose up -d
+podman compose ps  # verificar 3 containers healthy
 ```
 
 ### O que observar
 
 ```mermaid
 graph LR
-    DC["docker compose up -d"]
+    DC["podman compose up -d"]
     DC --> PG["PostgreSQL<br/>:5432 → Ready"]
     DC --> RB["RabbitMQ<br/>:5672 → Ready<br/>:15672 → Management UI"]
     DC --> RD["Redis<br/>:6379 → Ready"]
@@ -111,7 +111,7 @@ graph LR
 **Validação:**
 ```bash
 # Verificar que todos estão healthy
-docker compose ps
+podman compose ps
 # NAME          STATUS          PORTS
 # postgres      Up (healthy)    5432
 # rabbitmq      Up (healthy)    5672, 15672
@@ -341,7 +341,7 @@ Log:
 ### Verificar no Redis CLI
 
 ```bash
-docker exec -it redis-dia06 redis-cli
+podman exec -it redis-dia06 redis-cli
 
 KEYS *
 # 1) "categories::all"
@@ -369,7 +369,7 @@ graph LR
 
 ```
 06-persistence-messaging-demo/
-├── docker-compose.yml              ← PostgreSQL + RabbitMQ + Redis
+├── podman-compose.yml              ← PostgreSQL + RabbitMQ + Redis
 ├── pom.xml                         ← spring-data-jpa, amqp, redis, flyway
 ├── api-requests.http               ← Requests de teste (VS Code REST Client)
 └── src/main/
@@ -393,7 +393,7 @@ graph LR
 
 | # | O que observar | Onde ver | Esperado |
 |:---:|:---|:---|:---|
-| 1 | Container 3x healthy | Terminal (`docker compose ps`) | STATUS: Up |
+| 1 | Container 3x healthy | Terminal (`podman compose ps`) | STATUS: Up |
 | 2 | Flyway migrations aplicadas | Log de startup da app | "Successfully applied 4 migrations" |
 | 3 | N+1 queries | Console (GET /n-plus-one) | Múltiplas SELECTs |
 | 4 | JOIN FETCH | Console (GET /orders) | Uma única SELECT com JOIN |

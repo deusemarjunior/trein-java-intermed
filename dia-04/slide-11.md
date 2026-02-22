@@ -118,20 +118,20 @@ flowchart LR
 //   - Testar filtro por departamento contra banco PostgreSQL real
 ```
 
-### Pré-requisito: Docker Desktop rodando!
+### Pré-requisito: Podman Desktop rodando!
 
 ```bash
-docker --version   # deve retornar a versão
-docker ps          # deve funcionar sem erros
+podman --version   # deve retornar a versão
+podman ps          # deve funcionar sem erros
 ```
 
 ```mermaid
 flowchart TD
     subgraph "Checklist pré-TODO 6"
-        D1["Docker Desktop<br/>rodando? 🐳"] -->|"✅ Sim"| D2["docker ps<br/>funciona?"]
+        D1["Podman Desktop<br/>rodando? 🐳"] -->|"✅ Sim"| D2["podman ps<br/>funciona?"]
         D2 -->|"✅ Sim"| D3["Pronto para<br/>Testcontainers!"]
-        D1 -->|"❌ Não"| D4["Abra o Docker Desktop<br/>e aguarde inicializar"]
-        D2 -->|"❌ Não"| D5["Reinicie o<br/>Docker Desktop"]
+        D1 -->|"❌ Não"| D4["Abra o Podman Desktop<br/>e aguarde inicializar"]
+        D2 -->|"❌ Não"| D5["Reinicie o<br/>Podman Desktop"]
     end
 
     style D3 fill:#1dd1a1,color:#fff
@@ -145,12 +145,12 @@ flowchart TD
 sequenceDiagram
     participant JUnit as JUnit 5
     participant TC as Testcontainers
-    participant Docker as Docker
+    participant Podman as Podman
     participant PG as PostgreSQL
 
     JUnit->>TC: @Testcontainers
-    TC->>Docker: docker run postgres:16-alpine
-    Docker->>PG: Container UP (porta aleatória) 🐘
+    TC->>Podman: podman run postgres:16-alpine
+    Podman->>PG: Container UP (porta aleatória) 🐘
     
     loop Para cada @Test
         JUnit->>JUnit: @BeforeEach → deleteAll()
@@ -160,7 +160,7 @@ sequenceDiagram
     end
 
     JUnit->>TC: Testes concluídos
-    TC->>Docker: docker stop + rm 🗑️
+    TC->>Podman: podman stop + rm 🗑️
 ```
 
 ### 6.1 — Salvar e Buscar por ID
@@ -415,7 +415,7 @@ flowchart TD
 ```
 
 ```bash
-# Rodar TODOS os testes (Docker precisa estar rodando!)
+# Rodar TODOS os testes (Podman precisa estar rodando!)
 mvn test
 
 # Resultado esperado:
@@ -483,7 +483,7 @@ flowchart TD
 ## 💡 Dica do Instrutor
 
 > Os testes de integração (TODO 6-7) são os mais desafiadores. Se algum aluno travar, verifique:
-> 1. Docker Desktop está rodando?
+> 1. Podman Desktop está rodando?
 > 2. `@BeforeEach` tem `deleteAll()`?
 > 3. Está usando `saveAndFlush()` para o teste de constraint?
 > 4. Está salvando o `Department` antes do `Employee`? (FK)

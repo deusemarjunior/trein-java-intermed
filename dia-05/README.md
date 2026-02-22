@@ -31,13 +31,13 @@
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
 - [ ] IDE com suporte a Java (IntelliJ ou VS Code)
-- [ ] Docker Desktop rodando (para Testcontainers e serviços auxiliares)
+- [ ] Podman Desktop rodando (para Testcontainers e serviços auxiliares)
 - [ ] _(Opcional)_ Postman ou extensão REST Client no VS Code
 
 ### Preparação
 - [ ] Projeto `05-integration-security-demo` rodando com Swagger UI acessível
 - [ ] Projeto `05-employee-api-secure` com TODOs prontos e dependências configuradas
-- [ ] Verificar que `docker run hello-world` funciona
+- [ ] Verificar que `podman run docker.io/library/hello-world` funciona
 
 ---
 

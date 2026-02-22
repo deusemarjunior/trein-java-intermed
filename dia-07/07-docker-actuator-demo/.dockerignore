@@ -14,10 +14,10 @@ target/
 .git/
 .gitignore
 
-# Docker
-docker-compose.yml
-Dockerfile
-.dockerignore
+# Podman
+podman-compose.yml
+Containerfile
+.containerignore
 
 # Docs
 README.md

@@ -1,17 +1,17 @@
-# Slide 11: Exercício — TODO 1 e TODO 2 (Dockerfile + .dockerignore)
+# Slide 11: Exercício — TODO 1 e TODO 2 (Containerfile + .containerignore)
 
 **Horário:** 14:00 - 14:30
 
 ---
 
-## TODO 1: Otimizar Dockerfile com Multi-Stage Build
+## TODO 1: Otimizar Containerfile com Multi-Stage Build
 
-**Arquivo**: `Dockerfile`
+**Arquivo**: `Containerfile`
 
 ### O que já vem pronto (NÃO otimizado)
 
-```dockerfile
-# ❌ Dockerfile básico — imagem ~400MB
+```podmanfile
+# ❌ Containerfile básico — imagem ~400MB
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY . .
@@ -44,7 +44,7 @@ graph LR
 
 ### Implementação
 
-```dockerfile
+```podmanfile
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 1: BUILD — Compilar a aplicação        ║
 # ╚═══════════════════════════════════════════════╝
@@ -89,19 +89,19 @@ ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 
 ```bash
 # Build da imagem
-docker build -t employee-api:v1 .
+podman build -t employee-api:v1 .
 
 # Verificar tamanho
-docker images employee-api
+podman images employee-api
 # REPOSITORY       TAG   SIZE
 # employee-api     v1    ~85MB  ← Meta: < 100MB ✅
 ```
 
 ---
 
-## TODO 2: Criar .dockerignore
+## TODO 2: Criar .containerignore
 
-**Arquivo**: `.dockerignore`
+**Arquivo**: `.containerignore`
 
 ### Implementação
 
@@ -121,9 +121,9 @@ target/
 *.iml
 *.code-workspace
 
-# Docker
-docker-compose*.yml
-Dockerfile
+# Podman
+podman-compose*.yml
+Containerfile
 
 # Documentação
 README.md
@@ -147,10 +147,10 @@ README.md
 
 ## 🎯 Critérios de Aceite
 
-- [ ] Dockerfile com 2 stages (build + runtime)
+- [ ] Containerfile com 2 stages (build + runtime)
 - [ ] Stage build: `maven:3.9-eclipse-temurin-21`
 - [ ] Stage runtime: `eclipse-temurin:21-jre-alpine`
 - [ ] Cache de dependências (COPY pom.xml antes do código)
 - [ ] `HEALTHCHECK` configurado
-- [ ] `.dockerignore` criado com pelo menos `target/`, `.git/`, `.idea/`
+- [ ] `.containerignore` criado com pelo menos `target/`, `.git/`, `.idea/`
 - [ ] Imagem final < 100MB

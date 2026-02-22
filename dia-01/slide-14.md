@@ -141,7 +141,7 @@ GET /api/products/count → {"count": 5}
 
 ### 3. Preparação para Dia 2
 - Estudar os conceitos de IoC (Inversão de Controle) e DI (Injeção de Dependência)
-- Instalar PostgreSQL ou ter Docker pronto
+- Instalar PostgreSQL ou ter Podman pronto
 - Acessar https://start.spring.io/ e explorar
 
 ---

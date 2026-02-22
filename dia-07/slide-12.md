@@ -1,12 +1,12 @@
-# Slide 12: Exercício — TODO 3 (Docker Compose)
+# Slide 12: Exercício — TODO 3 (Podman Compose)
 
 **Horário:** 14:30 - 15:00
 
 ---
 
-## TODO 3: Completar docker-compose.yml
+## TODO 3: Completar podman-compose.yml
 
-**Arquivo**: `docker-compose.yml`
+**Arquivo**: `podman-compose.yml`
 
 ### O que já vem pronto
 
@@ -35,7 +35,7 @@ volumes:
 
 ```mermaid
 graph TB
-    subgraph "docker-compose.yml completo"
+    subgraph "podman-compose.yml completo"
         APP["🖥️ app (build: .)<br/>ports: 8092:8080<br/>depends_on: todos com health check"]
         PG[("🐘 postgres<br/>ports: 5434:5432<br/>healthcheck: pg_isready")]
         REDIS[("🔴 redis<br/>ports: 6381:6379<br/>healthcheck: redis-cli ping")]
@@ -141,23 +141,23 @@ volumes:
 
 ---
 
-## Testando o Docker Compose
+## Testando o Podman Compose
 
 ```bash
 # 1. Subir tudo
-docker compose up -d
+podman compose up -d
 
 # 2. Verificar status
-docker compose ps
+podman compose ps
 
 # 3. Verificar logs
-docker compose logs -f app
+podman compose logs -f app
 
 # 4. Testar health
 curl http://localhost:8092/actuator/health | jq
 
 # 5. Parar tudo
-docker compose down
+podman compose down
 ```
 
 ---
@@ -169,4 +169,4 @@ docker compose down
 - [ ] Serviço `rabbitmq` com health check e Management UI
 - [ ] Variáveis de ambiente corretamente configuradas (nomes de serviço, não localhost)
 - [ ] Volumes para persistência de dados
-- [ ] `docker compose up -d` sobe tudo sem erros
+- [ ] `podman compose up -d` sobe tudo sem erros

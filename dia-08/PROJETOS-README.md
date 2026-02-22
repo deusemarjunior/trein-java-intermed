@@ -3,7 +3,7 @@
 ## 📖 Projeto do Dia
 
 ### 1️⃣ **08-movie-service** (Exercício Individual — Desafio da Consultoria)
-**Objetivo**: Desenvolver individualmente um Microsserviço de Filmes completo com Arquitetura Hexagonal, integrando com a API do TheMovieDB e validando com o frontend TheMovie Web (React via Docker).
+**Objetivo**: Desenvolver individualmente um Microsserviço de Filmes completo com Arquitetura Hexagonal, integrando com a API do TheMovieDB e validando com o frontend TheMovie Web (React via Podman).
 
 **Conceitos aplicados (todos os dias anteriores)**:
 - **Dia 1**: Records como DTOs do domínio (`MovieSummary`, `MovieDetail`, `MovieSearchResult`)
@@ -12,10 +12,10 @@
 - **Dia 4**: Testes unitários (JUnit 5 + Mockito), testes de integração (Testcontainers)
 - **Dia 5**: Feign Client (TheMovieDB), Resilience4j, JWT, CORS, OpenAPI/Swagger
 - **Dia 6**: Cache Redis (`@Cacheable`), Flyway migrations
-- **Dia 7**: Docker Compose (PostgreSQL + Redis + frontend)
+- **Dia 7**: Podman Compose (PostgreSQL + Redis + frontend)
 
 **Porta**: 8080  
-**Frontend**: http://localhost:3000 (TheMovie Web via Docker)
+**Frontend**: http://localhost:3000 (TheMovie Web via Podman)
 
 ```bash
 # 1. Fork do template no GitHub
@@ -24,8 +24,8 @@
 git clone https://github.com/SEU-USUARIO/08-movie-service.git
 cd 08-movie-service
 
-# 3. Subir infraestrutura com Docker Compose
-docker compose up -d
+# 3. Subir infraestrutura com Podman Compose
+podman compose up -d
 
 # 4. Rodar a aplicação
 mvn spring-boot:run
@@ -68,7 +68,7 @@ mvn spring-boot:run
    ```bash
    git clone https://github.com/SEU-USUARIO/08-movie-service.git
    cd 08-movie-service
-   docker compose up -d
+   podman compose up -d
    ```
 
 ### 2. **Configure a API Key do TheMovieDB**

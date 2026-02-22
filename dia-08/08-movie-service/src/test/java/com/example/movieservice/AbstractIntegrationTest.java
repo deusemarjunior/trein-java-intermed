@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Classe base para testes de integração com Testcontainers.
- * Sobe um PostgreSQL real em container Docker para os testes.
+ * Sobe um PostgreSQL real em container Podman para os testes.
  *
  * Já implementado — o aluno NÃO precisa alterar este arquivo.
  * Basta estender esta classe nos testes de integração.

@@ -197,7 +197,7 @@ FROM flyway_schema_history;
 
 | Erro | Causa | Solução |
 |:---|:---|:---|
-| `Validate failed: Migration checksum mismatch` | Editou um script já aplicado | `docker compose down -v && docker compose up -d` |
+| `Validate failed: Migration checksum mismatch` | Editou um script já aplicado | `podman compose down -v && podman compose up -d` |
 | `Detected resolved migration not applied` | Criou V1 depois de V2 | Recriar DB limpo |
 | `relation already exists` | Tabela já existe (ddl-auto criou antes) | Limpar DB ou usar `baseline-on-migrate` |
 | `SchemaManagementException` | JPA validate falhou | Verificar nomes de colunas Entity vs SQL |
@@ -225,6 +225,6 @@ FROM flyway_schema_history;
 | Configurar application.yml | 5 min |
 | Testar (reiniciar app e verificar logs) | 5 min |
 
-> **⚠️ Importante**: Se der erro de checksum, reinicie com banco limpo: `docker compose down -v && docker compose up -d`
+> **⚠️ Importante**: Se der erro de checksum, reinicie com banco limpo: `podman compose down -v && podman compose up -d`
 
 > **Próximo**: RabbitMQ — publicar e consumir eventos!

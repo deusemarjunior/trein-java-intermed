@@ -32,7 +32,7 @@ class EmployeeServiceTest {
 ### A solução: substituir dependências por Mocks
 
 ```java
-// ✅ Teste unitário ISOLADO — sem banco, sem rede, sem Docker
+// ✅ Teste unitário ISOLADO — sem banco, sem rede, sem Podman
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 

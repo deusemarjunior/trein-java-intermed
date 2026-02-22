@@ -1,10 +1,10 @@
-# Slide 2: Docker Compose — Setup do Ambiente
+# Slide 2: Podman Compose — Setup do Ambiente
 
 **Horário:** 09:15 - 09:45
 
 ---
 
-## 🐳 Por que Docker Compose neste dia?
+## 🐳 Por que Podman Compose neste dia?
 
 Hoje trabalhamos com **3 serviços de infraestrutura** que precisam rodar localmente:
 
@@ -14,7 +14,7 @@ Hoje trabalhamos com **3 serviços de infraestrutura** que precisam rodar localm
 | **RabbitMQ** | 5672 / 15672 | Message broker (filas assíncronas) | AMQP / HTTP |
 | **Redis** | 6379 | Cache em memória (key-value) | RESP |
 
-> Instalar tudo manualmente? **Não.** Um `docker compose up -d` e tudo sobe em 30 segundos.
+> Instalar tudo manualmente? **Não.** Um `podman compose up -d` e tudo sobe em 30 segundos.
 
 ### 🏗️ Container vs. Instalação Local
 
@@ -28,8 +28,8 @@ graph LR
         I5 --> I6["⏱️ ~1 hora + erros de versão"]
     end
 
-    subgraph "✅ Docker Compose"
-        D1["docker compose up -d"] --> D2["3 containers rodando<br/>⏱️ ~30 segundos"]
+    subgraph "✅ Podman Compose"
+        D1["podman compose up -d"] --> D2["3 containers rodando<br/>⏱️ ~30 segundos"]
     end
 
     style I6 fill:#e74c3c,color:#fff
@@ -40,7 +40,7 @@ graph LR
 
 ```mermaid
 graph TB
-    subgraph "Docker Network (bridge padrão)"
+    subgraph "Podman Network (bridge padrão)"
         direction TB
         APP["🖥️ Spring Boot App<br/>(host: localhost)"]
 
@@ -66,11 +66,11 @@ graph TB
     style RED fill:#dc382d,color:#fff
 ```
 
-> **Nota**: A aplicação Spring Boot roda no host (sua máquina) e se conecta aos containers via portas mapeadas (`ports:`). Dentro da rede Docker, containers se comunicam pelo nome do serviço.
+> **Nota**: A aplicação Spring Boot roda no host (sua máquina) e se conecta aos containers via portas mapeadas (`ports:`). Dentro da rede Podman, containers se comunicam pelo nome do serviço.
 
 ---
 
-## docker-compose.yml — Os 3 Serviços
+## podman-compose.yml — Os 3 Serviços
 
 ```yaml
 version: '3.8'
@@ -120,14 +120,14 @@ services:
       retries: 5
 
 volumes:
-  postgres_data:      # Volume nomeado — dados sobrevivem a docker compose down
+  postgres_data:      # Volume nomeado — dados sobrevivem a podman compose down
 ```
 
-### Anatomia do docker-compose.yml
+### Anatomia do podman-compose.yml
 
 ```mermaid
 graph LR
-    DC["📄 docker-compose.yml"]
+    DC["📄 podman-compose.yml"]
 
     DC --> SVC["services:"]
     DC --> VOLS["volumes:"]
@@ -162,8 +162,8 @@ graph LR
 
 | Propriedade | O que faz | Exemplo |
 |-------------|----------|---------|
-| `image` | Imagem Docker Hub a usar | `postgres:16-alpine` (leve, ~80MB) |
-| `container_name` | Nome do container (para `docker exec`) | `postgres-dia06` |
+| `image` | Imagem Podman Hub a usar | `postgres:16-alpine` (leve, ~80MB) |
+| `container_name` | Nome do container (para `podman exec`) | `postgres-dia06` |
 | `environment` | Variáveis de ambiente | `POSTGRES_DB=employeedb` |
 | `ports` | Mapeamento host:container | `"5432:5432"` |
 | `volumes` | Persistência de dados | `postgres_data:/var/lib/postgresql/data` |
@@ -177,13 +177,13 @@ graph LR
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Criado: docker compose up -d
+    [*] --> Criado: podman compose up -d
     Criado --> Rodando: container starts
     Rodando --> Healthy: healthcheck passa
     Healthy --> Rodando: healthcheck falha
-    Rodando --> Parado: docker compose stop
-    Parado --> Rodando: docker compose start
-    Rodando --> Removido: docker compose down
+    Rodando --> Parado: podman compose stop
+    Parado --> Rodando: podman compose start
+    Rodando --> Removido: podman compose down
     Removido --> [*]
 
     note right of Healthy
@@ -195,30 +195,30 @@ stateDiagram-v2
     end note
 ```
 
-### Comandos Docker Compose Essenciais
+### Comandos Podman Compose Essenciais
 
 | Comando | O que faz | Quando usar |
 |---------|----------|-------------|
-| `docker compose up -d` | Cria e inicia containers em background | Início do dia |
-| `docker compose ps` | Lista containers e status | Verificar se tudo está up |
-| `docker compose logs -f` | Mostra logs em tempo real | Debugar problemas |
-| `docker compose stop` | Para containers (mantém dados) | Pausa rápida |
-| `docker compose start` | Reinicia containers parados | Retomar trabalho |
-| `docker compose down` | Remove containers (mantém volumes) | Fim do dia |
-| `docker compose down -v` | Remove tudo, incluindo dados | Recomeçar do zero |
-| `docker compose restart` | Para e inicia containers | Aplicar mudanças |
+| `podman compose up -d` | Cria e inicia containers em background | Início do dia |
+| `podman compose ps` | Lista containers e status | Verificar se tudo está up |
+| `podman compose logs -f` | Mostra logs em tempo real | Debugar problemas |
+| `podman compose stop` | Para containers (mantém dados) | Pausa rápida |
+| `podman compose start` | Reinicia containers parados | Retomar trabalho |
+| `podman compose down` | Remove containers (mantém volumes) | Fim do dia |
+| `podman compose down -v` | Remove tudo, incluindo dados | Recomeçar do zero |
+| `podman compose restart` | Para e inicia containers | Aplicar mudanças |
 
 ### Passo 1: Subir tudo
 
 ```bash
 cd 06-persistence-messaging-demo
-docker compose up -d
+podman compose up -d
 ```
 
 ### Passo 2: Verificar status
 
 ```bash
-docker compose ps
+podman compose ps
 ```
 
 Saída esperada:
@@ -233,12 +233,12 @@ redis-dia06        redis:7-alpine                Up (healthy)
 
 ```bash
 # PostgreSQL
-docker exec -it postgres-dia06 psql -U postgres -d employeedb -c "SELECT 1"
+podman exec -it postgres-dia06 psql -U postgres -d employeedb -c "SELECT 1"
 
 # RabbitMQ — acessar http://localhost:15672 (guest/guest)
 
 # Redis
-docker exec -it redis-dia06 redis-cli ping
+podman exec -it redis-dia06 redis-cli ping
 # Resposta: PONG
 ```
 
@@ -280,7 +280,7 @@ graph TB
 
 ```bash
 # Conectar ao Redis CLI dentro do container
-docker exec -it redis-dia06 redis-cli
+podman exec -it redis-dia06 redis-cli
 
 # Testar conexão
 PING
@@ -382,14 +382,14 @@ spring:
 
 | Problema | Causa provável | Solução |
 |----------|---------------|---------|
-| `Connection refused` no PostgreSQL | Container não está rodando | `docker compose up -d` |
-| Porta 5432 ocupada | Outro PostgreSQL rodando | `docker ps` e parar o outro container |
-| RabbitMQ UI não abre | Porta 15672 não mapeada | Verificar `docker-compose.yml` |
-| Redis `PONG` não responde | Container parado | `docker compose restart redis` |
+| `Connection refused` no PostgreSQL | Container não está rodando | `podman compose up -d` |
+| Porta 5432 ocupada | Outro PostgreSQL rodando | `podman ps` e parar o outro container |
+| RabbitMQ UI não abre | Porta 15672 não mapeada | Verificar `podman-compose.yml` |
+| Redis `PONG` não responde | Container parado | `podman compose restart redis` |
 
 ```bash
 # Comando útil: reiniciar tudo do zero
-docker compose down -v && docker compose up -d
+podman compose down -v && podman compose up -d
 ```
 
 ---
@@ -398,9 +398,9 @@ docker compose down -v && docker compose up -d
 
 Antes de prosseguir, confirme que todos os 3 serviços estão **healthy**:
 
-- [ ] `docker compose ps` mostra 3 containers "Up (healthy)"
-- [ ] PostgreSQL responde: `docker exec -it postgres-dia06 psql -U postgres -c "SELECT 1"`
+- [ ] `podman compose ps` mostra 3 containers "Up (healthy)"
+- [ ] PostgreSQL responde: `podman exec -it postgres-dia06 psql -U postgres -c "SELECT 1"`
 - [ ] RabbitMQ UI acessível: http://localhost:15672
-- [ ] Redis responde: `docker exec -it redis-dia06 redis-cli ping`
+- [ ] Redis responde: `podman exec -it redis-dia06 redis-cli ping`
 
 > **Tudo OK? Vamos para o conteúdo principal: o problema N+1!** 🚀

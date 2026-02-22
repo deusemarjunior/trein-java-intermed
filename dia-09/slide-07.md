@@ -13,7 +13,7 @@ graph TD
         B["Spring Boot 3.x"]
         C["REST APIs"]
         D["Testes"]
-        E["Docker"]
+        E["Podman"]
     end
 
     subgraph "Próximos passos 🎯"

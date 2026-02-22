@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  *
  * <p>Exercícios TODO 6 e 7 — implemente os testes de integração.</p>
  *
- * <p><strong>Pré-requisito:</strong> Docker Desktop deve estar rodando.</p>
+ * <p><strong>Pré-requisito:</strong> Podman Desktop deve estar rodando.</p>
  */
 @DisplayName("EmployeeRepository — Testes de Integração")
 class EmployeeRepositoryIT extends AbstractIntegrationTest {

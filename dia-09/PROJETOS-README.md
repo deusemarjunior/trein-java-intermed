@@ -25,10 +25,10 @@ O dia 09 não possui um novo projeto. O foco é a **finalização e apresentaç�
 
 ## Frontend: TheMovie Web
 
-O frontend já está pronto via Docker. Para rodar:
+O frontend já está pronto via Podman. Para rodar:
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 Acesse: http://localhost:3000
@@ -61,4 +61,4 @@ Acesse: http://localhost:3000
 - Segurança: Spring Security, JWT
 - Integrações: Feign Client, Resilience4j, Redis
 - Observabilidade: Actuator, Micrometer
-- CI/CD: GitHub Actions, Docker, Docker Compose
+- CI/CD: GitHub Actions, Podman, Podman Compose

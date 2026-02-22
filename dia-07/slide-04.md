@@ -1,4 +1,4 @@
-# Slide 4: Docker Compose — Orquestrando a Stack
+# Slide 4: Podman Compose — Orquestrando a Stack
 
 **Horário:** 10:15 - 10:45
 
@@ -10,28 +10,28 @@ Uma aplicação Spring Boot típica depende de **vários serviços**. Subir cada
 
 ```bash
 # ❌ Subir manualmente cada container
-docker run -d --name postgres -e POSTGRES_DB=mydb -p 5432:5432 postgres:16-alpine
-docker run -d --name redis -p 6379:6379 redis:7-alpine
-docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management-alpine
-docker build -t my-app .
-docker run -d --name app -p 8080:8080 --link postgres --link redis --link rabbitmq my-app
+podman run -d --name postgres -e POSTGRES_DB=mydb -p 5432:5432 docker.io/library/postgres:16-alpine
+podman run -d --name redis -p 6379:6379 docker.io/library/redis:7-alpine
+podman run -d --name rabbitmq -p 5672:5672 -p 15672:15672 docker.io/library/rabbitmq:3-management-alpine
+podman build -t my-app .
+podman run -d --name app -p 8080:8080 --network podman my-app
 
 # 😰 E se precisar reiniciar? E as variáveis de ambiente? E a ordem?
 ```
 
 ```bash
-# ✅ Com Docker Compose — UM comando
-docker compose up -d
+# ✅ Com Podman Compose — UM comando
+podman compose up -d
 # 🎉 Tudo sobe na ordem certa, com health checks, em 30 segundos
 ```
 
 ---
 
-## docker-compose.yml — Anatomia
+## podman-compose.yml — Anatomia
 
 ```mermaid
 graph TB
-    subgraph "docker-compose.yml"
+    subgraph "podman-compose.yml"
         direction TB
 
         subgraph "services:"
@@ -64,7 +64,7 @@ graph TB
 
 ---
 
-## Docker Compose Completo — Exemplo
+## Podman Compose Completo — Exemplo
 
 ```yaml
 version: '3.9'
@@ -72,7 +72,7 @@ version: '3.9'
 services:
   # ── Aplicação Spring Boot ──
   app:
-    build: .                           # Usa o Dockerfile local
+    build: .                           # Usa o Containerfile local
     container_name: my-app
     ports:
       - "8080:8080"
@@ -167,7 +167,7 @@ Sem health check, o `depends_on` apenas garante que o container **iniciou**, nã
 
 ```mermaid
 sequenceDiagram
-    participant DC as Docker Compose
+    participant DC as Podman Compose
     participant PG as PostgreSQL
     participant APP as Spring Boot
 
@@ -203,12 +203,12 @@ Sem volumes, os dados são **perdidos** quando o container para:
 ```mermaid
 graph TD
     subgraph "Sem volume"
-        C1["Container PostgreSQL"] -->|"docker compose down"| LOST["🔴 Dados PERDIDOS<br/>Tabelas, registros... tudo zerado"]
+        C1["Container PostgreSQL"] -->|"podman compose down"| LOST["🔴 Dados PERDIDOS<br/>Tabelas, registros... tudo zerado"]
     end
 
     subgraph "Com volume"
-        C2["Container PostgreSQL"] -->|"docker compose down"| V["📁 Volume: pg_data<br/>Dados persistem no disco"]
-        V -->|"docker compose up"| C3["Novo container<br/>✅ Dados intactos!"]
+        C2["Container PostgreSQL"] -->|"podman compose down"| V["📁 Volume: pg_data<br/>Dados persistem no disco"]
+        V -->|"podman compose up"| C3["Novo container<br/>✅ Dados intactos!"]
     end
 
     style LOST fill:#e74c3c,color:#fff
@@ -219,20 +219,20 @@ graph TD
 
 ## Networks — Comunicação entre Containers
 
-Dentro da mesma network Docker, containers se comunicam pelo **nome do serviço**:
+Dentro da mesma network Podman, containers se comunicam pelo **nome do serviço**:
 
 ```yaml
-# No Docker Compose, o nome do serviço vira o hostname
+# No Podman Compose, o nome do serviço vira o hostname
 # A app acessa o banco por "postgres" (não "localhost"!)
 environment:
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appdb
   #                                       ^^^^^^^^
-  #                                       Nome do serviço no docker-compose.yml
+  #                                       Nome do serviço no podman-compose.yml
 ```
 
 ```mermaid
 graph LR
-    subgraph "Docker Network: app-network"
+    subgraph "Podman Network: app-network"
         APP["app<br/>:8080"] -->|"postgres:5432"| PG["postgres<br/>:5432"]
         APP -->|"redis:6379"| RED["redis<br/>:6379"]
         APP -->|"rabbitmq:5672"| RMQ["rabbitmq<br/>:5672"]
@@ -248,18 +248,18 @@ graph LR
 
 ---
 
-## Comandos Docker Compose Essenciais
+## Comandos Podman Compose Essenciais
 
 | Comando | Função |
 |---------|--------|
-| `docker compose up -d` | Sobe todos os serviços em background |
-| `docker compose down` | Para e remove todos os containers |
-| `docker compose ps` | Lista containers rodando |
-| `docker compose logs -f app` | Acompanha logs de um serviço |
-| `docker compose restart app` | Reinicia um serviço |
-| `docker compose build` | Reconstrói imagens |
-| `docker compose up -d --build` | Sobe reconstruindo a imagem |
-| `docker compose down -v` | Para e remove containers + volumes |
+| `podman compose up -d` | Sobe todos os serviços em background |
+| `podman compose down` | Para e remove todos os containers |
+| `podman compose ps` | Lista containers rodando |
+| `podman compose logs -f app` | Acompanha logs de um serviço |
+| `podman compose restart app` | Reinicia um serviço |
+| `podman compose build` | Reconstrói imagens |
+| `podman compose up -d --build` | Sobe reconstruindo a imagem |
+| `podman compose down -v` | Para e remove containers + volumes |
 
 ---
 
@@ -268,8 +268,8 @@ graph LR
 1. **Por que usar `condition: service_healthy` no `depends_on`?**
    - Garante que o serviço está realmente pronto (não apenas que o container iniciou).
 
-2. **Se a app roda no container Docker, ela acessa o PostgreSQL por `localhost:5432`?**
-   - **Não!** Dentro do Docker, usa o nome do serviço: `postgres:5432`. `localhost` se refere ao próprio container da app.
+2. **Se a app roda no container Podman, ela acessa o PostgreSQL por `localhost:5432`?**
+   - **Não!** Dentro do Podman, usa o nome do serviço: `postgres:5432`. `localhost` se refere ao próprio container da app.
 
-3. **O que acontece com os dados se eu rodar `docker compose down -v`?**
+3. **O que acontece com os dados se eu rodar `podman compose down -v`?**
    - O `-v` remove os **volumes**, então todos os dados do banco, Redis e RabbitMQ são **apagados**.

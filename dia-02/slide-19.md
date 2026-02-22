@@ -21,7 +21,7 @@
 ### ✅ O que vimos até agora:
 
 **09:00 - 10:00 | Review & Setup**
-- Configuração PostgreSQL + Docker
+- Configuração PostgreSQL + Podman
 - Dependencies Spring Data JPA
 
 **10:00 - 11:00 | HTTP & REST Avançado**

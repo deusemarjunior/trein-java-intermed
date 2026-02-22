@@ -63,7 +63,7 @@ graph LR
 ## Checklist Pré-Apresentação
 
 ```
-□ Docker Compose rodando (docker compose up -d)
+□ Podman Compose rodando (podman compose up -d)
 □ Backend rodando e respondendo
 □ Frontend acessível em localhost:3000
 □ Filmes carregam na tela

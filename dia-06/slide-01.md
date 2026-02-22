@@ -209,7 +209,7 @@ graph LR
         FW["Flyway"]
     end
 
-    subgraph "Infraestrutura (Docker)"
+    subgraph "Infraestrutura (Podman)"
         PG["PostgreSQL 16"]
         RMQ["RabbitMQ 3"]
         RED["Redis 7"]
@@ -241,7 +241,7 @@ graph LR
 | # | Horário | Slide | Conteúdo |
 |---|---------|-------|----------|
 | 1 | 09:00 | Este slide | Recap + Introdução |
-| 2 | 09:15 | Slide 2 | Docker Compose — Setup do Ambiente |
+| 2 | 09:15 | Slide 2 | Podman Compose — Setup do Ambiente |
 | 3 | 09:45 | Slide 3 | JPA N+1 — O Problema e Diagnóstico |
 | 4 | 10:15 | Slide 4 | JPA N+1 — Soluções (JOIN FETCH, @EntityGraph) |
 | - | 10:45 | ☕ | Coffee Break |

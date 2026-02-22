@@ -190,7 +190,7 @@ GET /api/departments
 ### Teste 3: Verificar no Redis CLI
 
 ```bash
-docker exec -it redis-dia06 redis-cli
+podman exec -it redis-dia06 redis-cli
 
 # Ver chaves de cache
 KEYS *
@@ -212,7 +212,7 @@ KEYS *
 | Erro | Causa | Solução |
 |:---|:---|:---|
 | Cache não funciona (log sempre aparece) | Faltou `@EnableCaching` | Adicionar na classe principal |
-| `RedisConnectionException` | Redis não está rodando | `docker compose up -d` |
+| `RedisConnectionException` | Redis não está rodando | `podman compose up -d` |
 | `SerializationException` | Cacheou Entity com proxy | Cachear DTOs/Records, nunca Entities |
 | Cache funciona mas dados errados | TTL muito longo + dados mudaram | Adicionar `@CacheEvict` nas escritas |
 

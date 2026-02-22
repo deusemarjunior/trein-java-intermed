@@ -1,9 +1,9 @@
 # Dia 8 - Projeto Prático: O Desafio da Consultoria (Individual)
 
 **Duração**: 5 horas  
-**Objetivo**: Desenvolver individualmente um **Microsserviço de Filmes** completo com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta o frontend **TheMovie Web** (React) fornecido pelo instrutor como imagem Docker.
+**Objetivo**: Desenvolver individualmente um **Microsserviço de Filmes** completo com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta o frontend **TheMovie Web** (React) fornecido pelo instrutor como imagem Podman.
 
-> **Pré-requisito**: Dias 1-7 concluídos. Docker Desktop instalado e rodando. Conta no [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) para obter a API Key.
+> **Pré-requisito**: Dias 1-7 concluídos. Podman Desktop instalado e rodando. Conta no [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) para obter a API Key.
 
 > **⚠️ Importante**: O desafio é **individual**, mas cada aluno seguirá todos os passos e ritos como se estivesse em um time de consultoria — Daily Scrum, Kanban, Code Review via PR, commits semânticos e apresentação técnica.
 
@@ -33,15 +33,15 @@
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
 - [ ] IDE com suporte a Java (IntelliJ ou VS Code)
-- [ ] Docker Desktop rodando
+- [ ] Podman Desktop rodando
 - [ ] _(Opcional)_ Postman ou extensão REST Client no VS Code
 
 ### Preparação
 - [ ] Projeto template `08-movie-service` disponível para fork no GitHub
 - [ ] Contrato Swagger/OpenAPI (`openapi.yaml`) pronto para entrega
-- [ ] Frontend **TheMovie Web** acessível via Docker:
+- [ ] Frontend **TheMovie Web** acessível via Podman:
   ```bash
-  docker run -d --name themovie-web -p 3000:80 \
+  podman run -d --name themovie-web -p 3000:80 \
     -e REACT_APP_API_URL=http://localhost:8080 \
     ghcr.io/deusemar/themovie-web:latest
   ```
@@ -61,7 +61,7 @@ Mesmo trabalhando individualmente, o aluno segue o fluxo profissional de uma con
 - O instrutor entrega um **contrato Swagger/OpenAPI** que define os endpoints do microsserviço
 - Um **frontend já pronto** (TheMovie Web) consome esse contrato — o aluno desenvolve o backend que o alimenta
 - Fazer as perguntas certas antes de codar: escopar, negociar e priorizar
-- Definição de "pronto": o backend funciona quando o **TheMovie Web** (frontend React via Docker) exibe os dados corretamente
+- Definição de "pronto": o backend funciona quando o **TheMovie Web** (frontend React via Podman) exibe os dados corretamente
 
 > **Simulação**: Mesmo sendo individual, o aluno documenta decisões, mantém commits semânticos e abre PR como se estivesse em um time real.
 
@@ -89,13 +89,13 @@ O aluno pratica os ritos como se fosse membro de um time de consultoria:
 
 ## 🖥️ Frontend: TheMovie Web (React)
 
-> O frontend é uma aplicação **React** pré-construída e entregue como **imagem Docker**. O aluno **não precisa ter Node.js instalado** — basta rodar o container e apontar para o seu backend.
+> O frontend é uma aplicação **React** pré-construída e entregue como **imagem Podman**. O aluno **não precisa ter Node.js instalado** — basta rodar o container e apontar para o seu backend.
 
 **Como executar:**
 
 ```bash
 # Rodar o frontend apontando para o backend local (porta 8080)
-docker run -d \
+podman run -d \
   --name themovie-web \
   -p 3000:80 \
   -e REACT_APP_API_URL=http://localhost:8080 \
@@ -121,7 +121,7 @@ Após subir, acessar **http://localhost:3000** no navegador.
 | `GET` | `/api/movies/favorites?page=0&size=10` | Página de favoritos |
 | `POST` | `/auth/login` | Tela de login (JWT) |
 
-**Dica:** inclua o frontend no `docker-compose.yml` do projeto para subir tudo junto:
+**Dica:** inclua o frontend no `podman-compose.yml` do projeto para subir tudo junto:
 
 ```yaml
 services:
@@ -143,11 +143,11 @@ services:
 
 ## ✏️ Projeto Exercício: `08-movie-service`
 
-> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. O frontend **TheMovie Web** (React) roda via Docker e consome esse contrato. **Desenvolvimento individual.**
+> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. O frontend **TheMovie Web** (React) roda via Podman e consome esse contrato. **Desenvolvimento individual.**
 
 **O que já vem pronto no template:**
 - Estrutura de pacotes hexagonal: `domain/`, `adapter/in/web/`, `adapter/out/rest/`, `adapter/out/persistence/`
-- `docker-compose.yml` com PostgreSQL + Redis + **TheMovie Web** (frontend React)
+- `podman-compose.yml` com PostgreSQL + Redis + **TheMovie Web** (frontend React)
 - `application.yml` configurado para os containers e para a API do TheMovieDB
 - Migrations Flyway iniciais (`V1__create_favorites.sql`, `V2__create_watch_later.sql`)
 - `AbstractIntegrationTest` com Testcontainers
@@ -200,7 +200,7 @@ services:
 ## 📝 Dinâmica do Dia
 
 - **Manhã**: Entrega do contrato Swagger pelo instrutor, análise dos endpoints, perguntas ao "cliente", planejamento individual (Kanban) e início do desenvolvimento com arquitetura hexagonal
-- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o **TheMovie Web** (`docker compose up` → http://localhost:3000), code review entre colegas via Pull Request
+- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o **TheMovie Web** (`podman compose up` → http://localhost:3000), code review entre colegas via Pull Request
 
 > **Lembrete**: Mesmo sendo individual, mantenha os ritos — commits semânticos, branches por feature, Daily Scrum e Code Review. O objetivo é praticar o fluxo profissional completo.
 
@@ -210,7 +210,7 @@ services:
 
 Use este checklist como Kanban pessoal:
 
-- [ ] Fork do template e setup do ambiente (`docker compose up`)
+- [ ] Fork do template e setup do ambiente (`podman compose up`)
 - [ ] TODOs 1-2: Ports e Adapter REST (TheMovieDB)
 - [ ] TODOs 3-4: Use Case e Service (lógica de negócio)
 - [ ] TODO 5: Controller com todos os endpoints

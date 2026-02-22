@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     container_name: movie-postgres
     environment:
       POSTGRES_DB: moviedb
@@ -17,7 +17,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: docker.io/library/redis:7-alpine
     container_name: movie-redis
     ports:
       - "6382:6379"
@@ -33,7 +33,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      - API_URL=http://host.docker.internal:8080
+      - API_URL=http://host.podman.internal:8080
 
   # Alternativa: usar imagem publicada (quando disponível no registry)
   # themovie-web:
@@ -42,9 +42,9 @@ services:
   #   ports:
   #     - "3000:80"
   #   environment:
-  #     - API_URL=http://host.docker.internal:8080
+  #     - API_URL=http://host.podman.internal:8080
 
-  # Descomente abaixo após implementar o Dockerfile (multi-stage build)
+  # Descomente abaixo após implementar o Containerfile (multi-stage build)
   # app:
   #   build: .
   #   container_name: movie-service

@@ -66,7 +66,7 @@ mindmap
 | **Dia 4** | Testes | `MovieServiceTest`, `FavoriteRepositoryIT`, Testcontainers |
 | **Dia 5** | Feign + JWT + Swagger | `TheMovieDbClient`, `SecurityConfig`, OpenAPI |
 | **Dia 6** | Redis + Flyway | `@Cacheable` populares, migrations SQL |
-| **Dia 7** | Docker | `docker-compose.yml` com PostgreSQL, Redis, frontend |
+| **Dia 7** | Podman | `podman-compose.yml` com PostgreSQL, Redis, frontend |
 
 ---
 
@@ -78,7 +78,7 @@ mindmap
 4. **Soft Skills**: Carreira, consultoria, certificações
 5. **Encerramento**: Feedback, retrospectiva, certificados
 
-> **Dica**: Prepare-se para a apresentação — tenha o Docker Compose rodando e saiba explicar suas decisões.
+> **Dica**: Prepare-se para a apresentação — tenha o Podman Compose rodando e saiba explicar suas decisões.
 
 ### Commit final do dia:
 

@@ -367,7 +367,7 @@ Hibernate: SELECT d.id, d.name, d.code FROM departments d
 ### Verificando no Redis CLI
 
 ```bash
-docker exec -it redis-dia06 redis-cli
+podman exec -it redis-dia06 redis-cli
 
 # Listar todas as chaves de cache
 KEYS *

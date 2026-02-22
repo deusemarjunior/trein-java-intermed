@@ -1,9 +1,9 @@
-# Dia 7 - Docker, Cloud Readiness e Observabilidade
+# Dia 7 - Podman, Cloud Readiness e Observabilidade
 
 **Duração**: 5 horas  
-**Objetivo**: "Na minha máquina funciona" não é desculpa — containerizar a aplicação com Docker (multi-stage build), orquestrar com Docker Compose, adicionar observabilidade com Spring Actuator e logs estruturados (JSON + MDC), e introduzir conceitos de CI/CD.
+**Objetivo**: "Na minha máquina funciona" não é desculpa — containerizar a aplicação com Podman (multi-stage build), orquestrar com Podman Compose, adicionar observabilidade com Spring Actuator e logs estruturados (JSON + MDC), e introduzir conceitos de CI/CD.
 
-> **Pré-requisito**: Dias 1-6 concluídos (especialmente Dia 6 — Persistência Avançada e Mensageria). Docker Desktop instalado e rodando.
+> **Pré-requisito**: Dias 1-6 concluídos (especialmente Dia 6 — Persistência Avançada e Mensageria). Podman Desktop instalado e rodando.
 
 ---
 
@@ -12,15 +12,15 @@
 | Horário | Duração | Tópico | Tipo |
 |---------|---------|--------|------|
 | 09:00 - 09:15 | 15min | Recap Dia 6 e Introdução ao Dia 7 | Discussão |
-| 09:15 - 09:45 | 30min | Docker — Dockerfile, Instruções e Conceitos | Teórico |
-| 09:45 - 10:15 | 30min | Multi-stage Build e .dockerignore | Teórico |
-| 10:15 - 10:45 | 30min | Docker Compose — App + Infraestrutura Completa | Teórico |
+| 09:15 - 09:45 | 30min | Podman — Containerfile, Instruções e Conceitos | Teórico |
+| 09:45 - 10:15 | 30min | Multi-stage Build e .containerignore | Teórico |
+| 10:15 - 10:45 | 30min | Podman Compose — App + Infraestrutura Completa | Teórico |
 | 10:45 - 11:00 | 15min | ☕ Coffee Break | - |
 | 11:00 - 11:30 | 30min | Spring Actuator — Health, Metrics, Info | Teórico |
 | 11:30 - 12:00 | 30min | Logs Estruturados — Logback JSON + MDC | Teórico |
 | 12:00 - 13:00 | 1h | 🍽️ Almoço | - |
 | 13:00 - 13:20 | 20min | Observabilidade e CI/CD (Conceitual) | Teórico |
-| 13:20 - 13:50 | 30min | Walkthrough `07-docker-actuator-demo` | Demo |
+| 13:20 - 13:50 | 30min | Walkthrough `07-podman-actuator-demo` | Demo |
 | 13:50 - 15:30 | 1h40 | Exercício `07-employee-api-production` (TODOs 1-4) | Hands-on |
 | 15:30 - 16:30 | 1h | Exercício `07-employee-api-production` (TODOs 5-7) | Hands-on |
 | 16:30 - 17:00 | 30min | Review: imagem < 100MB, Actuator respondendo, logs JSON | Discussão |
@@ -33,17 +33,17 @@
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
 - [ ] IDE com suporte a Java (IntelliJ ou VS Code)
-- [ ] Docker Desktop rodando
+- [ ] Podman Desktop rodando
 - [ ] _(Opcional)_ Postman ou extensão REST Client no VS Code
 
 ### Preparação
-- [ ] Executar `docker compose up` no projeto `07-docker-actuator-demo` e verificar:
+- [ ] Executar `podman compose up` no projeto `07-podman-actuator-demo` e verificar:
   - [ ] PostgreSQL acessível na porta 5432
   - [ ] RabbitMQ Management UI em http://localhost:15672 (guest/guest)
   - [ ] Redis acessível na porta 6379
   - [ ] App respondendo em http://localhost:8080/api/products
   - [ ] Actuator respondendo em http://localhost:8080/actuator/health
-- [ ] Projeto `07-docker-actuator-demo` rodando com logs JSON no container
+- [ ] Projeto `07-podman-actuator-demo` rodando com logs JSON no container
 - [ ] Projeto `07-employee-api-production` com TODOs prontos e dependências configuradas
 
 ---
@@ -52,22 +52,22 @@
 
 ---
 
-### 1. Docker — Containerizando a Aplicação
+### 1. Podman — Containerizando a Aplicação
 
-#### Por que Docker?
+#### Por que Podman?
 
-O clássico "na minha máquina funciona" acontece porque ambientes são diferentes: versão do Java, variáveis de ambiente, serviços rodando. **Docker resolve isso empacotando tudo em um container reprodutível.**
+O clássico "na minha máquina funciona" acontece porque ambientes são diferentes: versão do Java, variáveis de ambiente, serviços rodando. **Podman resolve isso empacotando tudo em um container reprodutível.**
 
 ```
-Sem Docker:    Dev (Java 21) → Staging (Java 17) → Prod (Java 11) → 💥 FALHA
-Com Docker:    Dev (Container) → Staging (Container) → Prod (Container) → ✅ FUNCIONA
+Sem Podman:    Dev (Java 21) → Staging (Java 17) → Prod (Java 11) → 💥 FALHA
+Com Podman:    Dev (Container) → Staging (Container) → Prod (Container) → ✅ FUNCIONA
 ```
 
-#### Dockerfile — A Receita
+#### Containerfile — A Receita
 
-O **Dockerfile** é a receita para construir uma imagem Docker. Cada instrução cria uma **camada (layer)**:
+O **Containerfile** é a receita para construir uma imagem Podman. Cada instrução cria uma **camada (layer)**:
 
-```dockerfile
+```podmanfile
 # Imagem base
 FROM eclipse-temurin:21-jdk-alpine
 
@@ -97,13 +97,13 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 | `ENV` | Define variáveis de ambiente | `ENV SPRING_PROFILES_ACTIVE=prod` |
 | `ARG` | Variável de build-time | `ARG JAR_FILE=target/*.jar` |
 
-> **EXPOSE** apenas documenta a porta — para acessar externamente, use `-p 8080:8080` no `docker run` ou `ports:` no Compose.
+> **EXPOSE** apenas documenta a porta — para acessar externamente, use `-p 8080:8080` no `podman run` ou `ports:` no Compose.
 
 #### Cache de Layers
 
-Docker **cacheia cada layer** — se uma instrução não mudou, usa o cache. A **ordem importa**:
+Podman **cacheia cada layer** — se uma instrução não mudou, usa o cache. A **ordem importa**:
 
-```dockerfile
+```podmanfile
 # ❌ Ruim: qualquer mudança no código invalida o cache do mvn package
 COPY . .
 RUN mvn package -DskipTests
@@ -121,7 +121,7 @@ RUN mvn package -DskipTests
 
 #### O Problema das Imagens Grandes
 
-```dockerfile
+```podmanfile
 # Imagem com JDK + Maven + sources + target = ~800MB 😱
 FROM maven:3.9-eclipse-temurin-21
 COPY . .
@@ -133,7 +133,7 @@ Para rodar a aplicação, **não precisamos do Maven, JDK nem do código-fonte**
 
 #### A Solução: Multi-stage Build
 
-```dockerfile
+```podmanfile
 # ── Stage 1: BUILD ──
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
@@ -162,9 +162,9 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 | **Segurança** | JDK + Maven + sources expostos | Apenas JRE + JAR |
 | **Superfície de ataque** | Grande | Mínima |
 
-#### .dockerignore
+#### .containerignore
 
-Assim como `.gitignore`, o `.dockerignore` **exclui arquivos do contexto de build**:
+Assim como `.gitignore`, o `.containerignore` **exclui arquivos do contexto de build**:
 
 ```
 target/
@@ -172,21 +172,21 @@ target/
 .idea/
 *.iml
 .env
-docker-compose*.yml
+podman-compose*.yml
 README.md
 *.md
 .vscode/
 ```
 
-> **Sem .dockerignore**: o `COPY . .` copia `.git/` (pode ter 100MB+), `target/` e tudo mais para dentro do build context.
+> **Sem .containerignore**: o `COPY . .` copia `.git/` (pode ter 100MB+), `target/` e tudo mais para dentro do build context.
 
 ---
 
-### 3. Docker Compose — Orquestrando a Stack
+### 3. Podman Compose — Orquestrando a Stack
 
-Uma aplicação de verdade não roda sozinha — precisa de banco de dados, cache, fila de mensagens. **Docker Compose** orquestra tudo em um arquivo.
+Uma aplicação de verdade não roda sozinha — precisa de banco de dados, cache, fila de mensagens. **Podman Compose** orquestra tudo em um arquivo.
 
-#### Anatomia do docker-compose.yml
+#### Anatomia do podman-compose.yml
 
 ```yaml
 services:
@@ -264,12 +264,12 @@ networks:
 #### Comandos Essenciais
 
 ```bash
-docker compose up -d                  # Sobe tudo em background
-docker compose up --build -d          # Rebuild + sobe
-docker compose down                   # Para e remove containers
-docker compose logs -f app            # Logs da app em tempo real
-docker compose ps                     # Status dos containers
-docker compose exec app sh            # Shell dentro do container
+podman compose up -d                  # Sobe tudo em background
+podman compose up --build -d          # Rebuild + sobe
+podman compose down                   # Para e remove containers
+podman compose logs -f app            # Logs da app em tempo real
+podman compose ps                     # Status dos containers
+podman compose exec app sh            # Shell dentro do container
 ```
 
 ---
@@ -745,7 +745,7 @@ graph LR
 ```
 
 **Características:**
-- O artefato (JAR, imagem Docker) **já foi testado** em ambiente similar a produção (staging)
+- O artefato (JAR, imagem Podman) **já foi testado** em ambiente similar a produção (staging)
 - O deploy em produção é uma **decisão de negócio**, não técnica
 - Pode deployar a qualquer momento com **confiança** — sem surpresas
 - Rollback é simples: basta deployar a versão anterior do artefato
@@ -801,7 +801,7 @@ graph LR
     B --> TU["🧪 Testes<br/>Unitários"]
     TU --> TI["🧪 Testes de<br/>Integração"]
     TI --> SA["🔍 Análise<br/>Estática"]
-    SA --> D["🐳 Docker<br/>Build"]
+    SA --> D["🐳 Podman<br/>Build"]
     D --> R["📦 Push<br/>Registry"]
     R --> S["🚀 Deploy<br/>Staging"]
     S --> SM["✅ Smoke<br/>Tests"]
@@ -816,8 +816,8 @@ graph LR
 | **Testes Unitários** | Roda testes isolados (sem infra) | JUnit 5, Mockito | Algum teste falhar |
 | **Testes de Integração** | Roda testes com banco/fila reais | Testcontainers, MockMvc | Integração falhar |
 | **Análise Estática** | Verifica qualidade e vulnerabilidades | SonarQube, Checkstyle, Snyk | Code smell, CVE crítico |
-| **Docker Build** | Cria imagem Docker da aplicação | Docker, Buildpacks | Dockerfile com erro |
-| **Push Registry** | Publica imagem no registry | Docker Hub, ECR, ACR, GCR | Autenticação falhar |
+| **Podman Build** | Cria imagem Podman da aplicação | Podman, Buildpacks | Containerfile com erro |
+| **Push Registry** | Publica imagem no registry | Podman Hub, ECR, ACR, GCR | Autenticação falhar |
 | **Deploy Staging** | Deploya em ambiente de testes | Kubernetes, ECS, Azure App Service | Health check falhar |
 | **Smoke Tests** | Testes básicos em staging | REST Client, Newman, k6 | Endpoint não responder |
 | **Deploy Produção** | Deploya em produção | Kubernetes, ECS | Health check falhar |
@@ -828,7 +828,7 @@ graph LR
 |----------|------------|
 | **Stage** | Uma etapa do pipeline (Build, Test, Deploy) |
 | **Job** | Uma unidade de trabalho dentro de um stage |
-| **Artifact** | Arquivo gerado por um stage e usado pelo próximo (JAR, imagem Docker) |
+| **Artifact** | Arquivo gerado por um stage e usado pelo próximo (JAR, imagem Podman) |
 | **Runner/Agent** | Máquina que executa o pipeline (GitHub-hosted, self-hosted) |
 | **Trigger** | Evento que inicia o pipeline (push, merge request, schedule) |
 | **Gate** | Aprovação manual necessária para prosseguir (ex.: deploy em produção) |
@@ -879,23 +879,23 @@ jobs:
           name: app-jar
           path: target/*.jar
 
-  # Stage 2: Docker Build + Push
-  docker:
+  # Stage 2: Podman Build + Push
+  podman:
     needs: build-and-test   # só roda se o stage anterior passou
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'  # só na main
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: docker build -t myapp:${{ github.sha }} .
+      - name: Build Podman Image
+        run: podman build -t myapp:${{ github.sha }} .
 
       - name: Push to Registry
-        run: docker push registry/myapp:${{ github.sha }}
+        run: podman push registry/myapp:${{ github.sha }}
 
   # Stage 3: Deploy (com aprovação manual = Continuous Delivery)
   deploy:
-    needs: docker
+    needs: podman
     runs-on: ubuntu-latest
     environment: production   # requer aprovação manual no GitHub
     steps:
@@ -911,14 +911,14 @@ jobs:
 
 ## 📦 Projetos do Dia
 
-### `07-docker-actuator-demo` (Projeto Completo — Demonstração)
+### `07-podman-actuator-demo` (Projeto Completo — Demonstração)
 
-> API de Produtos dockerizada com Actuator, logs estruturados e observabilidade — tudo subindo com `docker compose up`.
+> API de Produtos containerizada com Actuator, logs estruturados e observabilidade — tudo subindo com `podman compose up`.
 
 Projeto completo demonstrando os conceitos:
-- `Dockerfile` multi-stage build otimizado (~80MB com JRE Alpine)
-- `.dockerignore` configurado
-- `docker-compose.yml` com: app Spring Boot, PostgreSQL, RabbitMQ, Redis — todos com health checks
+- `Containerfile` multi-stage build otimizado (~80MB com JRE Alpine)
+- `.containerignore` configurado
+- `podman-compose.yml` com: app Spring Boot, PostgreSQL, RabbitMQ, Redis — todos com health checks
 - Spring Actuator expondo `/health`, `/metrics`, `/info` com detalhes
 - Custom Health Indicator verificando conectividade com RabbitMQ
 - `logback-spring.xml` com `LogstashEncoder` gerando logs em JSON
@@ -929,11 +929,11 @@ Projeto completo demonstrando os conceitos:
 
 ### `07-employee-api-production` (Exercício — TODOs 1-7)
 
-> Dockerizar a API de Funcionários e adicionar observabilidade para produção.
+> Containerizar a API de Funcionários e adicionar observabilidade para produção.
 
-**O que já vem pronto:** `Dockerfile` básico não otimizado, `docker-compose.yml` com apenas PostgreSQL, `logback-spring.xml` com logs em texto, dependência do Actuator sem endpoints expostos.
+**O que já vem pronto:** `Containerfile` básico não otimizado, `podman-compose.yml` com apenas PostgreSQL, `logback-spring.xml` com logs em texto, dependência do Actuator sem endpoints expostos.
 
-**TODOs**: 7 tarefas cobrindo Dockerfile multi-stage, .dockerignore, Docker Compose completo, Actuator, Custom HealthIndicator, Logs JSON + MDC e logging contextual.
+**TODOs**: 7 tarefas cobrindo Containerfile multi-stage, .containerignore, Podman Compose completo, Actuator, Custom HealthIndicator, Logs JSON + MDC e logging contextual.
 
 **Porta**: `8092`
 
@@ -944,17 +944,17 @@ Projeto completo demonstrando os conceitos:
 | Slide | Tópico |
 |-------|--------|
 | [slide-01](slide-01.md) | Abertura e Recap do Dia 6 |
-| [slide-02](slide-02.md) | Docker — Dockerfile e Conceitos |
-| [slide-03](slide-03.md) | Multi-stage Build e .dockerignore |
-| [slide-04](slide-04.md) | Docker Compose — Orquestrando a Stack |
+| [slide-02](slide-02.md) | Podman — Containerfile e Conceitos |
+| [slide-03](slide-03.md) | Multi-stage Build e .containerignore |
+| [slide-04](slide-04.md) | Podman Compose — Orquestrando a Stack |
 | [slide-05](slide-05.md) | Spring Actuator — Health, Metrics, Info |
 | [slide-06](slide-06.md) | Logs Estruturados — Logback JSON |
 | [slide-07](slide-07.md) | MDC — Mapped Diagnostic Context |
 | [slide-08](slide-08.md) | Observabilidade — Os 3 Pilares |
 | [slide-09](slide-09.md) | CI/CD — Conceitos e GitHub Actions |
-| [slide-10](slide-10.md) | Walkthrough — 07-docker-actuator-demo |
-| [slide-11](slide-11.md) | Exercício — TODOs 1-2 (Dockerfile) |
-| [slide-12](slide-12.md) | Exercício — TODO 3 (Docker Compose) |
+| [slide-10](slide-10.md) | Walkthrough — 07-podman-actuator-demo |
+| [slide-11](slide-11.md) | Exercício — TODOs 1-2 (Containerfile) |
+| [slide-12](slide-12.md) | Exercício — TODO 3 (Podman Compose) |
 | [slide-13](slide-13.md) | Exercício — TODOs 4-5 (Actuator + HealthIndicator) |
 | [slide-14](slide-14.md) | Exercício — TODO 6 (Logs JSON + MDC) |
 | [slide-15](slide-15.md) | Exercício — TODO 7 (Logging Contextual) |

@@ -30,7 +30,7 @@ services:
 
   # ── PostgreSQL ─────────────────────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     container_name: demo-postgres
     environment:
       POSTGRES_DB: demodb
@@ -51,7 +51,7 @@ services:
 
   # ── RabbitMQ ───────────────────────────────────────────────
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: docker.io/library/rabbitmq:3-management-alpine
     container_name: demo-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
@@ -72,7 +72,7 @@ services:
 
   # ── Redis ──────────────────────────────────────────────────
   redis:
-    image: redis:7-alpine
+    image: docker.io/library/redis:7-alpine
     container_name: demo-redis
     ports:
       - "6379:6379"

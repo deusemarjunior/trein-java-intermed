@@ -47,8 +47,8 @@ graph LR
 
 ```bash
 cd 06-employee-api-advanced
-docker compose up -d        # Suba PostgreSQL + RabbitMQ + Redis
-docker compose ps           # Verifique 3 containers healthy
+podman compose up -d        # Suba PostgreSQL + RabbitMQ + Redis
+podman compose ps           # Verifique 3 containers healthy
 mvn spring-boot:run          # Inicie a aplicação (porta 8091)
 ```
 
@@ -236,7 +236,7 @@ INNER JOIN departments d ON e.department_id = d.id;
 
 | Atividade | Tempo |
 |-----------|-------|
-| Setup + subir Docker Compose | 5 min |
+| Setup + subir Podman Compose | 5 min |
 | Analisar logs SQL e identificar N+1 | 10 min |
 | Implementar JOIN FETCH | 10 min |
 | Implementar @EntityGraph | 10 min |

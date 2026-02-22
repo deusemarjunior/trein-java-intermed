@@ -35,16 +35,16 @@
       "problemMatcher": []
     },
     {
-      "label": "docker: build",
+      "label": "podman: build",
       "type": "shell",
-      "command": "docker build -t themovie-web .",
+      "command": "podman build -t themovie-web .",
       "group": "build",
       "problemMatcher": []
     },
     {
-      "label": "docker: run (3000)",
+      "label": "podman: run (3000)",
       "type": "shell",
-      "command": "docker run --rm -p 3000:80 --env-file .env themovie-web",
+      "command": "podman run --rm -p 3000:80 --env-file .env themovie-web",
       "group": "none",
       "isBackground": true,
       "problemMatcher": []

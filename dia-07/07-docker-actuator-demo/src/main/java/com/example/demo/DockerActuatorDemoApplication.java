@@ -6,9 +6,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
 @EnableCaching
-public class DockerActuatorDemoApplication {
+public class PodmanActuatorDemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DockerActuatorDemoApplication.class, args);
+        SpringApplication.run(PodmanActuatorDemoApplication.class, args);
     }
 }

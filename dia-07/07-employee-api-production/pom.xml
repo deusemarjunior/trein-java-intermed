@@ -15,7 +15,7 @@
     <artifactId>employee-api-production</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>employee-api-production</name>
-    <description>Exercício prático — Docker, Actuator, Logs Estruturados e Observabilidade</description>
+    <description>Exercício prático — Podman, Actuator, Logs Estruturados e Observabilidade</description>
 
     <properties>
         <java.version>21</java.version>

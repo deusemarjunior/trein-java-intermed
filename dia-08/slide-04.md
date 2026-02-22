@@ -54,7 +54,7 @@ graph TB
 
 ```
 08-movie-service/
-├── docker-compose.yml          ← PostgreSQL + Redis + TheMovie Web
+├── podman-compose.yml          ← PostgreSQL + Redis + TheMovie Web
 ├── openapi.yaml                ← Contrato Swagger (do cliente)
 ├── src/main/java/com/example/movieservice/
 │   ├── domain/                 ← Regras de negócio (sem dependências externas)

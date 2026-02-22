@@ -33,7 +33,7 @@ graph TD
 
 | 🟢 Start | 🔴 Stop | 🔵 Continue |
 |----------|---------|-------------|
-| Praticar TDD desde o início | Copiar código sem entender | Usar Docker em projetos |
+| Praticar TDD desde o início | Copiar código sem entender | Usar Podman em projetos |
 | Estudar padrões de projeto | Ignorar testes | Code reviews com colegas |
 | Contribuir em open source | Commitar tudo junto | Arquitetura hexagonal |
 | Escrever documentação | Nomes genéricos em variáveis | Usar branches e PRs |
@@ -97,4 +97,4 @@ graph LR
     style D9 fill:#f39c12,color:#fff
 ```
 
-> Você saiu de Java básico e agora domina: **Records, Sealed Classes, Stream API, Spring Boot 3, JPA, Hexagonal Architecture, Testes com Testcontainers, JWT, Docker, CI/CD e muito mais!**
+> Você saiu de Java básico e agora domina: **Records, Sealed Classes, Stream API, Spring Boot 3, JPA, Hexagonal Architecture, Testes com Testcontainers, JWT, Podman, CI/CD e muito mais!**

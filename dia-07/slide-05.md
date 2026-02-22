@@ -136,7 +136,7 @@ graph TD
     style STATUS fill:#e74c3c,color:#fff
 ```
 
-> **Regra**: Se **qualquer** componente estiver `DOWN`, o status geral é `DOWN`. Isso é usado por orquestradores (Docker, Kubernetes) para reiniciar containers.
+> **Regra**: Se **qualquer** componente estiver `DOWN`, o status geral é `DOWN`. Isso é usado por orquestradores (Podman, Kubernetes) para reiniciar containers.
 
 ---
 

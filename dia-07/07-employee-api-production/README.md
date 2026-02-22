@@ -1,10 +1,10 @@
 # 07 — Employee API Production
 
-Projeto de exercício do **Dia 7** — Dockerização, Observabilidade e Cloud Readiness.
+Projeto de exercício do **Dia 7** — Podmanização, Observabilidade e Cloud Readiness.
 
 ## 🎯 Objetivo
 
-Aplicar os conceitos de Docker, Docker Compose, Spring Actuator e logs estruturados
+Aplicar os conceitos de Podman, Podman Compose, Spring Actuator e logs estruturados
 ao projeto Employee API, tornando-o **production-ready**.
 
 ---
@@ -13,9 +13,9 @@ ao projeto Employee API, tornando-o **production-ready**.
 
 | # | Arquivo | Descrição |
 |---|---------|-----------|
-| **TODO 1** | `Dockerfile` | Converter para multi-stage build (JDK → JRE) |
-| **TODO 2** | `.dockerignore` | Adicionar exclusões (target, IDE, git, docs, OS) |
-| **TODO 3** | `docker-compose.yml` | Adicionar services rabbitmq, redis, app + networks + volumes |
+| **TODO 1** | `Containerfile` | Converter para multi-stage build (JDK → JRE) |
+| **TODO 2** | `.containerignore` | Adicionar exclusões (target, IDE, git, docs, OS) |
+| **TODO 3** | `podman-compose.yml` | Adicionar services rabbitmq, redis, app + networks + volumes |
 | **TODO 4** | `application.yml` | Configurar Actuator (endpoints, show-details) |
 | **TODO 5** | `RabbitMQHealthIndicator.java` | Implementar custom HealthIndicator para RabbitMQ |
 | **TODO 6a** | `logback-spring.xml` | Adicionar profile `prod` com LogstashEncoder JSON |
@@ -28,7 +28,7 @@ ao projeto Employee API, tornando-o **production-ready**.
 
 - Java 21+
 - Maven 3.9+
-- Docker e Docker Compose
+- Podman e Podman Compose
 - VS Code com extensões: Extension Pack for Java, Spring Boot Extension Pack, REST Client
 
 ---
@@ -39,16 +39,16 @@ ao projeto Employee API, tornando-o **production-ready**.
 
 ```bash
 # 1. Subir dependências
-docker compose up -d postgres rabbitmq redis
+podman compose up -d postgres rabbitmq redis
 
 # 2. Rodar a aplicação (VS Code → F5 ou terminal)
 ./mvnw spring-boot:run
 ```
 
-### Opção 2 — Docker Compose completo (após TODO 3)
+### Opção 2 — Podman Compose completo (após TODO 3)
 
 ```bash
-docker compose up --build -d
+podman compose up --build -d
 ```
 
 ### Verificar
@@ -104,9 +104,9 @@ http://localhost:8092/actuator/health
 │       ├── V1__create_departments_table.sql
 │       ├── V2__create_employees_table.sql
 │       └── V3__seed_data.sql
-├── Dockerfile                           ← TODO 1
-├── .dockerignore                        ← TODO 2
-├── docker-compose.yml                   ← TODO 3
+├── Containerfile                           ← TODO 1
+├── .containerignore                        ← TODO 2
+├── podman-compose.yml                   ← TODO 3
 ├── api-requests.http
 ├── pom.xml
 └── README.md
@@ -128,8 +128,8 @@ http://localhost:8092/actuator/health
 
 ## 📝 Dicas
 
-1. Comece pelo **TODO 1** (Dockerfile) e vá em ordem
-2. Use o projeto `07-docker-actuator-demo` como referência
+1. Comece pelo **TODO 1** (Containerfile) e vá em ordem
+2. Use o projeto `07-podman-actuator-demo` como referência
 3. Teste cada TODO individualmente antes de avançar
-4. Use `docker compose logs -f app` para ver os logs estruturados
+4. Use `podman compose logs -f app` para ver os logs estruturados
 5. Acesse `http://localhost:8092/actuator/health` para validar os health checks

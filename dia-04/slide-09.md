@@ -121,23 +121,23 @@ mvn test
 [INFO] BUILD SUCCESS
 ```
 
-> **Ação ao vivo**: Abra o Docker Desktop e mostre o container PostgreSQL subindo e descendo.
+> **Ação ao vivo**: Abra o Podman Desktop e mostre o container PostgreSQL subindo e descendo.
 
 ```mermaid
 sequenceDiagram
     participant DEV as Terminal
     participant MVN as Maven
     participant JU as JUnit 5
-    participant D as Docker
+    participant D as Podman
 
     DEV->>MVN: mvn test
     MVN->>JU: Executar testes unitários
     Note over JU: ProductServiceTest ✅<br/>ProductServiceParameterizedTest ✅
     MVN->>JU: Executar testes de integração
-    JU->>D: docker run postgres:16-alpine
+    JU->>D: podman run postgres:16-alpine
     Note over D: Container PostgreSQL UP 🐘
     JU->>JU: ProductRepositoryIT ✅
-    JU->>D: docker stop + rm
+    JU->>D: podman stop + rm
     Note over D: Container destruído 🗑️
     MVN-->>DEV: BUILD SUCCESS ✅
 ```
@@ -312,12 +312,12 @@ class ProductRepositoryIT extends AbstractIntegrationTest {
 
 ```mermaid
 flowchart TD
-    subgraph "Testes Unitários — Mockito (rápidos, sem Docker)"
+    subgraph "Testes Unitários — Mockito (rápidos, sem Podman)"
         ST["ProductServiceTest<br/>7 testes"] -->|"testa"| S["ProductService<br/>create, findById,<br/>findAll, delete"]
         SPT["ProductServiceParameterizedTest<br/>2+ testes"] -->|"testa"| S
     end
 
-    subgraph "Testes de Integração — Testcontainers (com Docker)"
+    subgraph "Testes de Integração — Testcontainers (com Podman)"
         RT["ProductRepositoryIT<br/>4 testes"] -->|"testa"| R["ProductRepository<br/>save, findById,<br/>findBySku, paginação"]
         R -->|"SQL real"| DB[(PostgreSQL<br/>Container)]
     end
@@ -351,10 +351,10 @@ flowchart TD
 # Todos os testes (unitários + integração)
 mvn test
 
-# Apenas testes unitários (sem Docker)
+# Apenas testes unitários (sem Podman)
 mvn test -Dtest="*Test"
 
-# Apenas testes de integração (precisa Docker)
+# Apenas testes de integração (precisa Podman)
 mvn test -Dtest="*IT"
 
 # Com relatório de cobertura (JaCoCo)
@@ -366,8 +366,8 @@ mvn test jacoco:report
 flowchart TD
     subgraph "Comandos de Teste"
         A["mvn test"] -->|"executa"| B["*Test + *IT"]
-        C["mvn test -Dtest='*Test'"] -->|"executa"| D["Apenas Unitários<br/>(sem Docker)"]
-        E["mvn test -Dtest='*IT'"] -->|"executa"| F["Apenas Integração<br/>(com Docker)"]
+        C["mvn test -Dtest='*Test'"] -->|"executa"| D["Apenas Unitários<br/>(sem Podman)"]
+        E["mvn test -Dtest='*IT'"] -->|"executa"| F["Apenas Integração<br/>(com Podman)"]
     end
 
     style D fill:#54a0ff,color:#fff
@@ -528,13 +528,13 @@ sequenceDiagram
     Dev->>RPT: Abrir no browser 📊
 ```
 
-### SonarQube com Docker (Local)
+### SonarQube com Podman (Local)
 
 Para rodar o SonarQube localmente durante o treinamento:
 
 ```bash
-# Subir SonarQube com Docker
-docker run -d --name sonarqube \
+# Subir SonarQube com Podman
+podman run -d --name sonarqube \
   -p 9000:9000 \
   sonarqube:lts-community
 
@@ -611,7 +611,7 @@ flowchart LR
 flowchart TD
     subgraph "Sequência da Demonstração"
         S1["1️⃣ mvn test — mostrar verde"]
-        S2["2️⃣ Docker Desktop — container subindo"]
+        S2["2️⃣ Podman Desktop — container subindo"]
         S3["3️⃣ ProductBuilder — defaults sensatos"]
         S4["4️⃣ ProductServiceTest — AAA + Mockito"]
         S5["5️⃣ ArgumentCaptor — capturar e inspecionar"]
@@ -627,7 +627,7 @@ flowchart TD
 ```
 
 1. [ ] Rodar `mvn test` e mostrar todos passando (verde)
-2. [ ] Abrir Docker Desktop e mostrar container PostgreSQL subindo
+2. [ ] Abrir Podman Desktop e mostrar container PostgreSQL subindo
 3. [ ] Mostrar `ProductBuilder` e como simplifica criação de dados
 4. [ ] Mostrar `ProductServiceTest` — padrão AAA com `@Mock`, `@InjectMocks`
 5. [ ] Mostrar `ArgumentCaptor` capturando o que foi salvo
@@ -648,4 +648,4 @@ flowchart TD
 
 > **Técnica**: Quebre o teste do `ArgumentCaptor` e mostre que o valor capturado era diferente do esperado. Os alunos entendem imediatamente o valor da ferramenta.
 
-> **SonarQube**: Se o tempo permitir, suba o SonarQube com Docker e analise o projeto ao vivo. Os alunos se impressionam ao ver bugs e code smells detectados automaticamente em código que "funciona".
+> **SonarQube**: Se o tempo permitir, suba o SonarQube com Podman e analise o projeto ao vivo. Os alunos se impressionam ao ver bugs e code smells detectados automaticamente em código que "funciona".

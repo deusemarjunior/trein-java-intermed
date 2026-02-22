@@ -1,13 +1,13 @@
 version: "3.9"
 
 services:
-  # ── TODO 3: Complete o docker-compose.yml ──────────────────
+  # ── TODO 3: Complete o podman-compose.yml ──────────────────
   #
   # Este arquivo já tem o PostgreSQL configurado.
   # Você precisa adicionar:
   #
   # 1. Serviço "rabbitmq" com:
-  #    - image: rabbitmq:3-management-alpine
+  #    - image: docker.io/library/rabbitmq:3-management-alpine
   #    - container_name: employee-prod-rabbitmq
   #    - environment: RABBITMQ_DEFAULT_USER=guest, RABBITMQ_DEFAULT_PASS=guest
   #    - ports: "5674:5672" e "15674:15672"
@@ -16,7 +16,7 @@ services:
   #    - networks: employee-network
   #
   # 2. Serviço "redis" com:
-  #    - image: redis:7-alpine
+  #    - image: docker.io/library/redis:7-alpine
   #    - container_name: employee-prod-redis
   #    - ports: "6381:6379"
   #    - volumes: redis_data:/data
@@ -37,7 +37,7 @@ services:
 
   # ── PostgreSQL (já configurado) ────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     container_name: employee-prod-postgres
     environment:
       POSTGRES_DB: employeedb

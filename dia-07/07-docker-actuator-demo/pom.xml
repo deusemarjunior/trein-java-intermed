@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>docker-actuator-demo</artifactId>
+    <artifactId>podman-actuator-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>docker-actuator-demo</name>
-    <description>Demonstração — Docker, Actuator, Logs Estruturados e Observabilidade</description>
+    <name>podman-actuator-demo</name>
+    <description>Demonstração — Podman, Actuator, Logs Estruturados e Observabilidade</description>
 
     <properties>
         <java.version>21</java.version>

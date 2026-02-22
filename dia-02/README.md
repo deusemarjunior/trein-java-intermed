@@ -29,7 +29,7 @@
 ## 📦 Material Necessário (Checklist Instrutor)
 
 ### Software
-- [ ] PostgreSQL ou Docker com Postgres rodando
+- [ ] PostgreSQL ou Podman com Postgres rodando
 - [ ] DBeaver ou pgAdmin (cliente SQL)
 - [ ] Postman/Insomnia com collections prontas
 - [ ] H2 Console configurado

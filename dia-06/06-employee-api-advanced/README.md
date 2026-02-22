@@ -29,14 +29,14 @@ Aplicar na API de funcionários os conceitos aprendidos no dia:
 
 - Java 21
 - Maven 3.9+
-- Docker Desktop
+- Podman Desktop
 
 ## Como executar
 
 ### 1. Subir infraestrutura
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 Inicia:
@@ -113,12 +113,12 @@ src/main/java/com/example/employee/
 - 2ª chamada `GET /api/departments/1` → sem log (veio do cache!)
 
 ```bash
-docker exec -it employee-redis redis-cli
+podman exec -it employee-redis redis-cli
 KEYS *
 ```
 
 ## Parar infraestrutura
 
 ```bash
-docker compose down
+podman compose down
 ```

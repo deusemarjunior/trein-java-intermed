@@ -22,7 +22,7 @@ mvn test                 # Roda todos os testes (unitários + integração)
 mvn spring-boot:run      # Roda a aplicação
 ```
 
-**Pré-requisito**: Docker Desktop rodando (para Testcontainers)
+**Pré-requisito**: Podman Desktop rodando (para Testcontainers)
 
 ---
 
@@ -48,15 +48,15 @@ mvn spring-boot:run      # Roda a aplicação
 
 **TODOs a implementar**: 7 (Builder, testes unitários, testes parametrizados, testes de integração)
 
-**Pré-requisito**: Docker Desktop rodando (para Testcontainers)
+**Pré-requisito**: Podman Desktop rodando (para Testcontainers)
 
 ---
 
 ## 🚀 Como Usar
 
-### 1. **Verifique que o Docker está rodando**
+### 1. **Verifique que o Podman está rodando**
    ```bash
-   docker run hello-world   # Deve exibir "Hello from Docker!"
+   podman run docker.io/library/hello-world   # Deve exibir "Hello from Podman!"
    ```
 
 ### 2. **Estude primeiro o projeto completo** (04-testing-demo)
@@ -82,9 +82,9 @@ mvn spring-boot:run      # Roda a aplicação
 
 | Requisito | Verificação |
 |-----------|-------------|
-| Docker Desktop | `docker --version` |
-| Docker rodando | `docker run hello-world` |
+| Podman Desktop | `podman --version` |
+| Podman rodando | `podman run docker.io/library/hello-world` |
 | JDK 21 | `java --version` |
 | Maven 3.8+ | `mvn --version` |
 
-> **IMPORTANTE**: Se o Docker não estiver rodando, os testes de integração (Testcontainers) vão falhar. Certifique-se de iniciar o Docker Desktop antes de rodar os testes.
+> **IMPORTANTE**: Se o Podman não estiver rodando, os testes de integração (Testcontainers) vão falhar. Certifique-se de iniciar o Podman Desktop antes de rodar os testes.

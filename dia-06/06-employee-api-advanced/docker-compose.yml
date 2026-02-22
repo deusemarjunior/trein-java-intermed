@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: docker.io/library/postgres:16-alpine
     container_name: employee-postgres
     environment:
       POSTGRES_DB: employeedb
@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: docker.io/library/rabbitmq:3-management-alpine
     container_name: employee-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
@@ -26,7 +26,7 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   redis:
-    image: redis:7-alpine
+    image: docker.io/library/redis:7-alpine
     container_name: employee-redis
     ports:
       - "6380:6379"

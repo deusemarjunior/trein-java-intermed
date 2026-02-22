@@ -14,7 +14,7 @@ Ao final deste treinamento, o aluno será capaz de:
 - Desenvolver APIs e microsserviços profissionais com Java 17/21 e Spring Boot
 - Aplicar Clean Code, arquiteturas em camadas e Hexagonal em projetos reais
 - Implementar testes automatizados com Testcontainers e bancos reais
-- Trabalhar com Docker, observabilidade nativa (Actuator, logs estruturados) e entender conceitos de CI/CD
+- Trabalhar com Podman, observabilidade nativa (Actuator, logs estruturados) e entender conceitos de CI/CD
 - Consumir e documentar APIs com OpenAPI (Swagger) e Feign Client
 - Integrar serviços com bancos SQL, cache (Redis) e mensageria (RabbitMQ)
 - Realizar Code Review profissional e trabalhar com boas práticas de consultoria
@@ -375,7 +375,7 @@ Projeto completo demonstrando todos os conceitos do dia:
 ### [Dia 6 - Persistência Avançada e Mensageria](dia-06/README.md)
 > **Foco**: Performance e desacoplamento.
 >
-> **Pré-requisito**: Docker Compose básico para subir PostgreSQL + RabbitMQ + Redis (ver [guia-docker.md](dia-00/guia-docker.md)). Docker será aprofundado no Dia 7.
+> **Pré-requisito**: Podman Compose básico para subir PostgreSQL + RabbitMQ + Redis (ver [guia-podman.md](dia-00/guia-podman.md)). Podman será aprofundado no Dia 7.
 
 #### 🎯 Objetivos de Aprendizagem
 - Identificar e resolver o problema N+1 com JOIN FETCH e @EntityGraph
@@ -387,7 +387,7 @@ Projeto completo demonstrando todos os conceitos do dia:
 #### ⏱️ Distribuição Sugerida (5h)
 | Bloco | Duração | Conteúdo |
 |-------|---------|----------|
-| Setup | 15min | `docker compose up` (PostgreSQL + RabbitMQ + Redis) |
+| Setup | 15min | `podman compose up` (PostgreSQL + RabbitMQ + Redis) |
 | Teoria | 1h30 | JPA N+1, Flyway, RabbitMQ, Redis |
 | Demo | 30min | Walkthrough `06-persistence-messaging-demo` |
 | Exercício | 2h15 | `06-employee-api-advanced` (TODOs 1-8) |
@@ -429,7 +429,7 @@ Projeto completo demonstrando todos os conceitos do dia:
    - Armadilhas: cache stampede, dados inconsistentes entre cache e banco
 
 #### 📦 Projeto Exemplo: `06-persistence-messaging-demo`
-> API de Pedidos com JPA otimizado, Flyway, RabbitMQ e Redis — tudo rodando via Docker Compose.
+> API de Pedidos com JPA otimizado, Flyway, RabbitMQ e Redis — tudo rodando via Podman Compose.
 
 Projeto completo demonstrando todos os conceitos do dia:
 - Queries propositalmente com N+1 + versão corrigida com `JOIN FETCH` e `@EntityGraph`
@@ -439,12 +439,12 @@ Projeto completo demonstrando todos os conceitos do dia:
 - Producer: publica `OrderCreatedEvent` no RabbitMQ ao criar pedido
 - Consumer: escuta o evento e atualiza estoque (simulado com log)
 - Cache Redis: `@Cacheable` na listagem de categorias com TTL de 10 minutos
-- `docker-compose.yml` com PostgreSQL + RabbitMQ + Redis
+- `podman-compose.yml` com PostgreSQL + RabbitMQ + Redis
 
 #### ✏️ Projeto Exercício: `06-employee-api-advanced`
 > Otimizar persistência, adicionar migrations, mensageria e cache à API de Funcionários.
 
-**O que já vem pronto:** `docker-compose.yml` com PostgreSQL + RabbitMQ + Redis, Flyway configurado (sem migrations), `application.yml` com `spring.jpa.show-sql=true` para visualizar o N+1, e queries propositalmente ineficientes no `EmployeeRepository`.
+**O que já vem pronto:** `podman-compose.yml` com PostgreSQL + RabbitMQ + Redis, Flyway configurado (sem migrations), `application.yml` com `spring.jpa.show-sql=true` para visualizar o N+1, e queries propositalmente ineficientes no `EmployeeRepository`.
 
 **TODOs:**
 - `// TODO 1: Identificar o N+1 no endpoint GET /employees:`
@@ -477,12 +477,12 @@ Projeto completo demonstrando todos os conceitos do dia:
 
 ---
 
-### [Dia 7 - Docker, Cloud Readiness e Observabilidade](dia-07/README.md)
+### [Dia 7 - Podman, Cloud Readiness e Observabilidade](dia-07/README.md)
 > **Foco**: "Na minha máquina funciona" não é desculpa.
 
 #### 🎯 Objetivos de Aprendizagem
-- Criar Dockerfiles otimizados com multi-stage build (imagem < 100MB)
-- Orquestrar stack completa com Docker Compose (app + banco + cache + fila)
+- Criar Containerfiles otimizados com multi-stage build (imagem < 100MB)
+- Orquestrar stack completa com Podman Compose (app + banco + cache + fila)
 - Configurar Spring Actuator para health checks e métricas
 - Implementar logs estruturados (JSON) com Logback e MDC
 - Compreender conceitos de Observabilidade em produção e CI/CD
@@ -490,31 +490,31 @@ Projeto completo demonstrando todos os conceitos do dia:
 #### ⏱️ Distribuição Sugerida (5h)
 | Bloco | Duração | Conteúdo |
 |-------|---------|----------|
-| Teoria 1 | 1h | Docker + Docker Compose (hands-on) |
+| Teoria 1 | 1h | Podman + Podman Compose (hands-on) |
 | Teoria 2 | 45min | Actuator + Logs Estruturados (hands-on) |
 | Teoria 3 | 15min | Observabilidade + CI/CD (conceitual) |
-| Demo | 30min | Walkthrough `07-docker-actuator-demo` (`docker compose up`) |
+| Demo | 30min | Walkthrough `07-podman-actuator-demo` (`podman compose up`) |
 | Exercício | 2h | `07-employee-api-production` (TODOs 1-7) |
 | Review | 30min | Validação: imagem < 100MB, Actuator respondendo, logs JSON |
 
 #### 📦 Entregáveis
-- `07-employee-api-production` dockerizada com Actuator e logs JSON
-- Stack completa subindo com `docker compose up` (app + PostgreSQL + Redis + RabbitMQ)
+- `07-employee-api-production` containerizada com Actuator e logs JSON
+- Stack completa subindo com `podman compose up` (app + PostgreSQL + Redis + RabbitMQ)
 
 #### 📖 Guia Conceitual
 
-1. **Docker — Containerizando a Aplicação**
-   - Dockerfile: camadas, cache de layers, por que a ordem das instruções importa
+1. **Podman — Containerizando a Aplicação**
+   - Containerfile: camadas, cache de layers, por que a ordem das instruções importa
    - Multi-stage build: stage `build` com Maven/Gradle + stage `runtime` com JRE slim (~80MB)
-   - `.dockerignore`: excluindo `target/`, `.git/`, `.idea/` para imagens menores e builds rápidos
+   - `.containerignore`: excluindo `target/`, `.git/`, `.idea/` para imagens menores e builds rápidos
    - Variáveis de ambiente: externalizando config (`DB_URL`, `REDIS_HOST`) em vez de hardcoding
 
-2. **Docker Compose — Orquestrando a Stack**
-   - `docker-compose.yml`: definindo app + banco + cache + fila em um único arquivo
+2. **Podman Compose — Orquestrando a Stack**
+   - `podman-compose.yml`: definindo app + banco + cache + fila em um único arquivo
    - `depends_on` + health checks: garantindo que o banco esteja pronto antes da app subir
    - Volumes: persistindo dados do PostgreSQL entre restarts
    - Networks: isolando comunicação entre containers
-   - Um `docker compose up` e tudo funciona
+   - Um `podman compose up` e tudo funciona
 
 3. **Spring Actuator — Observabilidade Nativa**
    - Endpoints embutidos: `/health` (liveness/readiness), `/metrics`, `/info`, `/env`
@@ -544,13 +544,13 @@ Projeto completo demonstrando todos os conceitos do dia:
    - Etapas típicas: build → testes unitários → testes de integração → análise estática → deploy
    - Por que CI/CD é obrigatório: "código que não passa no pipeline não vai pra produção"
 
-#### 📦 Projeto Exemplo: `07-docker-actuator-demo`
-> App Spring Boot dockerizada com Actuator e logs estruturados — tudo subindo com `docker compose up`.
+#### 📦 Projeto Exemplo: `07-podman-actuator-demo`
+> App Spring Boot containerizada com Actuator e logs estruturados — tudo subindo com `podman compose up`.
 
 Projeto completo demonstrando os conceitos práticos do dia:
-- `Dockerfile` multi-stage build otimizado (~80MB com JRE slim)
-- `.dockerignore` configurado
-- `docker-compose.yml` com: app Spring Boot, PostgreSQL, Redis, RabbitMQ
+- `Containerfile` multi-stage build otimizado (~80MB com JRE slim)
+- `.containerignore` configurado
+- `podman-compose.yml` com: app Spring Boot, PostgreSQL, Redis, RabbitMQ
 - Health checks em todos os serviços
 - Actuator expondo `/health`, `/metrics`, `/info` com métricas customizadas
 - Custom Health Indicator verificando conectividade com RabbitMQ
@@ -559,18 +559,18 @@ Projeto completo demonstrando os conceitos práticos do dia:
 - Profile `dev` (logs texto) vs. `prod` (logs JSON) no Logback
 
 #### ✏️ Projeto Exercício: `07-employee-api-production`
-> Dockerizar a API de Funcionários e adicionar observabilidade nativa.
+> Containerizar a API de Funcionários e adicionar observabilidade nativa.
 
-**O que já vem pronto:** `Dockerfile` básico não otimizado (imagem ~400MB), `docker-compose.yml` com apenas PostgreSQL, `logback-spring.xml` com logs em texto puro e dependência do Actuator sem nenhum endpoint exposto.
+**O que já vem pronto:** `Containerfile` básico não otimizado (imagem ~400MB), `podman-compose.yml` com apenas PostgreSQL, `logback-spring.xml` com logs em texto puro e dependência do Actuator sem nenhum endpoint exposto.
 
 **TODOs:**
-- `// TODO 1: Otimizar o Dockerfile com multi-stage build:`
+- `// TODO 1: Otimizar o Containerfile com multi-stage build:`
   - `//   - Stage 1 (build): FROM maven:3.9-eclipse-temurin-21 → copiar pom.xml e src → mvn package`
   - `//   - Stage 2 (runtime): FROM eclipse-temurin:21-jre-alpine → copiar JAR → ENTRYPOINT`
   - `//   - Meta: imagem final < 100MB`
-- `// TODO 2: Criar .dockerignore:`
-  - `//   - Excluir: target/, .git/, .idea/, *.iml, .env, docker-compose*.yml`
-- `// TODO 3: Completar docker-compose.yml:`
+- `// TODO 2: Criar .containerignore:`
+  - `//   - Excluir: target/, .git/, .idea/, *.iml, .env, podman-compose*.yml`
+- `// TODO 3: Completar podman-compose.yml:`
   - `//   - Adicionar: app (build: .), Redis, RabbitMQ`
   - `//   - Health checks: pg_isready para PostgreSQL, redis-cli ping para Redis`
   - `//   - Variáveis de ambiente: SPRING_DATASOURCE_URL, SPRING_REDIS_HOST, etc.`
@@ -600,7 +600,7 @@ Projeto completo demonstrando os conceitos práticos do dia:
 - Desenvolver um microsserviço completo a partir de um contrato Swagger (Contract First)
 - Aplicar Arquitetura Hexagonal em um projeto real com integração externa
 - Consumir a API do TheMovieDB com Feign Client + Resilience4j
-- Validar o backend com um frontend React real (**TheMovie Web**) rodando via Docker
+- Validar o backend com um frontend React real (**TheMovie Web**) rodando via Podman
 - Trabalhar com ritos ágeis: Daily Scrum, Kanban, timeboxing
 - Praticar Git profissional: feature branches, commits semânticos, Code Review via PR
 
@@ -620,13 +620,13 @@ Projeto completo demonstrando os conceitos práticos do dia:
 
 #### 🖥️ Frontend: TheMovie Web (React)
 
-> O frontend é uma aplicação **React** pré-construída e entregue como **imagem Docker**. O aluno **não precisa ter Node.js instalado** — basta rodar o container e apontar para o seu backend.
+> O frontend é uma aplicação **React** pré-construída e entregue como **imagem Podman**. O aluno **não precisa ter Node.js instalado** — basta rodar o container e apontar para o seu backend.
 
 **Como executar:**
 
 ```bash
 # Rodar o frontend apontando para o backend local (porta 8080)
-docker run -d \
+podman run -d \
   --name themovie-web \
   -p 3000:80 \
   -e REACT_APP_API_URL=http://localhost:8080 \
@@ -652,7 +652,7 @@ Após subir, acessar **http://localhost:3000** no navegador.
 | `GET` | `/api/movies/favorites?page=0&size=10` | Página de favoritos |
 | `POST` | `/auth/login` | Tela de login (JWT) |
 
-**Dica:** inclua o frontend no `docker-compose.yml` do projeto para subir tudo junto:
+**Dica:** inclua o frontend no `podman-compose.yml` do projeto para subir tudo junto:
 
 ```yaml
 services:
@@ -676,7 +676,7 @@ services:
    - O instrutor entrega um **contrato Swagger/OpenAPI** que define os endpoints do microsserviço
    - Um **frontend já pronto** consome esse contrato — o aluno desenvolve o backend que o alimenta
    - Fazer as perguntas certas antes de codar: escopar, negociar e priorizar
-   - Definição de "pronto": o backend funciona quando o **TheMovie Web** (frontend React via Docker) exibe os dados corretamente
+   - Definição de "pronto": o backend funciona quando o **TheMovie Web** (frontend React via Podman) exibe os dados corretamente
 
 2. **Ritos Ágeis**
    - Daily Scrum simulado: o que fiz, o que vou fazer, quais impedimentos
@@ -690,11 +690,11 @@ services:
    - Feedback construtivo: como apontar problemas sem ser ofensivo
 
 #### ✏️ Projeto Exercício: `08-movie-service`
-> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. O frontend **TheMovie Web** (React) roda via Docker e consome esse contrato.
+> Microsserviço de Filmes com Arquitetura Hexagonal — consome a API do TheMovieDB e expõe endpoints definidos pelo contrato Swagger fornecido pelo instrutor. O frontend **TheMovie Web** (React) roda via Podman e consome esse contrato.
 
 **O que já vem pronto no template:**
 - Estrutura de pacotes hexagonal: `domain/`, `adapter/in/web/`, `adapter/out/rest/`, `adapter/out/persistence/`
-- `docker-compose.yml` com PostgreSQL + Redis + **TheMovie Web** (frontend React)
+- `podman-compose.yml` com PostgreSQL + Redis + **TheMovie Web** (frontend React)
 - `application.yml` configurado para os containers e para a API do TheMovieDB
 - Migrations Flyway iniciais (`V1__create_favorites.sql`, `V2__create_watch_later.sql`)
 - `AbstractIntegrationTest` com Testcontainers
@@ -744,7 +744,7 @@ services:
 
 #### 📝 Dinâmica do Dia
 - **Manhã**: Entrega do contrato Swagger pelo instrutor, análise dos endpoints, perguntas ao "cliente", planejamento e início do desenvolvimento com arquitetura hexagonal
-- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o **TheMovie Web** (`docker compose up` → http://localhost:3000), code review entre colegas via Pull Request
+- **Tarde**: Desenvolvimento ativo, integração com TheMovieDB, validação com o **TheMovie Web** (`podman compose up` → http://localhost:3000), code review entre colegas via Pull Request
 
 ---
 
@@ -768,7 +768,7 @@ services:
 | Encerramento | 30min | Feedback, retrospectiva, próximos passos |
 
 #### 📦 Entregáveis
-- `08-movie-service` finalizado e funcionando com o frontend **TheMovie Web** via Docker
+- `08-movie-service` finalizado e funcionando com o frontend **TheMovie Web** via Podman
 - Apresentação técnica do projeto (demo ao vivo + decisões arquiteturais)
 - Pull Request revisado e aprovado
 
@@ -808,12 +808,12 @@ services:
 
 ## 🚀 Projeto Integrador
 
-No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de Filmes** com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta o frontend **TheMovie Web** (React) fornecido pelo instrutor como imagem Docker:
+No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de Filmes** com Arquitetura Hexagonal, integrando com a API do [TheMovieDB](https://developer.themoviedb.org/reference/getting-started) e implementando um backend que alimenta o frontend **TheMovie Web** (React) fornecido pelo instrutor como imagem Podman:
 
 - Contrato Swagger/OpenAPI entregue pelo instrutor (Contract First)
 - Arquitetura Hexagonal com Ports & Adapters
 - Integração com API externa (TheMovieDB) via Feign Client + Resilience4j
-- Frontend **TheMovie Web** (React) via Docker — `docker run -p 3000:80 ghcr.io/deusemar/themovie-web:latest`
+- Frontend **TheMovie Web** (React) via Podman — `podman run -p 3000:80 ghcr.io/deusemar/themovie-web:latest`
 - Testes automatizados com Testcontainers
 - Code Review via Pull Requests
 - Simulação de Daily Scrum
@@ -827,7 +827,7 @@ No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de F
 - Conhecimento de POO
 - SQL básico
 - IDE instalada (IntelliJ IDEA ou VS Code)
-- Docker instalado
+- Podman instalado
 - Conta no GitHub
 
 ## 🛠️ Ferramentas Utilizadas
@@ -838,7 +838,7 @@ No Dia 8, os alunos receberão o desafio de desenvolver um **Microsserviço de F
 - PostgreSQL + Testcontainers
 - Redis
 - RabbitMQ / Kafka
-- Docker / Docker Compose
+- Podman / Podman Compose
 - Flyway
 - Git/GitHub
 - Postman/Insomnia

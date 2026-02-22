@@ -23,7 +23,7 @@ Implementar testes unitários, parametrizados e de integração para uma API de 
 
 - **Java 21**
 - **Maven 3.9+**
-- **Docker Desktop** rodando (para Testcontainers)
+- **Podman Desktop** rodando (para Testcontainers)
 
 ## Como executar
 

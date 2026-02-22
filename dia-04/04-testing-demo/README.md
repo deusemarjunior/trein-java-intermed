@@ -19,7 +19,7 @@ Projeto demonstração de **Estratégias de Testes** com Spring Boot.
 
 - **Java 21**
 - **Maven 3.9+**
-- **Docker Desktop** rodando (para Testcontainers)
+- **Podman Desktop** rodando (para Testcontainers)
 
 ## Como executar
 

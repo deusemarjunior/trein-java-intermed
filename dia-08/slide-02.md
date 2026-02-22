@@ -16,7 +16,7 @@ Vocês são desenvolvedores Java em uma consultoria. O cliente entregou:
 graph LR
     subgraph "Cliente"
         CONTRACT["📄 Contrato Swagger<br/>(openapi.yaml)"]
-        FRONT["🖥️ TheMovie Web<br/>(React — Docker)"]
+        FRONT["🖥️ TheMovie Web<br/>(React — Podman)"]
     end
 
     subgraph "Você — Desenvolvedor"

@@ -272,7 +272,7 @@ INFO  EmployeeNotificationConsumer : ✅ Notificação processada para funcioná
 
 | Erro | Causa | Solução |
 |:---|:---|:---|
-| `ConnectException: Connection refused` | RabbitMQ não está rodando | `docker compose up -d` |
+| `ConnectException: Connection refused` | RabbitMQ não está rodando | `podman compose up -d` |
 | `LazyInitializationException` | Enviou Entity com lazy collection | Converter Entity → Record antes de publicar |
 | Log não mostra "📧" | Consumer não está registrado | Verificar `@Component` e `@RabbitListener` |
 | Mensagem na fila mas não consumida | Nome da fila diferente no Listener | Verificar `QUEUE_NAME` é o mesmo |

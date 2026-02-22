@@ -232,10 +232,10 @@ graph LR
 
 O Dia 4 é sobre **Testes Automatizados**. Para se preparar:
 
-### 1. Verificar Docker
+### 1. Verificar Podman
 ```bash
-docker --version      # Verificar instalação (necessário para Testcontainers)
-docker info           # Verificar que está rodando
+podman --version      # Verificar instalação (necessário para Testcontainers)
+podman info           # Verificar que está rodando
 ```
 
 ### 2. Conceitos para revisar
@@ -260,7 +260,7 @@ graph LR
 
 - **JUnit 5:** AAA pattern (Arrange, Act, Assert), `@Test`, `@BeforeEach`, `@DisplayName`
 - **Mockito:** `@Mock`, `@InjectMocks`, `when(...).thenReturn(...)`, `verify(...)`
-- **Testcontainers:** PostgreSQL em container Docker para testes de integração
+- **Testcontainers:** PostgreSQL em container Podman para testes de integração
 - **Cobertura:** O que é, por que > 80% no Service é um bom alvo
 
 ### 3. Ler

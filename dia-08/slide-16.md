@@ -9,11 +9,11 @@
 O verdadeiro critério de aceite: **o frontend funciona com o seu backend?**
 
 ```bash
-# 1. Subir tudo com Docker Compose
-docker compose up -d
+# 1. Subir tudo com Podman Compose
+podman compose up -d
 
 # 2. Verificar que os serviços estão rodando
-docker compose ps
+podman compose ps
 
 # 3. Abrir no navegador
 # http://localhost:3000
@@ -50,7 +50,7 @@ graph TD
 
 | Problema | Causa Provável | Solução |
 |----------|---------------|---------|
-| Frontend mostra tela branca | Backend não está rodando | `docker compose logs app` |
+| Frontend mostra tela branca | Backend não está rodando | `podman compose logs app` |
 | Erro de CORS no console | CORS não configurado | Adicionar `@CrossOrigin` ou `WebMvcConfigurer` |
 | Filmes não aparecem | Endpoint não retorna dados | Testar com `curl` primeiro |
 | 401 ao favoritar | JWT não configurado ou expirado | Verificar `SecurityConfig` |

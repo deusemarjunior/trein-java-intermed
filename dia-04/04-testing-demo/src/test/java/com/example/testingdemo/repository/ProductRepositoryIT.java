@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Testes de integração do {@link ProductRepository} com Testcontainers.
  *
- * <p>Usa PostgreSQL real via container Docker para garantir que
+ * <p>Usa PostgreSQL real via container Podman para garantir que
  * as queries JPA funcionam corretamente em um banco de produção.</p>
  *
  * <p>Estende {@link AbstractIntegrationTest} que configura

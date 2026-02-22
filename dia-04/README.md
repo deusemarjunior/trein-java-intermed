@@ -30,15 +30,15 @@
 ### Software
 - [ ] JDK 21 instalado
 - [ ] Maven 3.8+
-- [ ] Docker Desktop rodando (para Testcontainers e SonarQube)
+- [ ] Podman Desktop rodando (para Testcontainers e SonarQube)
 - [ ] IDE com suporte a JUnit 5 (IntelliJ recomendado)
 - [ ] _(Opcional)_ SonarLint extension no VS Code
 
 ### Preparação
 - [ ] Projeto `04-testing-demo` rodando com todos os testes passando
 - [ ] Projeto `04-employee-api-tests` com TODOs prontos e infraestrutura de testes configurada
-- [ ] Docker Desktop funcionando (necessário para Testcontainers com PostgreSQL)
-- [ ] Verificar que `docker run hello-world` funciona
+- [ ] Podman Desktop funcionando (necessário para Testcontainers com PostgreSQL)
+- [ ] Verificar que `podman run docker.io/library/hello-world` funciona
 
 ---
 
@@ -244,7 +244,7 @@ void shouldSaveProductWithTimestamps() {
 | Tipos de dados | Sem `UUID`, `JSONB`, `ARRAY` nativos | Suporte completo |
 | Migrations | Pode falhar com Flyway/Liquibase SQL nativo | Funciona idêntico |
 
-> **Regra**: teste com o **mesmo banco que roda em produção**. Testcontainers sobe um PostgreSQL real em um container Docker em segundos.
+> **Regra**: teste com o **mesmo banco que roda em produção**. Testcontainers sobe um PostgreSQL real em um container Podman em segundos.
 
 #### Configuração com Testcontainers
 
@@ -489,7 +489,7 @@ Ao final deste dia, o aluno será capaz de:
 
 No próximo dia abordaremos **Comunicação entre Sistemas e Segurança**:
 
-- [ ] Verificar que o Docker está funcionando (`docker run hello-world`)
+- [ ] Verificar que o Podman está funcionando (`podman run docker.io/library/hello-world`)
 - [ ] Pesquisar sobre Feign Client e REST Client declarativo
 - [ ] Ler sobre JWT (JSON Web Token) — estrutura Header.Payload.Signature
 - [ ] Conceito de CORS (Cross-Origin Resource Sharing)
@@ -502,7 +502,7 @@ No próximo dia abordaremos **Comunicação entre Sistemas e Segurança**:
 ### Dicas de Condução
 
 1. **Testes ao vivo**: rodar `mvn test` no `04-testing-demo` e mostrar a saída verde
-2. **Mostrar o container**: durante Testcontainers, abrir Docker Desktop e mostrar o PostgreSQL subindo
+2. **Mostrar o container**: durante Testcontainers, abrir Podman Desktop e mostrar o PostgreSQL subindo
 3. **Red → Green → Refactor**: demonstrar o ciclo TDD simplificado escrevendo um teste que falha, implementando e refatorando
 4. **Cobertura**: rodar `mvn test jacoco:report` e abrir o relatório HTML para mostrar cobertura
 
@@ -510,5 +510,5 @@ No próximo dia abordaremos **Comunicação entre Sistemas e Segurança**:
 - Esquecer `@ExtendWith(MockitoExtension.class)` nos testes com Mockito
 - Não fazer `deleteAll()` no `@BeforeEach` dos testes de integração
 - Confundir `@Mock` com `@InjectMocks`
-- Docker Desktop não estar rodando (Testcontainers falha silenciosamente)
+- Podman Desktop não estar rodando (Testcontainers falha silenciosamente)
 - Usar `assertEquals` com `BigDecimal` sem considerar escala

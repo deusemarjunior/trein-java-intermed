@@ -590,7 +590,7 @@ Ao final deste dia, você deve ser capaz de:
 3. **Preparação para Dia 4**:
    - Ler sobre JUnit 5 e Mockito
    - Entender o conceito de Testcontainers
-   - Instalar Docker (necessário para Testcontainers)
+   - Instalar Podman (necessário para Testcontainers)
 
 ## 📝 Notas do Instrutor
 

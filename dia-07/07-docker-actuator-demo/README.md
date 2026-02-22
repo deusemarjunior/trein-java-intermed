@@ -1,14 +1,14 @@
-# 07-docker-actuator-demo
+# 07-podman-actuator-demo
 
-Projeto completo de demonstração do **Dia 7** — Docker, Actuator, Logs Estruturados e Observabilidade.
+Projeto completo de demonstração do **Dia 7** — Podman, Actuator, Logs Estruturados e Observabilidade.
 
 ## Objetivo
 
 Demonstrar a containerização completa de uma aplicação Spring Boot com todos os conceitos do dia:
 
-1. **Dockerfile multi-stage** — Build com JDK + Runtime com JRE Alpine (~200MB)
-2. **.dockerignore** — Excluir arquivos desnecessários do contexto Docker
-3. **Docker Compose** — Orquestrar app + PostgreSQL + RabbitMQ + Redis com health checks
+1. **Containerfile multi-stage** — Build com JDK + Runtime com JRE Alpine (~200MB)
+2. **.containerignore** — Excluir arquivos desnecessários do contexto Podman
+3. **Podman Compose** — Orquestrar app + PostgreSQL + RabbitMQ + Redis com health checks
 4. **Spring Actuator** — Endpoints `/health`, `/metrics`, `/info` + custom HealthIndicator
 5. **Logs estruturados** — Logback com LogstashEncoder (JSON no profile `prod`)
 6. **MDC (traceId)** — Correlacionar logs de uma mesma requisição
@@ -17,33 +17,33 @@ Demonstrar a containerização completa de uma aplicação Spring Boot com todos
 
 - Java 21
 - Maven 3.9+
-- Docker Desktop
+- Podman Desktop
 
 ## Como executar
 
-### Opção 1: Docker Compose (tudo containerizado)
+### Opção 1: Podman Compose (tudo containerizado)
 
 ```bash
 # Build e subir todos os containers
-docker compose up --build -d
+podman compose up --build -d
 
 # Verificar status
-docker compose ps
+podman compose ps
 
 # Verificar logs da aplicação (JSON estruturado)
-docker compose logs app --tail=20
+podman compose logs app --tail=20
 
 # Parar tudo
-docker compose down
+podman compose down
 ```
 
 A API sobe na porta **8080**.
 
-### Opção 2: Local (apenas infraestrutura no Docker)
+### Opção 2: Local (apenas infraestrutura no Podman)
 
 ```bash
 # Subir apenas os serviços de infraestrutura
-docker compose up postgres rabbitmq redis -d
+podman compose up postgres rabbitmq redis -d
 
 # Rodar a aplicação localmente (profile dev — logs texto)
 mvn spring-boot:run
@@ -52,18 +52,18 @@ mvn spring-boot:run
 ## Estrutura do projeto
 
 ```
-07-docker-actuator-demo/
-├── .dockerignore                         ← Exclusões do build Docker
+07-podman-actuator-demo/
+├── .containerignore                         ← Exclusões do build Podman
 ├── .vscode/
 │   ├── launch.json                       ← Configs de execução VS Code
-│   └── tasks.json                        ← Tasks Maven e Docker
+│   └── tasks.json                        ← Tasks Maven e Podman
 ├── api-requests.http                     ← Testes de API (REST Client)
-├── docker-compose.yml                    ← Orquestração completa
-├── Dockerfile                            ← Multi-stage build
+├── podman-compose.yml                    ← Orquestração completa
+├── Containerfile                            ← Multi-stage build
 ├── pom.xml                               ← Dependências (Actuator + Logstash)
 └── src/main/
     ├── java/com/example/demo/
-    │   ├── DockerActuatorDemoApplication.java
+    │   ├── PodmanActuatorDemoApplication.java
     │   ├── config/
     │   │   ├── CacheConfig.java          ← Redis cache config
     │   │   ├── MdcFilter.java            ← Filtro MDC (traceId, method, uri)
@@ -99,16 +99,16 @@ mvn spring-boot:run
 
 ## Verificações
 
-### Docker
+### Podman
 ```bash
 # Tamanho da imagem
-docker images | grep docker-actuator-demo
+podman images | grep podman-actuator-demo
 
 # Containers rodando
-docker compose ps
+podman compose ps
 
-# Logs JSON (profile prod ativo no Docker)
-docker compose logs app --tail=5
+# Logs JSON (profile prod ativo no Podman)
+podman compose logs app --tail=5
 ```
 
 ### Actuator

@@ -207,11 +207,11 @@ sequenceDiagram
 
 | Anotação | Quando executa | Quantas vezes | Uso típico |
 |----------|---------------|---------------|------------|
-| `@BeforeAll` | Antes de **todos** os testes (static) | 1x por classe | Subir container Docker |
+| `@BeforeAll` | Antes de **todos** os testes (static) | 1x por classe | Subir container Podman |
 | `@BeforeEach` | Antes de **cada** teste | N vezes | Criar mocks, preparar dados |
 | `@Test` | O teste em si | 1x cada | O que estamos testando |
 | `@AfterEach` | Depois de **cada** teste | N vezes | Limpar estado |
-| `@AfterAll` | Depois de **todos** os testes (static) | 1x por classe | Parar container Docker |
+| `@AfterAll` | Depois de **todos** os testes (static) | 1x por classe | Parar container Podman |
 
 ---
 

@@ -1,4 +1,4 @@
-# Slide 3: Dockerfile Multi-Stage Build
+# Slide 3: Containerfile Multi-Stage Build
 
 **Horário:** 09:45 - 10:15
 
@@ -6,7 +6,7 @@
 
 ## Multi-Stage Build — O Segredo das Imagens Pequenas
 
-O multi-stage build usa **dois estágios** no mesmo Dockerfile:
+O multi-stage build usa **dois estágios** no mesmo Containerfile:
 
 1. **Stage `build`**: Usa JDK completo + Maven para compilar
 2. **Stage `runtime`**: Usa apenas JRE slim para rodar
@@ -39,9 +39,9 @@ graph LR
 
 ---
 
-## Dockerfile Otimizado — Multi-Stage
+## Containerfile Otimizado — Multi-Stage
 
-```dockerfile
+```podmanfile
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 1: BUILD — Compilar a aplicação        ║
 # ╚═══════════════════════════════════════════════╝
@@ -113,19 +113,19 @@ graph LR
 
 ---
 
-## .dockerignore — Excluir Arquivos do Build Context
+## .containerignore — Excluir Arquivos do Build Context
 
-O `.dockerignore` funciona como o `.gitignore` — diz ao Docker quais arquivos **não enviar** para o build context.
+O `.containerignore` funciona como o `.gitignore` — diz ao Podman quais arquivos **não enviar** para o build context.
 
 ```text
-# .dockerignore
+# .containerignore
 target/
 .git/
 .idea/
 .vscode/
 *.iml
 .env
-docker-compose*.yml
+podman-compose*.yml
 README.md
 *.md
 .gitignore
@@ -135,12 +135,12 @@ README.md
 
 ```mermaid
 graph LR
-    subgraph "Sem .dockerignore"
+    subgraph "Sem .containerignore"
         S1["COPY . .<br/>Envia 500MB<br/>(.git = 300MB!)"]
         S2["Build lento<br/>⏱️ Context: 30s"]
     end
 
-    subgraph "Com .dockerignore"
+    subgraph "Com .containerignore"
         C1["COPY . .<br/>Envia 5MB<br/>(só código)"]
         C2["Build rápido<br/>⏱️ Context: 1s"]
     end
@@ -175,12 +175,12 @@ spring:
 # Em dev: usa os defaults do application.yml (localhost)
 mvn spring-boot:run
 
-# Em Docker: injeta variáveis de ambiente
-docker run -e DB_URL=jdbc:postgresql://postgres:5432/mydb \
+# Em Podman: injeta variáveis de ambiente
+podman run -e DB_URL=jdbc:postgresql://postgres:5432/mydb \
            -e DB_USER=admin \
            -e DB_PASSWORD=s3cr3t \
            -e REDIS_HOST=redis \
-           my-app:latest
+           docker.io/library/my-app:latest
 ```
 
 > **Convenção Spring Boot**: `SPRING_DATASOURCE_URL` sobrescreve `spring.datasource.url` automaticamente. Spring converte `_` para `.` e torna tudo lowercase.
@@ -191,25 +191,25 @@ docker run -e DB_URL=jdbc:postgresql://postgres:5432/mydb \
 
 ```bash
 # Build da imagem
-docker build -t my-app:v1 .
+podman build -t my-app:v1 .
 
 # Verificar tamanho
-docker images my-app
+podman images my-app
 # REPOSITORY   TAG   IMAGE ID       SIZE
 # my-app       v1    abc123def456   82.4MB  ← Meta: < 100MB ✅
 
 # Rodar container
-docker run -p 8080:8080 my-app:v1
+podman run -p 8080:8080 my-app:v1
 
 # Ver layers da imagem
-docker history my-app:v1
+podman history my-app:v1
 ```
 
 ---
 
 ## 🎯 Quiz Rápido
 
-1. **Quantos stages tem um Dockerfile multi-stage build?**
+1. **Quantos stages tem um Containerfile multi-stage build?**
    - Pelo menos 2: `build` (compilação) e `runtime` (execução).
 
 2. **O que `COPY --from=build` faz?**
@@ -218,5 +218,5 @@ docker history my-app:v1
 3. **Por que Alpine é menor que Debian?**
    - Alpine usa `musl libc` e `busybox` em vez de `glibc` e `coreutils`. Distribuição minimalista (~5MB base).
 
-4. **O que acontece se eu não criar `.dockerignore`?**
-   - O Docker envia **todos** os arquivos (incluindo `.git/`, `target/`, `.idea/`) para o build context, tornando o build muito mais lento.
+4. **O que acontece se eu não criar `.containerignore`?**
+   - O Podman envia **todos** os arquivos (incluindo `.git/`, `target/`, `.idea/`) para o build context, tornando o build muito mais lento.

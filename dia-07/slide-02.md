@@ -1,22 +1,22 @@
-# Slide 2: Docker — Conceitos e Dockerfile
+# Slide 2: Podman — Conceitos e Containerfile
 
 **Horário:** 09:15 - 09:45
 
 ---
 
-## 🐳 O que é Docker?
+## 🐳 O que é Podman?
 
-Docker é uma plataforma de **containerização** que empacota sua aplicação + todas as dependências em um **container** — um ambiente isolado, leve e reproduzível.
+Podman é uma plataforma de **containerização** que empacota sua aplicação + todas as dependências em um **container** — um ambiente isolado, leve e reproduzível.
 
 ```mermaid
 graph LR
-    subgraph "❌ Sem Docker"
+    subgraph "❌ Sem Podman"
         DEV["💻 Dev: Java 21<br/>PostgreSQL 16<br/>Redis 7<br/>Ubuntu 22.04"]
         PROD["🖥️ Prod: Java 17?<br/>PostgreSQL 14?<br/>Redis 6?<br/>CentOS 7?"]
         DEV -.->|"'Na minha máquina<br/>funciona!' 😅"| PROD
     end
 
-    subgraph "✅ Com Docker"
+    subgraph "✅ Com Podman"
         CONT1["📦 Container<br/>Java 21<br/>PostgreSQL 16<br/>Redis 7<br/>Alpine Linux"]
         CONT2["📦 Container<br/>Mesmo container<br/>IDÊNTICO em dev,<br/>staging e prod ✅"]
         CONT1 -->|"Mesmo container<br/>em qualquer lugar"| CONT2
@@ -48,10 +48,10 @@ graph TB
         VM_HYP --> VM_OS2 --> VM_APP2
     end
 
-    subgraph "Container Docker"
+    subgraph "Container Podman"
         D_HW["Hardware"]
         D_HOS["Host OS"]
-        D_ENG["Docker Engine"]
+        D_ENG["Podman Engine"]
         D_C1["Container 1<br/>(~80MB)"]
         D_C2["Container 2<br/>(~80MB)"]
 
@@ -76,14 +76,14 @@ graph TB
 
 ---
 
-## Dockerfile — A Receita do Container
+## Containerfile — A Receita do Container
 
-O `Dockerfile` é um arquivo de texto com instruções para **construir uma imagem Docker**. Cada instrução cria uma **camada** (layer).
+O `Containerfile` é um arquivo de texto com instruções para **construir uma imagem Podman**. Cada instrução cria uma **camada** (layer).
 
-### Dockerfile Básico (NÃO otimizado)
+### Containerfile Básico (NÃO otimizado)
 
-```dockerfile
-# ❌ Dockerfile simples — imagem ~400MB
+```podmanfile
+# ❌ Containerfile simples — imagem ~400MB
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
@@ -100,7 +100,7 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "target/app.jar"]
 ```
 
-### Problemas deste Dockerfile
+### Problemas deste Containerfile
 
 ```mermaid
 graph TD
@@ -117,9 +117,9 @@ graph TD
 
 ---
 
-## Camadas Docker — Como funciona o cache
+## Camadas Podman — Como funciona o cache
 
-Cada instrução do Dockerfile cria uma **camada (layer)**. O Docker **cacheia** cada camada. Se nada mudou naquela instrução, ele **reutiliza** o cache — sem re-executar.
+Cada instrução do Containerfile cria uma **camada (layer)**. O Podman **cacheia** cada camada. Se nada mudou naquela instrução, ele **reutiliza** o cache — sem re-executar.
 
 ### Build 1 — Primeira vez (tudo é construído do zero)
 
@@ -159,11 +159,11 @@ graph TD
     style C6 fill:#2c3e50,color:#fff
 ```
 
-> **Regra de ouro**: Coloque instruções que mudam **pouco** (dependências) **antes** das que mudam **muito** (código fonte). Assim o Docker reutiliza o cache das dependências e o build leva **30s em vez de 2+ minutos**.
+> **Regra de ouro**: Coloque instruções que mudam **pouco** (dependências) **antes** das que mudam **muito** (código fonte). Assim o Podman reutiliza o cache das dependências e o build leva **30s em vez de 2+ minutos**.
 
 ---
 
-## Instruções do Dockerfile — Referência
+## Instruções do Containerfile — Referência
 
 | Instrução | Função | Exemplo |
 |-----------|--------|---------|
@@ -182,11 +182,11 @@ graph TD
 
 ## 🎯 Quiz Rápido
 
-1. **Por que o Docker é melhor que instalar tudo manualmente?**
+1. **Por que o Podman é melhor que instalar tudo manualmente?**
    - Ambiente idêntico em dev, staging e produção. "Funciona na minha máquina" deixa de existir.
 
 2. **O que acontece se eu mudar apenas 1 linha de código Java?**
    - Com cache de layers otimizado: só recompila o código (30s). Sem cache: rebaixa tudo (2+ min).
 
 3. **Qual a diferença entre `ENTRYPOINT` e `CMD`?**
-   - `ENTRYPOINT` define o executável (não pode ser sobrescrito facilmente). `CMD` define argumentos padrão (pode ser sobrescrito no `docker run`).
+   - `ENTRYPOINT` define o executável (não pode ser sobrescrito facilmente). `CMD` define argumentos padrão (pode ser sobrescrito no `podman run`).
