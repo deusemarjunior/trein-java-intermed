@@ -48,7 +48,7 @@ classDiagram
     Payment <|-- PixPayment : permits
     Payment <|-- BoletoPayment : permits
     
-    note for Payment "Apenas estas 3 classes\npodem estender Payment!"
+    note for Payment "Apenas estas 3 classes podem estender Payment!"
 ```
 
 ### Código
