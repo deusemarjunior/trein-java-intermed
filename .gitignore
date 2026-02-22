@@ -121,3 +121,6 @@ nbdist/
 .project
 .settings/
 .classpath
+
+# Node
+node_modules/
