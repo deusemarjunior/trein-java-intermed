@@ -13,6 +13,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
