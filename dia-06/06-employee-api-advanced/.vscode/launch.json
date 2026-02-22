@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Employee API Advanced (8091)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiAdvancedApplication",
+      "projectName": "employee-api-advanced",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Employee API Advanced (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiAdvancedApplication",
+      "projectName": "employee-api-advanced",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5091"
+    }
+  ]
+}

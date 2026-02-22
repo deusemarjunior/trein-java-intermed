@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Persistence Messaging Demo API (8090)",
+      "request": "launch",
+      "mainClass": "com.example.demo.PersistenceMessagingDemoApplication",
+      "projectName": "persistence-messaging-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Persistence Messaging Demo API (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.demo.PersistenceMessagingDemoApplication",
+      "projectName": "persistence-messaging-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5090"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mvn: compile",
+      "type": "shell",
+      "command": "mvn compile -q",
+      "group": "build",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: test",
+      "type": "shell",
+      "command": "mvn test",
+      "group": "test",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: clean package",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: clean install",
+      "type": "shell",
+      "command": "mvn clean install",
+      "group": "build",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: spring-boot:run (8091)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: compose up",
+      "type": "shell",
+      "command": "docker compose up -d",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "docker: compose down",
+      "type": "shell",
+      "command": "docker compose down",
+      "group": "none",
+      "problemMatcher": []
+    }
+  ]
+}

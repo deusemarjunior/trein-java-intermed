@@ -1,0 +1,90 @@
+### ========================================
+### 06-employee-api-advanced
+### API Requests — Exercício Dia 6
+### ========================================
+
+### ── Funcionários ──
+
+### TODO 1: Listar funcionários (observe o N+1 nos logs!)
+GET http://localhost:8091/api/employees
+Content-Type: application/json
+
+###
+
+### TODO 4: Listar funcionários com projeção DTO + paginação
+GET http://localhost:8091/api/employees/summary?page=0&size=5&sort=name,asc
+Content-Type: application/json
+
+###
+
+### Buscar funcionário por ID
+GET http://localhost:8091/api/employees/1
+Content-Type: application/json
+
+###
+
+### Criar funcionário (TODO 6: deve disparar evento no RabbitMQ)
+POST http://localhost:8091/api/employees
+Content-Type: application/json
+
+{
+  "name": "Maria Teste",
+  "email": "maria.teste@empresa.com",
+  "cpf": "123.456.789-00",
+  "salary": 7500.00,
+  "departmentId": 1
+}
+
+###
+
+### Atualizar funcionário
+PUT http://localhost:8091/api/employees/1
+Content-Type: application/json
+
+{
+  "name": "Ana Silva Atualizada",
+  "email": "ana.atualizada@empresa.com",
+  "cpf": "111.111.111-11",
+  "salary": 9200.00,
+  "departmentId": 2
+}
+
+###
+
+### Deletar funcionário
+DELETE http://localhost:8091/api/employees/11
+
+###
+
+### ── Departamentos (TODO 8: Redis Cache) ──
+
+### Listar departamentos (1ª vez = CACHE MISS, 2ª vez = CACHE HIT)
+GET http://localhost:8091/api/departments
+Content-Type: application/json
+
+###
+
+### Buscar departamento por ID (testar @Cacheable)
+GET http://localhost:8091/api/departments/1
+Content-Type: application/json
+
+###
+
+### Deletar departamento (testar @CacheEvict)
+DELETE http://localhost:8091/api/departments/5
+
+###
+
+### ── Teste de Validação ──
+
+### Criar funcionário com dados inválidos
+POST http://localhost:8091/api/employees
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "email-invalido",
+  "cpf": "",
+  "salary": -100,
+  "departmentId": null
+}
