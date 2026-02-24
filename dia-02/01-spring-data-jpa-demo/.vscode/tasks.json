@@ -2,22 +2,25 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "build",
+			"type": "shell",
+			"command": "mvn compile -q",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$javac"
+			]
+		},
+		{
 			"label": "Run Spring Boot",
 			"type": "shell",
 			"command": "mvn spring-boot:run",
 			"isBackground": true,
 			"problemMatcher": [
 				"$javac"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"options": {
-				"shell": {
-					"executable": "wsl.exe"
-				}
-			}
+			]
 		}
 	]
 }

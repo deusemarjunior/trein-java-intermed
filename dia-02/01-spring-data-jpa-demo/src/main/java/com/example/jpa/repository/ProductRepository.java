@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     // ========== Query Methods (Spring gera automaticamente) ==========
     
-    List<Product> findByName(String name);
+    Optional<List<Product>> findByName(String name);
     
     List<Product> findByNameContainingIgnoreCase(String keyword);
     

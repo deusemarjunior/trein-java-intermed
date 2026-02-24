@@ -113,7 +113,7 @@ public class ProductService {
             // Verificar duplicidade (exceto o próprio produto)
             productRepository.findByName(request.name())
                 .ifPresent(existing -> {
-                    if (!existing.getId().equals(id)) {
+                    if (!existing.get(0).getId().equals(id)) {
                         throw new DuplicateResourceException("Product", "name", request.name());
                     }
                 });
