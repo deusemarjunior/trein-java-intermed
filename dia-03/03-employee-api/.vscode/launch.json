@@ -9,6 +9,7 @@
       "projectName": "employee-api",
       "args": "",
       "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
       "preLaunchTask": "build-employee-api"
     },
     {
@@ -19,6 +20,7 @@
       "projectName": "employee-api",
       "args": "",
       "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
       "vmArgs": "-Dspring.profiles.active=dev"
     }
   ]

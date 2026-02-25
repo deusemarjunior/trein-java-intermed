@@ -1,0 +1,22 @@
+# Execute com: podman-compose up -d
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: employee-postgres
+    environment:
+      POSTGRES_DB: employeedb
+      POSTGRES_USER: employee
+      POSTGRES_PASSWORD: employee123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U employee -d employeedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_data:
+

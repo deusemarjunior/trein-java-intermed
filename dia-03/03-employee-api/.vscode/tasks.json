@@ -6,7 +6,8 @@
       "type": "shell",
       "command": "./mvnw clean compile -DskipTests || mvn clean compile -DskipTests",
       "windows": {
-        "command": "mvnw.cmd clean compile -DskipTests || mvn clean compile -DskipTests"
+        "command": "cmd",
+        "args": ["/c", "mvnw.cmd clean compile -DskipTests || mvn clean compile -DskipTests"]
       },
       "group": "build",
       "problemMatcher": ["$javac"],
@@ -17,7 +18,8 @@
       "type": "shell",
       "command": "./mvnw test || mvn test",
       "windows": {
-        "command": "mvnw.cmd test || mvn test"
+        "command": "cmd",
+        "args": ["/c", "mvnw.cmd test || mvn test"]
       },
       "group": "test",
       "problemMatcher": ["$javac"],
@@ -28,7 +30,8 @@
       "type": "shell",
       "command": "./mvnw spring-boot:run || mvn spring-boot:run",
       "windows": {
-        "command": "mvnw.cmd spring-boot:run || mvn spring-boot:run"
+        "command": "cmd",
+        "args": ["/c", "mvnw.cmd spring-boot:run || mvn spring-boot:run"]
       },
       "group": "none",
       "problemMatcher": [],
@@ -40,7 +43,8 @@
       "type": "shell",
       "command": "./mvnw clean package -DskipTests || mvn clean package -DskipTests",
       "windows": {
-        "command": "mvnw.cmd clean package -DskipTests || mvn clean package -DskipTests"
+        "command": "cmd",
+        "args": ["/c", "mvnw.cmd clean package -DskipTests || mvn clean package -DskipTests"]
       },
       "group": "build",
       "problemMatcher": ["$javac"],

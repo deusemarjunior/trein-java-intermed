@@ -46,6 +46,61 @@ mvn spring-boot:run
 - `adapter/in/web/` → controller, DTOs
 - `adapter/out/persistence/` → repository, entity JPA
 
-## 📝 Testar
+## � Podman e Podman Compose
+
+O projeto usa **Podman** como runtime de containers e **podman-compose** para orquestrar os serviços definidos no `docker-compose.yml`.
+
+### Instalando o Podman
+
+Baixe e instale o Podman Desktop a partir de: https://podman-desktop.io/
+
+Após a instalação, verifique:
+
+```bash
+podman --version
+```
+
+### Instalando o podman-compose via Python (pip)
+
+Caso o `podman-compose` não esteja disponível, instale via pip:
+
+```bash
+pip install podman-compose
+```
+
+Verifique a instalação:
+
+```bash
+podman-compose --version
+```
+
+### Subindo os containers
+
+```bash
+# Iniciar os serviços (PostgreSQL) em background
+podman-compose up -d
+
+# Verificar se o container está rodando
+podman ps -a
+
+# Ver logs do container
+podman-compose logs -f
+
+# Parar os serviços
+podman-compose down
+```
+
+### Configuração do banco
+
+O `docker-compose.yml` sobe um **PostgreSQL 16** com as seguintes credenciais:
+
+| Variável            | Valor          |
+|---------------------|----------------|
+| `POSTGRES_DB`       | employeedb     |
+| `POSTGRES_USER`     | employee       |
+| `POSTGRES_PASSWORD` | employee123    |
+| Porta               | 5432           |
+
+## �📝 Testar
 
 Use o arquivo `api-requests.http` com VS Code REST Client ou Postman.

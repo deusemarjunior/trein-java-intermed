@@ -1,8 +1,11 @@
 -- Departamentos
-INSERT INTO departments (id, name) VALUES (1, 'Tecnologia');
-INSERT INTO departments (id, name) VALUES (2, 'Recursos Humanos');
-INSERT INTO departments (id, name) VALUES (3, 'Financeiro');
-INSERT INTO departments (id, name) VALUES (4, 'Comercial');
+INSERT INTO departments (id, name) VALUES (1, 'Tecnologia') ON CONFLICT (id) DO NOTHING;
+INSERT INTO departments (id, name) VALUES (2, 'Recursos Humanos') ON CONFLICT (id) DO NOTHING;
+INSERT INTO departments (id, name) VALUES (3, 'Financeiro') ON CONFLICT (id) DO NOTHING;
+INSERT INTO departments (id, name) VALUES (4, 'Comercial') ON CONFLICT (id) DO NOTHING;
+
+-- Ajusta a sequence do ID de departamentos
+SELECT setval('departments_id_seq', (SELECT COALESCE(MAX(id), 1) FROM departments));
 
 -- Funcionários
 INSERT INTO employees (name, email, cpf, salary, department_id, created_at, updated_at)
