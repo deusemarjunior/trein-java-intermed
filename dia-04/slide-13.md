@@ -163,11 +163,8 @@ cd 04-testing-demo
 mvn clean test
 
 # Passo 2: Enviar análise para o SonarQube
-mvn sonar:sonar \
-  -Dsonar.projectKey=testing-demo \
-  -Dsonar.projectName="Testing Demo" \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.token=sqp_SEU_TOKEN_AQUI
+mvn sonar:sonar "-Dsonar.projectKey=testing-demo" "-Dsonar.projectName=Testing Demo" "-Dsonar.host.url=http://localhost:9000" "-Dsonar.login=sqp_SEU_TOKEN_AQUI"
+ 
 ```
 
 > **Windows PowerShell:**
@@ -179,11 +176,9 @@ cd 04-testing-demo
 mvn clean test
 
 # Passo 2: Enviar análise para o SonarQube
-mvn sonar:sonar `
-  -Dsonar.projectKey=testing-demo `
-  -Dsonar.projectName="Testing Demo" `
-  -Dsonar.host.url=http://localhost:9000 `
-  -Dsonar.token=sqp_SEU_TOKEN_AQUI
+mvn sonar:sonar "-Dsonar.projectKey=testing-demo" "-Dsonar.projectName=Testing Demo" "-Dsonar.host.url=http://localhost:9000" "-Dsonar.login=sqp_SEU_TOKEN_AQUI"
+ 
+
 ```
 
 ### Fluxo completo
