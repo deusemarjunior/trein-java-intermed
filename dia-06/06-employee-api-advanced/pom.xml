@@ -52,11 +52,15 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
+            <version>12.0.3</version>
+            <scope>runtime</scope>
         </dependency>
-
+        
         <!-- RabbitMQ (Spring AMQP) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

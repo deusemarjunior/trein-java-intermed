@@ -8,7 +8,8 @@
       "mainClass": "com.example.employee.EmployeeApiAdvancedApplication",
       "projectName": "employee-api-advanced",
       "envFile": "${workspaceFolder}/.env",
-      "vmArgs": "-Dspring.profiles.active=default"
+      "vmArgs": "-Dspring.profiles.active=default",
+      "console": "internalConsole"
     },
     {
       "type": "java",
@@ -17,7 +18,8 @@
       "mainClass": "com.example.employee.EmployeeApiAdvancedApplication",
       "projectName": "employee-api-advanced",
       "envFile": "${workspaceFolder}/.env",
-      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5091"
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5091",
+      "console": "internalConsole"
     }
   ]
 }
