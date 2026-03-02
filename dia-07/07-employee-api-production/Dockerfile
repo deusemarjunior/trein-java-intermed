@@ -4,15 +4,12 @@
 # Transforme em multi-stage build para reduzir para ~200MB:
 #
 # Stage 1 (build):
-#   FROM docker.io/library/eclipse-temurin:21-jdk-alpine AS build
+#   FROM docker.io/library/maven:3.9-eclipse-temurin-21-alpine AS build
 #   WORKDIR /app
 #   COPY pom.xml .
-#   COPY .mvn .mvn
-#   COPY mvnw .
-#   RUN chmod +x mvnw
-#   RUN ./mvnw dependency:resolve -q
+#   RUN mvn dependency:resolve -q
 #   COPY src ./src
-#   RUN ./mvnw clean package -DskipTests -q
+#   RUN mvn clean package -DskipTests -q
 #
 # Stage 2 (runtime):
 #   FROM docker.io/library/eclipse-temurin:21-jre-alpine

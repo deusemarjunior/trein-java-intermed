@@ -1,12 +1,12 @@
-# Slide 12: Exercício — TODO 3 (Podman Compose)
+# Slide 12: Exercício — TODO 3 (Docker Compose)
 
 **Horário:** 14:30 - 15:00
 
 ---
 
-## TODO 3: Completar podman-compose.yml
+## TODO 3: Completar docker-compose.yml
 
-**Arquivo**: `podman-compose.yml`
+**Arquivo**: `docker-compose.yml`
 
 ### O que já vem pronto
 
@@ -35,7 +35,7 @@ volumes:
 
 ```mermaid
 graph TB
-    subgraph "podman-compose.yml completo"
+    subgraph "docker-compose.yml completo"
         APP["🖥️ app (build: .)<br/>ports: 8092:8080<br/>depends_on: todos com health check"]
         PG[("🐘 postgres<br/>ports: 5434:5432<br/>healthcheck: pg_isready")]
         REDIS[("🔴 redis<br/>ports: 6381:6379<br/>healthcheck: redis-cli ping")]
@@ -63,16 +63,18 @@ services:
     build: .
     container_name: employee-prod-app
     ports:
-      - "8092:8080"
+      - "8092:8092"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/employeedb
       SPRING_DATASOURCE_USERNAME: employee
       SPRING_DATASOURCE_PASSWORD: employee123
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     depends_on:
       postgres:
         condition: service_healthy
@@ -80,11 +82,13 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    networks:
+      - employee-network
 
   # ── PostgreSQL ──
   postgres:
-    image: postgres:16-alpine
-    container_name: prod-postgres
+    image: docker.io/library/postgres:16-alpine
+    container_name: employee-prod-postgres
     environment:
       POSTGRES_DB: employeedb
       POSTGRES_USER: employee
@@ -95,28 +99,33 @@ services:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U employee -d employeedb"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    networks:
+      - employee-network
 
   # ── Redis ──
   redis:
-    image: redis:7-alpine
-    container_name: prod-redis
+    image: docker.io/library/redis:7-alpine
+    container_name: employee-prod-redis
     ports:
       - "6381:6379"
     volumes:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - employee-network
 
   # ── RabbitMQ ──
   rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: prod-rabbitmq
+    image: docker.io/library/rabbitmq:3-management-alpine
+    container_name: employee-prod-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -128,36 +137,43 @@ services:
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 5
+      start_period: 20s
+    networks:
+      - employee-network
 
 volumes:
   pg_data:
   redis_data:
   rabbitmq_data:
+
+networks:
+  employee-network:
+    driver: bridge
 ```
 
 > **Nota**: As portas são diferentes dos projetos anteriores (5434, 6381, 5674, 15674, 8092) para evitar conflitos.
 
 ---
 
-## Testando o Podman Compose
+## Testando o Docker Compose
 
 ```bash
 # 1. Subir tudo
-podman compose up -d
+docker compose up -d
 
 # 2. Verificar status
-podman compose ps
+docker compose ps
 
 # 3. Verificar logs
-podman compose logs -f app
+docker compose logs -f app
 
 # 4. Testar health
 curl http://localhost:8092/actuator/health | jq
 
 # 5. Parar tudo
-podman compose down
+docker compose down
 ```
 
 ---
@@ -169,4 +185,5 @@ podman compose down
 - [ ] Serviço `rabbitmq` com health check e Management UI
 - [ ] Variáveis de ambiente corretamente configuradas (nomes de serviço, não localhost)
 - [ ] Volumes para persistência de dados
-- [ ] `podman compose up -d` sobe tudo sem erros
+- [ ] Networks configuradas (`employee-network`)
+- [ ] `docker compose up -d` sobe tudo sem erros

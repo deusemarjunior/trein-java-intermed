@@ -1,4 +1,4 @@
-# Slide 3: Containerfile Multi-Stage Build
+# Slide 3: Dockerfile Multi-Stage Build
 
 **Horário:** 09:45 - 10:15
 
@@ -6,7 +6,7 @@
 
 ## Multi-Stage Build — O Segredo das Imagens Pequenas
 
-O multi-stage build usa **dois estágios** no mesmo Containerfile:
+O multi-stage build usa **dois estágios** no mesmo Dockerfile:
 
 1. **Stage `build`**: Usa JDK completo + Maven para compilar
 2. **Stage `runtime`**: Usa apenas JRE slim para rodar
@@ -39,13 +39,13 @@ graph LR
 
 ---
 
-## Containerfile Otimizado — Multi-Stage
+## Dockerfile Otimizado — Multi-Stage
 
-```podmanfile
+```dockerfile
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 1: BUILD — Compilar a aplicação        ║
 # ╚═══════════════════════════════════════════════╝
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM docker.io/library/maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
@@ -64,26 +64,28 @@ RUN mvn clean package -DskipTests -q
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 2: RUNTIME — Imagem final enxuta        ║
 # ╚═══════════════════════════════════════════════╝
-FROM eclipse-temurin:21-jre-alpine
+FROM docker.io/library/eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
+
+# Criar usuário não-root
+RUN addgroup -S spring && adduser -S spring -G spring
 
 # Copia APENAS o JAR do stage de build
 COPY --from=build /app/target/*.jar app.jar
 
+# Trocar para usuário não-root
+USER spring:spring
+
 # Porta da aplicação
 EXPOSE 8080
 
-# Variáveis de ambiente padrão
-ENV SPRING_PROFILES_ACTIVE=prod
-ENV JAVA_OPTS="-Xmx512m -Xms256m"
-
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Executa a aplicação
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
 ---
@@ -113,19 +115,19 @@ graph LR
 
 ---
 
-## .containerignore — Excluir Arquivos do Build Context
+## .dockerignore — Excluir Arquivos do Build Context
 
-O `.containerignore` funciona como o `.gitignore` — diz ao Podman quais arquivos **não enviar** para o build context.
+O `.dockerignore` funciona como o `.gitignore` — diz ao Docker quais arquivos **não enviar** para o build context.
 
 ```text
-# .containerignore
+# .dockerignore
 target/
 .git/
 .idea/
 .vscode/
 *.iml
 .env
-podman-compose*.yml
+docker-compose*.yml
 README.md
 *.md
 .gitignore
@@ -135,12 +137,12 @@ README.md
 
 ```mermaid
 graph LR
-    subgraph "Sem .containerignore"
+    subgraph "Sem .dockerignore"
         S1["COPY . .<br/>Envia 500MB<br/>(.git = 300MB!)"]
         S2["Build lento<br/>⏱️ Context: 30s"]
     end
 
-    subgraph "Com .containerignore"
+    subgraph "Com .dockerignore"
         C1["COPY . .<br/>Envia 5MB<br/>(só código)"]
         C2["Build rápido<br/>⏱️ Context: 1s"]
     end
@@ -191,25 +193,25 @@ podman run -e DB_URL=jdbc:postgresql://postgres:5432/mydb \
 
 ```bash
 # Build da imagem
-podman build -t my-app:v1 .
+docker build -t my-app:v1 .
 
 # Verificar tamanho
-podman images my-app
+docker images my-app
 # REPOSITORY   TAG   IMAGE ID       SIZE
 # my-app       v1    abc123def456   82.4MB  ← Meta: < 100MB ✅
 
 # Rodar container
-podman run -p 8080:8080 my-app:v1
+docker run -p 8080:8080 my-app:v1
 
 # Ver layers da imagem
-podman history my-app:v1
+docker history my-app:v1
 ```
 
 ---
 
 ## 🎯 Quiz Rápido
 
-1. **Quantos stages tem um Containerfile multi-stage build?**
+1. **Quantos stages tem um Dockerfile multi-stage build?**
    - Pelo menos 2: `build` (compilação) e `runtime` (execução).
 
 2. **O que `COPY --from=build` faz?**
@@ -218,5 +220,5 @@ podman history my-app:v1
 3. **Por que Alpine é menor que Debian?**
    - Alpine usa `musl libc` e `busybox` em vez de `glibc` e `coreutils`. Distribuição minimalista (~5MB base).
 
-4. **O que acontece se eu não criar `.containerignore`?**
-   - O Podman envia **todos** os arquivos (incluindo `.git/`, `target/`, `.idea/`) para o build context, tornando o build muito mais lento.
+4. **O que acontece se eu não criar `.dockerignore`?**
+   - O Docker envia **todos** os arquivos (incluindo `.git/`, `target/`, `.idea/`) para o build context, tornando o build muito mais lento.

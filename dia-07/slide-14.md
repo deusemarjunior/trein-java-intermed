@@ -138,7 +138,7 @@ public class MdcFilter extends OncePerRequestFilter {
 ### Dev (texto)
 
 ```bash
-# Rodar em modo dev (sem Podman)
+# Rodar em modo dev (sem Docker)
 mvn spring-boot:run
 
 # Log gerado:
@@ -148,9 +148,9 @@ mvn spring-boot:run
 ### Prod (JSON) — dentro do Podman
 
 ```bash
-# Rodar com profile prod (Podman Compose define SPRING_PROFILES_ACTIVE=prod)
-podman compose up -d
-podman compose logs -f app
+# Rodar com profile prod (Docker Compose define SPRING_PROFILES_ACTIVE=prod)
+docker compose up -d
+docker compose logs -f app
 
 # Log gerado:
 # {"@timestamp":"2024-03-15T14:30:22.456Z","level":"INFO",
@@ -166,5 +166,5 @@ podman compose logs -f app
 - [ ] `logback-spring.xml` com dois profiles: `dev` (texto) e `prod` (JSON)
 - [ ] `MdcFilter` implementado com traceId e requestId
 - [ ] Em modo dev: logs em texto com traceId entre colchetes
-- [ ] Em modo prod (Podman): logs em JSON com campos MDC
+- [ ] Em modo prod (Docker): logs em JSON com campos MDC
 - [ ] Resposta HTTP inclui header `X-Trace-ID`

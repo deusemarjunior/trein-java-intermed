@@ -12,8 +12,8 @@ O projeto `07-podman-actuator-demo` é uma aplicação Spring Boot **completa e 
 graph TB
     subgraph "07-podman-actuator-demo"
         direction TB
-        PODMAN["🐳 Containerfile<br/>Multi-stage build<br/>Imagem ~80MB"]
-        COMPOSE["📦 podman-compose.yml<br/>App + PostgreSQL + Redis + RabbitMQ"]
+        PODMAN["🐳 Dockerfile<br/>Multi-stage build<br/>Imagem ~80MB"]
+        COMPOSE["📦 docker-compose.yml<br/>App + PostgreSQL + Redis + RabbitMQ"]
         ACTUATOR["📊 Actuator<br/>/health, /metrics, /info<br/>Custom Health Indicator"]
         LOGS["📋 Logback<br/>JSON (prod) + Texto (dev)<br/>MDC Filter"]
     end
@@ -30,12 +30,12 @@ graph TB
 
 ```
 07-podman-actuator-demo/
-├── .containerignore                         ← Arquivos excluídos do build
+├── .dockerignore                            ← Arquivos excluídos do build
 ├── .vscode/
 │   ├── launch.json
 │   └── tasks.json
-├── Containerfile                            ← Multi-stage build otimizado
-├── podman-compose.yml                    ← Stack completa com health checks
+├── Dockerfile                               ← Multi-stage build otimizado
+├── docker-compose.yml                       ← Stack completa com health checks
 ├── pom.xml
 ├── api-requests.http                     ← Testes dos endpoints
 ├── README.md
@@ -76,22 +76,22 @@ graph TB
 
 ## Roteiro de Demonstração
 
-### 1. Mostrar o Containerfile Multi-Stage
+### 1. Mostrar o Dockerfile Multi-Stage
 
 ```bash
 # Tamanho da imagem
-podman images 07-podman-actuator-demo
+docker images 07-podman-actuator-demo
 # REPOSITORY                TAG      SIZE
 # 07-podman-actuator-demo   latest   82MB  ← < 100MB ✅
 ```
 
-### 2. Subir tudo com Podman Compose
+### 2. Subir tudo com Docker Compose
 
 ```bash
 cd 07-podman-actuator-demo
-podman compose up -d
-podman compose ps    # Verificar que tudo subiu
-podman compose logs -f app   # Acompanhar logs
+docker compose up -d
+docker compose ps    # Verificar que tudo subiu
+docker compose logs -f app   # Acompanhar logs
 ```
 
 ### 3. Testar Actuator
@@ -112,11 +112,11 @@ curl http://localhost:8080/actuator/info | jq
 
 ```bash
 # Profile dev (texto legível)
-# Rodar com: mvn spring-boot:run (sem Podman)
+# Rodar com: mvn spring-boot:run (sem Docker)
 # 14:30:22 INFO [traceId=abc123] Criando produto: Notebook
 
-# Profile prod (JSON — dentro do Podman)
-podman compose logs -f app
+# Profile prod (JSON — dentro do Docker)
+docker compose logs -f app
 # {"@timestamp":"...","level":"INFO","message":"Criando produto: Notebook","traceId":"abc123"}
 ```
 
@@ -137,15 +137,15 @@ curl -X POST http://localhost:8080/api/products \
 
 - Mostrar o **antes** (texto) e **depois** (JSON) mudando o profile
 - Demonstrar que o **traceId é o mesmo** em todas as linhas de uma requisição
-- Mostrar o health check retornando **DOWN** ao parar um container (`podman stop app-redis`)
-- Mostrar o tamanho da imagem (`podman images`) e comparar com a versão não otimizada
+- Mostrar o health check retornando **DOWN** ao parar um container (`docker stop app-redis`)
+- Mostrar o tamanho da imagem (`docker images`) e comparar com a versão não otimizada
 
 ---
 
 ## 🎯 O que o aluno deve observar
 
-1. **Containerfile**: Como o multi-stage build reduz o tamanho de ~400MB para ~80MB
-2. **Podman Compose**: Tudo sobe com `podman compose up -d`, health checks garantem a ordem
+1. **Dockerfile**: Como o multi-stage build reduz o tamanho de ~400MB para ~80MB
+2. **Docker Compose**: Tudo sobe com `docker compose up -d`, health checks garantem a ordem
 3. **Actuator**: `/health` mostra status de todas as dependências
 4. **Logs**: JSON em produção, texto em desenvolvimento
 5. **MDC**: traceId correlaciona todos os logs de uma requisição

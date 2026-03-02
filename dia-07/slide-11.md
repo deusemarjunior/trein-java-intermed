@@ -1,22 +1,22 @@
-# Slide 11: Exercício — TODO 1 e TODO 2 (Containerfile + .containerignore)
+# Slide 11: Exercício — TODO 1 e TODO 2 (Dockerfile + .dockerignore)
 
 **Horário:** 14:00 - 14:30
 
 ---
 
-## TODO 1: Otimizar Containerfile com Multi-Stage Build
+## TODO 1: Otimizar Dockerfile com Multi-Stage Build
 
-**Arquivo**: `Containerfile`
+**Arquivo**: `Dockerfile`
 
 ### O que já vem pronto (NÃO otimizado)
 
-```podmanfile
-# ❌ Containerfile básico — imagem ~400MB
-FROM eclipse-temurin:21-jdk
+```dockerfile
+# ❌ Dockerfile básico — imagem ~800MB
+FROM docker.io/library/eclipse-temurin:21-jdk
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean package -DskipTests
-EXPOSE 8080
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests -q
+EXPOSE 8092
 ENTRYPOINT ["java", "-jar", "target/employee-api-production-0.0.1-SNAPSHOT.jar"]
 ```
 
@@ -25,15 +25,15 @@ ENTRYPOINT ["java", "-jar", "target/employee-api-production-0.0.1-SNAPSHOT.jar"]
 ```mermaid
 graph LR
     subgraph "Stage 1: BUILD"
-        B1["FROM maven:3.9-eclipse-temurin-21 AS build"]
+        B1["FROM maven:3.9-eclipse-temurin-21-alpine AS build"]
         B2["COPY pom.xml → resolve deps"]
         B3["COPY src → mvn package"]
     end
 
     subgraph "Stage 2: RUNTIME"
         R1["FROM eclipse-temurin:21-jre-alpine"]
-        R2["COPY --from=build JAR"]
-        R3["ENTRYPOINT java -jar"]
+        R2["adduser spring + COPY --from=build JAR"]
+        R3["USER spring + ENTRYPOINT java -jar"]
     end
 
     B3 -->|"Copia APENAS o JAR"| R2
@@ -44,11 +44,11 @@ graph LR
 
 ### Implementação
 
-```podmanfile
+```dockerfile
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 1: BUILD — Compilar a aplicação        ║
 # ╚═══════════════════════════════════════════════╝
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM docker.io/library/maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
@@ -67,41 +67,44 @@ RUN mvn clean package -DskipTests -q
 # ╔═══════════════════════════════════════════════╗
 # ║  STAGE 2: RUNTIME — Imagem final enxuta        ║
 # ╚═══════════════════════════════════════════════╝
-FROM eclipse-temurin:21-jre-alpine
+FROM docker.io/library/eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
+
+# Criar usuário não-root
+RUN addgroup -S spring && adduser -S spring -G spring
 
 # Copia APENAS o JAR do stage de build
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+# Trocar para usuário não-root
+USER spring:spring
 
-ENV SPRING_PROFILES_ACTIVE=prod
-ENV JAVA_OPTS="-Xmx512m -Xms256m"
+EXPOSE 8092
 
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:8092/actuator/health || exit 1
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
 ### Verificação
 
 ```bash
 # Build da imagem
-podman build -t employee-api:v1 .
+docker build -t employee-api:v1 .
 
 # Verificar tamanho
-podman images employee-api
+docker images employee-api
 # REPOSITORY       TAG   SIZE
 # employee-api     v1    ~85MB  ← Meta: < 100MB ✅
 ```
 
 ---
 
-## TODO 2: Criar .containerignore
+## TODO 2: Criar .dockerignore
 
-**Arquivo**: `.containerignore`
+**Arquivo**: `.dockerignore`
 
 ### Implementação
 
@@ -121,9 +124,9 @@ target/
 *.iml
 *.code-workspace
 
-# Podman
-podman-compose*.yml
-Containerfile
+# Docker
+docker-compose*.yml
+Dockerfile
 
 # Documentação
 README.md
@@ -147,10 +150,11 @@ README.md
 
 ## 🎯 Critérios de Aceite
 
-- [ ] Containerfile com 2 stages (build + runtime)
-- [ ] Stage build: `maven:3.9-eclipse-temurin-21`
+- [ ] Dockerfile com 2 stages (build + runtime)
+- [ ] Stage build: `maven:3.9-eclipse-temurin-21-alpine`
 - [ ] Stage runtime: `eclipse-temurin:21-jre-alpine`
+- [ ] Usuário não-root (`addgroup`/`adduser`/`USER`)
 - [ ] Cache de dependências (COPY pom.xml antes do código)
 - [ ] `HEALTHCHECK` configurado
-- [ ] `.containerignore` criado com pelo menos `target/`, `.git/`, `.idea/`
+- [ ] `.dockerignore` criado com pelo menos `target/`, `.git/`, `.idea/`
 - [ ] Imagem final < 100MB

@@ -135,12 +135,12 @@ public class RabbitMQHealthIndicator implements HealthIndicator {
 curl http://localhost:8092/actuator/health | jq
 
 # Parar RabbitMQ e verificar que fica DOWN
-podman stop prod-rabbitmq
+docker stop prod-rabbitmq
 curl http://localhost:8092/actuator/health | jq
 # status: DOWN, rabbitMQHealthIndicator: DOWN
 
 # Reiniciar
-podman start prod-rabbitmq
+docker start prod-rabbitmq
 ```
 
 ---

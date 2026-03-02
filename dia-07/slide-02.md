@@ -1,4 +1,4 @@
-# Slide 2: Podman — Conceitos e Containerfile
+# Slide 2: Docker — Conceitos e Dockerfile
 
 **Horário:** 09:15 - 09:45
 
@@ -76,14 +76,14 @@ graph TB
 
 ---
 
-## Containerfile — A Receita do Container
+## Dockerfile — A Receita do Container
 
-O `Containerfile` é um arquivo de texto com instruções para **construir uma imagem Podman**. Cada instrução cria uma **camada** (layer).
+O `Dockerfile` é um arquivo de texto com instruções para **construir uma imagem Docker**. Cada instrução cria uma **camada** (layer).
 
-### Containerfile Básico (NÃO otimizado)
+### Dockerfile Básico (NÃO otimizado)
 
-```podmanfile
-# ❌ Containerfile simples — imagem ~400MB
+```dockerfile
+# ❌ Dockerfile simples — imagem ~400MB
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
@@ -100,7 +100,7 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "target/app.jar"]
 ```
 
-### Problemas deste Containerfile
+### Problemas deste Dockerfile
 
 ```mermaid
 graph TD
@@ -117,9 +117,9 @@ graph TD
 
 ---
 
-## Camadas Podman — Como funciona o cache
+## Camadas Docker — Como funciona o cache
 
-Cada instrução do Containerfile cria uma **camada (layer)**. O Podman **cacheia** cada camada. Se nada mudou naquela instrução, ele **reutiliza** o cache — sem re-executar.
+Cada instrução do Dockerfile cria uma **camada (layer)**. O Docker **cacheia** cada camada. Se nada mudou naquela instrução, ele **reutiliza** o cache — sem re-executar.
 
 ### Build 1 — Primeira vez (tudo é construído do zero)
 
@@ -159,11 +159,11 @@ graph TD
     style C6 fill:#2c3e50,color:#fff
 ```
 
-> **Regra de ouro**: Coloque instruções que mudam **pouco** (dependências) **antes** das que mudam **muito** (código fonte). Assim o Podman reutiliza o cache das dependências e o build leva **30s em vez de 2+ minutos**.
+> **Regra de ouro**: Coloque instruções que mudam **pouco** (dependências) **antes** das que mudam **muito** (código fonte). Assim o Docker reutiliza o cache das dependências e o build leva **30s em vez de 2+ minutos**.
 
 ---
 
-## Instruções do Containerfile — Referência
+## Instruções do Dockerfile — Referência
 
 | Instrução | Função | Exemplo |
 |-----------|--------|---------|
@@ -189,4 +189,4 @@ graph TD
    - Com cache de layers otimizado: só recompila o código (30s). Sem cache: rebaixa tudo (2+ min).
 
 3. **Qual a diferença entre `ENTRYPOINT` e `CMD`?**
-   - `ENTRYPOINT` define o executável (não pode ser sobrescrito facilmente). `CMD` define argumentos padrão (pode ser sobrescrito no `podman run`).
+   - `ENTRYPOINT` define o executável (não pode ser sobrescrito facilmente). `CMD` define argumentos padrão (pode ser sobrescrito no `docker run`).

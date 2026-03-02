@@ -58,7 +58,7 @@ flowchart TD
 
     D6 -->|"API performática e desacoplada<br/>agora precisa ir para produção"| D7
 
-    D7["<b>⭐ Dia 7 — Podman e Observabilidade</b><br/>🐳 Containerfile + Podman Compose<br/>📊 Actuator + Métricas<br/>📋 Logs Estruturados (JSON + MDC)"]
+    D7["<b>⭐ Dia 7 — Docker e Observabilidade</b><br/>🐳 Dockerfile + Docker Compose<br/>📊 Actuator + Métricas<br/>📋 Logs Estruturados (JSON + MDC)"]
 
     style D1 fill:#4a90d9,color:#fff,stroke:#2c6fad
     style D2 fill:#4a90d9,color:#fff,stroke:#2c6fad
@@ -75,18 +75,18 @@ flowchart TD
 
 ```mermaid
 mindmap
-  root((Dia 7<br/>Podman e<br/>Observabilidade))
-    Podman
-      Containerfile
+  root((Dia 7<br/>Docker e<br/>Observabilidade))
+    Docker
+      Dockerfile
         Camadas e cache
         Multi-stage build
         JRE slim ~80MB
-      .containerignore
+      .dockerignore
         Excluir target .git .idea
       Variáveis de ambiente
         Externalizar config
         DB_URL REDIS_HOST
-    Podman Compose
+    Docker Compose
       Orquestração
         app + banco + cache + fila
       depends_on
@@ -128,8 +128,8 @@ mindmap
 
 Ao final deste dia, você será capaz de:
 
-1. **Criar Containerfiles otimizados** com multi-stage build (imagem < 100MB)
-2. **Orquestrar stack completa** com Podman Compose (app + banco + cache + fila)
+1. **Criar Dockerfiles otimizados** com multi-stage build (imagem < 100MB)
+2. **Orquestrar stack completa** com Docker Compose (app + banco + cache + fila)
 3. **Configurar Spring Actuator** para health checks e métricas
 4. **Implementar logs estruturados** (JSON) com Logback e MDC
 5. **Compreender Observabilidade** em produção e conceitos de CI/CD
