@@ -3,9 +3,9 @@ target/
 .idea/
 *.iml
 .env
-.containerignore
-Containerfile
-podman-compose*.yml
+.dockerignore
+Dockerfile
+docker-compose*.yml
 README.md
 *.md
 .mvn/

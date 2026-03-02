@@ -3,7 +3,7 @@ FROM docker.io/library/node:20-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 COPY . .
 RUN npm run build
@@ -20,8 +20,8 @@ COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 # Copia build do React
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Variável de ambiente (pode ser sobrescrita no podman run / podman-compose)
-ENV API_URL=http://host.containers.internal:8080
+# Variável de ambiente (pode ser sobrescrita no docker run / docker-compose)
+ENV API_URL=http://host.docker.internal:8080
 
 EXPOSE 80
 

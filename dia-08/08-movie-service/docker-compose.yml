@@ -33,7 +33,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      - API_URL=http://host.podman.internal:8080
+      - API_URL=http://host.containers.internal:8080
 
   # Alternativa: usar imagem publicada (quando disponível no registry)
   # themovie-web:

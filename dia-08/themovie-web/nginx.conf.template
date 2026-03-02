@@ -25,7 +25,9 @@ server {
 
     # Proxy reverso: /api/* → backend Spring Boot
     location /api/ {
-        proxy_pass ${API_URL};
+        resolver 127.0.0.11 valid=30s ipv6=off;
+        set $backend ${API_URL};
+        proxy_pass $backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -36,7 +38,9 @@ server {
 
     # Proxy reverso: /auth/* → backend Spring Boot
     location /auth/ {
-        proxy_pass ${API_URL};
+        resolver 127.0.0.11 valid=30s ipv6=off;
+        set $backend ${API_URL};
+        proxy_pass $backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
