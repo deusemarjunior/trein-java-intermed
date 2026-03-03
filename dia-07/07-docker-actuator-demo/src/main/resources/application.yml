@@ -41,6 +41,11 @@ spring:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
 
+  # Jackson — suporte a JSR-310 (LocalDateTime)
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
   # Cache
   cache:
     type: redis
