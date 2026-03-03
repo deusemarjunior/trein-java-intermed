@@ -1,6 +1,8 @@
 package com.example.demo.dto;
 
 import com.example.demo.model.Product;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,6 +16,7 @@ public record ProductResponse(
         BigDecimal price,
         Integer stock,
         String category,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime createdAt
 ) {
     public static ProductResponse from(Product product) {
