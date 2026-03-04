@@ -17,6 +17,11 @@ public record Movie(
         boolean favorite,
         boolean watchLater
 ) {
+    public Movie(Long id2, String title2, String posterPath2, String overview2, Double voteAverage2, boolean b,
+            boolean c) {
+        //TODO Auto-generated constructor stub
+    }
+
     /**
      * Cria uma cópia do filme com status de favorito atualizado.
      */

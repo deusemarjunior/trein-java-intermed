@@ -17,4 +17,6 @@ public interface WatchLaterRepositoryPort {
     void deleteByMovieIdAndUserId(Long movieId, String userId);
 
     boolean existsByMovieIdAndUserId(Long movieId, String userId);
+
+    void save(Long movieId, String userId);
 }
