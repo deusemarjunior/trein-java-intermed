@@ -1,0 +1,129 @@
+### =============================
+### 03-employee-api
+### Porta: 8084
+### =============================
+
+### ----- Listar Todos -----
+
+GET http://localhost:8084/api/employees
+Accept: application/json
+
+### ----- Buscar por ID -----
+
+GET http://localhost:8084/api/employees/1
+Accept: application/json
+
+### ----- Buscar por ID — Não encontrado -----
+
+GET http://localhost:8084/api/employees/999
+Accept: application/json
+
+### ----- Criar Funcionário -----
+
+POST http://localhost:8084/api/employees
+Content-Type: application/json
+
+{
+  "name": "Lucas Oliveira",
+  "email": "lucas.oliveira@email.com",
+  "cpf": "123.456.789-09",
+  "salary": 5500.00,
+  "department": {
+    "id": 2
+  }
+}
+
+### ----- Criar Funcionário — Departamento Vendas -----
+
+POST http://localhost:8084/api/employees
+Content-Type: application/json
+
+{
+  "name": "Beatriz Santos",
+  "email": "beatriz.santos@email.com",
+  "cpf": "987.654.321-00",
+  "salary": 4200.00,
+  "department": {
+    "id": 3
+  }
+}
+
+### ----- Criar Funcionário — Salário abaixo do mínimo (TODO 3) -----
+### Após implementar EmployeeService, deve retornar 400
+
+POST http://localhost:8084/api/employees
+Content-Type: application/json
+
+{
+  "name": "Teste Baixo",
+  "email": "teste.baixo@email.com",
+  "cpf": "111.222.333-44",
+  "salary": 500.00,
+  "department": {
+    "id": 1
+  }
+}
+
+### ----- Criar Funcionário — Email duplicado (TODO 3) -----
+### Após implementar regra de email único, deve retornar 409
+
+POST http://localhost:8084/api/employees
+Content-Type: application/json
+
+{
+  "name": "Clone Maria",
+  "email": "maria.silva@email.com",
+  "cpf": "555.666.777-88",
+  "salary": 3000.00,
+  "department": {
+    "id": 1
+  }
+}
+
+### ----- Criar Funcionário — Campos inválidos (TODO 5) -----
+### Após adicionar @Valid + Bean Validation, deve retornar 400
+
+POST http://localhost:8084/api/employees
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "nao-e-email",
+  "cpf": "123",
+  "salary": -100,
+  "department": {
+    "id": 1
+  }
+}
+
+### ----- Atualizar Funcionário -----
+
+PUT http://localhost:8084/api/employees/1
+Content-Type: application/json
+
+{
+  "name": "Maria Silva Santos",
+  "email": "maria.silva.santos@email.com",
+  "cpf": "111.222.333-44",
+  "salary": 6500.00
+}
+
+### ----- Atualizar — Não encontrado -----
+
+PUT http://localhost:8084/api/employees/999
+Content-Type: application/json
+
+{
+  "name": "Inexistente",
+  "email": "inexistente@email.com",
+  "cpf": "000.000.000-00",
+  "salary": 3000.00
+}
+
+### ----- Deletar Funcionário -----
+
+DELETE http://localhost:8084/api/employees/4
+
+### ----- Deletar — Não encontrado -----
+
+DELETE http://localhost:8084/api/employees/999

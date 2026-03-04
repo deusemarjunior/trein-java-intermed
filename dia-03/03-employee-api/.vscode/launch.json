@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Employee API",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiApplication",
+      "projectName": "employee-api",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "preLaunchTask": "build-employee-api"
+    },
+    {
+      "type": "java",
+      "name": "Employee API (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.employee.EmployeeApiApplication",
+      "projectName": "employee-api",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    }
+  ]
+}

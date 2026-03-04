@@ -1,0 +1,128 @@
+### Blog API - Testes de Relacionamentos JPA
+
+### ========== PROBLEMA N+1 vs SOLUÇÃO ==========
+
+### 1. Buscar post SEM JOIN FETCH (❌ Problema N+1)
+# Veja nos logs: múltiplas queries separadas!
+GET http://localhost:8081/api/posts/1
+
+###
+
+### 2. Buscar post COM JOIN FETCH (✅ Solução)
+# Veja nos logs: apenas 1 query com JOINs!
+GET http://localhost:8081/api/posts/1/with-details
+
+###
+
+### ========== CRUD BÁSICO ==========
+
+### Listar todos os posts
+GET http://localhost:8081/api/posts
+
+###
+
+### Buscar posts por autor
+GET http://localhost:8081/api/posts/by-author/Maria%20Santos
+
+###
+
+### Buscar posts por tag
+GET http://localhost:8081/api/posts/by-tag/Java
+
+###
+
+### Posts mais comentados (ordenados)
+GET http://localhost:8081/api/posts/most-commented
+
+###
+
+### ========== CRIAR POST ==========
+
+### Criar post sem tags
+POST http://localhost:8081/api/posts
+Content-Type: application/json
+
+{
+  "title": "Meu Novo Post sobre JPA",
+  "content": "Conteúdo detalhado sobre relacionamentos em JPA...",
+  "author": "Carlos Developer"
+}
+
+###
+
+### Criar post com tags (relacionamento ManyToMany)
+POST http://localhost:8081/api/posts
+Content-Type: application/json
+
+{
+  "title": "Spring Boot 3 - Novidades",
+  "content": "Explorando as novidades do Spring Boot 3 e Jakarta EE...",
+  "author": "Ana Tech",
+  "tagIds": [1, 2, 4]
+}
+
+###
+
+### ========== ADICIONAR COMENTÁRIO ==========
+
+### Adicionar comentário ao post (demonstra cascade e helper method)
+POST http://localhost:8081/api/posts/1/comments
+Content-Type: application/json
+
+{
+  "text": "Explicação muito clara sobre relacionamentos!",
+  "author": "Roberto Silva"
+}
+
+###
+
+### ========== TAGS ==========
+
+### Listar todas as tags
+GET http://localhost:8081/api/tags
+
+###
+
+### Criar nova tag
+POST http://localhost:8081/api/tags
+Content-Type: application/json
+
+{
+  "name": "Microservices",
+  "color": "#9B59B6"
+}
+
+###
+
+### ========== DELETAR POST ==========
+
+### Deletar post (demonstra cascade - comments são deletados também)
+DELETE http://localhost:8081/api/posts/3
+
+###
+
+### ========== EXERCÍCIOS ==========
+
+### Exercício 1: Crie um post com pelo menos 2 tags
+# Seu código aqui:
+POST http://localhost:8081/api/posts
+Content-Type: application/json
+
+{
+  "title": "Seu título",
+  "content": "Seu conteúdo",
+  "author": "Seu nome",
+  "tagIds": []
+}
+
+###
+
+### Exercício 2: Adicione 3 comentários ao post criado
+# Seu código aqui:
+
+###
+
+### Exercício 3: Compare as queries nos logs
+# 1. Busque um post usando /api/posts/{id}
+# 2. Busque o mesmo post usando /api/posts/{id}/with-details
+# 3. Conte quantas queries SQL foram executadas em cada caso

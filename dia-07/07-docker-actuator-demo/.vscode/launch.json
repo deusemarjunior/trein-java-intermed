@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "type": "java",
+      "name": "Podman Actuator Demo (8080)",
+      "request": "launch",
+      "mainClass": "com.example.demo.DockerActuatorDemoApplication",
+      "projectName": "podman-actuator-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default",
+      "console": "internalConsole"
+    },
+    {
+      "type": "java",
+      "name": "Podman Actuator Demo (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.demo.DockerActuatorDemoApplication",
+      "projectName": "podman-actuator-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5080",
+      "console": "internalConsole"
+    }
+  ]
+}

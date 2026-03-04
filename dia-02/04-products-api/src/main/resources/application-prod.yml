@@ -1,0 +1,19 @@
+# Production Profile
+
+spring:
+  # H2 Console DESABILITADO em produção
+  h2:
+    console:
+      enabled: false
+  
+  # JPA - NUNCA use create-drop em produção!
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate  # Apenas valida schema
+
+# Logging reduzido
+logging:
+  level:
+    root: INFO
+    com.example.products: INFO

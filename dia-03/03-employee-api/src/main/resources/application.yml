@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: employee-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employeedb
+    username: employee
+    password: employee123
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8084
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    com.example: DEBUG

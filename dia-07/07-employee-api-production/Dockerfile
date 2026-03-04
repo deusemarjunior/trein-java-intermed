@@ -1,0 +1,36 @@
+# ── TODO 1: Transforme este Containerfile em multi-stage build ──
+#
+# Atualmente este Containerfile usa uma imagem JDK completa (~800MB).
+# Transforme em multi-stage build para reduzir para ~200MB:
+#
+# Stage 1 (build):
+#   FROM docker.io/library/maven:3.9-eclipse-temurin-21-alpine AS build
+#   WORKDIR /app
+#   COPY pom.xml .
+#   RUN mvn dependency:resolve -q
+#   COPY src ./src
+#   RUN mvn clean package -DskipTests -q
+#
+# Stage 2 (runtime):
+#   FROM docker.io/library/eclipse-temurin:21-jre-alpine
+#   WORKDIR /app
+#   RUN addgroup -S spring && adduser -S spring -G spring
+#   COPY --from=build /app/target/*.jar app.jar
+#   USER spring:spring
+#   EXPOSE 8092
+#   HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+#     CMD wget --quiet --tries=1 --spider http://localhost:8092/actuator/health || exit 1
+#   ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# ❌ Versão atual (NÃO otimizada — ~800MB)
+FROM docker.io/library/eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+COPY . .
+
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests -q
+
+EXPOSE 8092
+
+ENTRYPOINT ["java", "-jar", "target/employee-api-production-0.0.1-SNAPSHOT.jar"]

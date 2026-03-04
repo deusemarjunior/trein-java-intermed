@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Clean Architecture Demo",
+      "request": "launch",
+      "mainClass": "com.example.cleanarchitecture.CleanArchitectureDemoApplication",
+      "projectName": "clean-architecture-demo",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "preLaunchTask": "build-clean-architecture-demo"
+    },
+    {
+      "type": "java",
+      "name": "Clean Architecture Demo (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.cleanarchitecture.CleanArchitectureDemoApplication",
+      "projectName": "clean-architecture-demo",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    }
+  ]
+}

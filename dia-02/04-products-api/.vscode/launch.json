@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run ProductsApiApplication",
+            "request": "launch",
+            "mainClass": "com.example.products.ProductsApiApplication",
+            "projectName": "products-api",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}

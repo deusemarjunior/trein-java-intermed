@@ -1,0 +1,71 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: integration-security-demo
+
+  datasource:
+    url: jdbc:h2:mem:securitydb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: dGhpcy1pcy1hLXZlcnktc2VjdXJlLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi1nZW5lcmF0aW9u
+  expiration: 86400000  # 24 horas em milissegundos
+
+# Feign Client Configuration
+department:
+  api:
+    url: http://localhost:8081
+
+# Resilience4j Configuration
+resilience4j:
+  retry:
+    instances:
+      departmentService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.io.IOException
+          - feign.FeignException.ServiceUnavailable
+  circuitbreaker:
+    instances:
+      departmentService:
+        failureRateThreshold: 50
+        slidingWindowSize: 10
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
+        slidingWindowType: COUNT_BASED
+
+# SpringDoc Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+logging:
+  level:
+    com.example.demo: DEBUG
+    io.github.resilience4j: DEBUG

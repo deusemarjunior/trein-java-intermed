@@ -1,0 +1,18 @@
+INSERT INTO departments (name, code) VALUES
+    ('Tecnologia', 'TI'),
+    ('Recursos Humanos', 'RH'),
+    ('Financeiro', 'FIN'),
+    ('Marketing', 'MKT'),
+    ('Operações', 'OPS');
+
+INSERT INTO employees (name, email, cpf, salary, department_id) VALUES
+    ('Ana Silva', 'ana@empresa.com', '111.111.111-11', 8500.00, 1),
+    ('Bruno Costa', 'bruno@empresa.com', '222.222.222-22', 7200.00, 1),
+    ('Carla Oliveira', 'carla@empresa.com', '333.333.333-33', 6800.00, 2),
+    ('Daniel Santos', 'daniel@empresa.com', '444.444.444-44', 9100.00, 1),
+    ('Elena Ferreira', 'elena@empresa.com', '555.555.555-55', 5500.00, 3),
+    ('Felipe Lima', 'felipe@empresa.com', '666.666.666-66', 7800.00, 2),
+    ('Gabriela Rocha', 'gabriela@empresa.com', '777.777.777-77', 6200.00, 4),
+    ('Henrique Alves', 'henrique@empresa.com', '888.888.888-88', 8900.00, 1),
+    ('Isabela Martins', 'isabela@empresa.com', '999.999.999-99', 5900.00, 5),
+    ('João Pedro', 'joao@empresa.com', '000.000.000-00', 7400.00, 3);

@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Testing Demo API (8086)",
+      "request": "launch",
+      "mainClass": "com.example.testingdemo.TestingDemoApplication",
+      "projectName": "testing-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default"
+    },
+    {
+      "type": "java",
+      "name": "Testing Demo API (Debug)",
+      "request": "launch",
+      "mainClass": "com.example.testingdemo.TestingDemoApplication",
+      "projectName": "testing-demo",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=default -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5086"
+    }
+  ]
+}

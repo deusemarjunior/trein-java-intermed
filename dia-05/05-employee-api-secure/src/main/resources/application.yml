@@ -1,0 +1,67 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: employee-api-secure
+
+  datasource:
+    url: jdbc:h2:mem:employeedb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    defer-datasource-initialization: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  sql:
+    init:
+      mode: always
+
+# ── JWT ───────────────────────────────────────────────────────
+jwt:
+  secret: MinhaChaveSecretaMuitoGrandeParaOTreinamentoDia05ExercicioJWT2024!
+  expiration: 3600000   # 1 hora
+
+# ── Feign — serviço externo de departamentos ──────────────────
+department:
+  api:
+    url: http://localhost:8090
+
+# ── Resilience4j ──────────────────────────────────────────────
+# TODO 3: Descomentar e ajustar a configuração abaixo
+#resilience4j:
+#  retry:
+#    instances:
+#      departmentService:
+#        max-attempts: 3
+#        wait-duration: 1s
+#  circuitbreaker:
+#    instances:
+#      departmentService:
+#        sliding-window-size: 5
+#        failure-rate-threshold: 50
+#        wait-duration-in-open-state: 10s
+#        permitted-number-of-calls-in-half-open-state: 3
+
+# ── SpringDoc / Swagger ──────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+logging:
+  level:
+    com.example.employee: DEBUG
+    io.github.resilience4j: DEBUG

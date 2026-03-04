@@ -1,0 +1,65 @@
+### ========================================
+### Movie Service — HTTP Requests
+### ========================================
+### Use com IntelliJ HTTP Client ou REST Client do VS Code
+
+### --- Auth ---
+
+### Login (obter token JWT)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@movie.com",
+  "password": "123456"
+}
+
+### Login Admin
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@movie.com",
+  "password": "123456"
+}
+
+### --- Movies ---
+
+### Buscar filmes por texto
+GET http://localhost:8080/api/movies/search?query=Matrix&page=1
+
+### Buscar filmes populares
+GET http://localhost:8080/api/movies/popular?page=1
+
+### Detalhes de um filme (Matrix = 603)
+GET http://localhost:8080/api/movies/603
+
+### --- Favoritos ---
+
+### Favoritar filme (Matrix = 603)
+POST http://localhost:8080/api/movies/603/favorite
+
+### Listar favoritos (paginado)
+GET http://localhost:8080/api/movies/favorites?page=0&size=10
+
+### Remover favorito
+DELETE http://localhost:8080/api/movies/603/favorite
+
+### --- Watch Later ---
+
+### Marcar para assistir depois
+POST http://localhost:8080/api/movies/603/watch-later
+
+### --- Actuator ---
+
+### Health check
+GET http://localhost:8080/actuator/health
+
+### Métricas
+GET http://localhost:8080/actuator/metrics
+
+### Info
+GET http://localhost:8080/actuator/info
+
+### --- Swagger ---
+### Acesse no browser: http://localhost:8080/swagger-ui.html

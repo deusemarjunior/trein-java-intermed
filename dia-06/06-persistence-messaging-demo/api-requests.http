@@ -1,0 +1,130 @@
+### ========================================
+### 06-persistence-messaging-demo
+### API Requests (VS Code REST Client / IntelliJ HTTP Client)
+### ========================================
+
+### ── Categorias (Redis Cache) ──
+
+### Listar todas as categorias (1ª vez = CACHE MISS, 2ª vez = CACHE HIT)
+GET http://localhost:8090/api/categories
+Content-Type: application/json
+
+###
+
+### Buscar categoria por ID
+GET http://localhost:8090/api/categories/1
+Content-Type: application/json
+
+###
+
+### Atualizar categoria (demonstra @CachePut)
+PUT http://localhost:8090/api/categories/1
+Content-Type: application/json
+
+{
+  "name": "Eletrônicos e Gadgets",
+  "description": "Smartphones, notebooks, tablets, gadgets e acessórios"
+}
+
+###
+
+### Deletar categoria (demonstra @CacheEvict)
+DELETE http://localhost:8090/api/categories/5
+
+###
+
+### ── Pedidos (N+1 Demo) ──
+
+### ❌ Listar pedidos COM N+1 (observe os logs SQL!)
+GET http://localhost:8090/api/orders/n-plus-one
+Content-Type: application/json
+
+###
+
+### ✅ Listar pedidos otimizado (JOIN FETCH)
+GET http://localhost:8090/api/orders/optimized
+Content-Type: application/json
+
+###
+
+### ✅ Listar pedidos com @EntityGraph
+GET http://localhost:8090/api/orders/entity-graph
+Content-Type: application/json
+
+###
+
+### ✅ Listar pedidos — Projeção DTO com paginação
+GET http://localhost:8090/api/orders/summary?page=0&size=5&sort=customerName,asc
+Content-Type: application/json
+
+###
+
+### Buscar pedido por ID
+GET http://localhost:8090/api/orders/1
+Content-Type: application/json
+
+###
+
+### Criar pedido (dispara evento no RabbitMQ)
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "João Silva",
+  "customerEmail": "joao@email.com",
+  "categoryId": 1,
+  "items": [
+    {
+      "productName": "Smartphone Galaxy S24",
+      "quantity": 1,
+      "unitPrice": 4299.90
+    },
+    {
+      "productName": "Capa Protetora",
+      "quantity": 2,
+      "unitPrice": 49.90
+    }
+  ]
+}
+
+###
+
+### Criar outro pedido (outra categoria)
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "Maria Oliveira",
+  "customerEmail": "maria@email.com",
+  "categoryId": 2,
+  "items": [
+    {
+      "productName": "Clean Code — Robert C. Martin",
+      "quantity": 1,
+      "unitPrice": 89.90
+    },
+    {
+      "productName": "Effective Java — Joshua Bloch",
+      "quantity": 1,
+      "unitPrice": 119.90
+    },
+    {
+      "productName": "Java Concurrency in Practice",
+      "quantity": 1,
+      "unitPrice": 134.90
+    }
+  ]
+}
+
+###
+
+### Criar pedido com dados inválidos (teste de validação)
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "",
+  "customerEmail": "email-invalido",
+  "categoryId": null,
+  "items": []
+}

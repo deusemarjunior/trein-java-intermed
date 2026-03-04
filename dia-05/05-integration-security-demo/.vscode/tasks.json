@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "mvn: compile",
+      "type": "shell",
+      "command": "mvn compile -q",
+      "group": "build",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: test (todos)",
+      "type": "shell",
+      "command": "mvn test",
+      "group": "test",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: test unitários (*Test)",
+      "type": "shell",
+      "command": "mvn test -Dtest=\"*Test\"",
+      "group": "test",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: test integração (*IT)",
+      "type": "shell",
+      "command": "mvn test -Dtest=\"*IT\"",
+      "group": "test",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: clean package",
+      "type": "shell",
+      "command": "mvn clean package -DskipTests",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: clean install",
+      "type": "shell",
+      "command": "mvn clean install",
+      "group": "build",
+      "problemMatcher": "$javac"
+    },
+    {
+      "label": "mvn: spring-boot:run (8088)",
+      "type": "shell",
+      "command": "mvn spring-boot:run",
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

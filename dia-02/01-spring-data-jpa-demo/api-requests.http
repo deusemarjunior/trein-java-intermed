@@ -1,0 +1,277 @@
+### Exemplos de Requisições - Spring Data JPA Demo
+
+### Categories
+
+# Listar todas as categorias
+GET http://localhost:8080/api/categories
+
+###
+
+# Buscar categoria por ID
+GET http://localhost:8080/api/categories/1
+
+###
+
+# Listar apenas categorias ativas
+GET http://localhost:8080/api/categories/active
+
+###
+
+# Criar nova categoria
+POST http://localhost:8080/api/categories
+Content-Type: application/json
+
+{
+  "name": "Móveis",
+  "description": "Móveis e decoração para casa"
+}
+
+###
+
+# Atualizar categoria
+PUT http://localhost:8080/api/categories/1
+Content-Type: application/json
+
+{
+  "name": "Eletrônicos Premium",
+  "description": "Produtos eletrônicos de alta qualidade"
+}
+
+###
+
+# Deletar categoria
+DELETE http://localhost:8080/api/categories/5
+
+###
+
+### Products
+
+# Listar todos os produtos
+GET http://localhost:8080/api/products
+
+###
+
+# Buscar produto por ID
+GET http://localhost:8080/api/products/1
+
+###
+
+# Listar produtos com paginação
+GET http://localhost:8080/api/products/paged?page=0&size=5&sort=name,asc
+
+###
+
+# Busca avançada de produtos
+GET http://localhost:8080/api/products/search?name=laptop&minPrice=2000&maxPrice=5000&active=true&page=0&size=10
+
+###
+
+# Buscar produtos por categoria
+GET http://localhost:8080/api/products/category/1
+
+###
+
+# Obter preço médio por categoria
+GET http://localhost:8080/api/products/category/1/average-price
+
+###
+
+# Listar resumo de produtos (id, name, price)
+GET http://localhost:8080/api/products/summaries
+
+###
+
+# Criar novo produto
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "iPhone 15 Pro Max",
+  "description": "Smartphone Apple com 256GB",
+  "price": 8999.00,
+  "stock": 25,
+  "categoryId": 1,
+  "imageUrl": "https://example.com/iphone15.jpg"
+}
+
+###
+
+# Atualizar produto (parcial)
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "price": 4200.00,
+  "stock": 10
+}
+
+###
+
+# Deletar produto
+DELETE http://localhost:8080/api/products/12
+
+###
+
+# Desativar produtos sem estoque
+POST http://localhost:8080/api/products/deactivate-out-of-stock
+
+###
+
+### Posts
+
+# Listar todos os posts
+GET http://localhost:8080/api/posts
+
+###
+
+# Buscar post por ID (com comments e tags)
+GET http://localhost:8080/api/posts/1
+
+###
+
+# Listar posts com paginação
+GET http://localhost:8080/api/posts/paged?page=0&size=5
+
+###
+
+# Listar apenas posts publicados
+GET http://localhost:8080/api/posts/published
+
+###
+
+# Listar apenas rascunhos
+GET http://localhost:8080/api/posts/drafts
+
+###
+
+# Criar novo post
+POST http://localhost:8080/api/posts
+Content-Type: application/json
+
+{
+  "title": "Dominando Spring Boot 3",
+  "content": "Neste artigo vamos explorar as novidades do Spring Boot 3 e como aproveitá-las ao máximo em seus projetos...",
+  "author": "Carlos Developer",
+  "tagIds": [1, 2, 3]
+}
+
+###
+
+# Atualizar post
+PUT http://localhost:8080/api/posts/3
+Content-Type: application/json
+
+{
+  "title": "Relacionamentos em JPA - Guia Completo",
+  "content": "Entenda os diferentes tipos de relacionamentos: OneToOne, OneToMany, ManyToMany e as melhores práticas...",
+  "author": "Pedro Costa",
+  "tagIds": [1, 2]
+}
+
+###
+
+# Publicar post
+POST http://localhost:8080/api/posts/3/publish
+
+###
+
+# Deletar post
+DELETE http://localhost:8080/api/posts/3
+
+###
+
+### Comments
+
+# Listar comentários de um post
+GET http://localhost:8080/api/posts/1/comments
+
+###
+
+# Adicionar comentário a um post
+POST http://localhost:8080/api/posts/1/comments
+Content-Type: application/json
+
+{
+  "text": "Excelente explicação! Muito útil para o meu projeto.",
+  "author": "Roberto Silva"
+}
+
+###
+
+# Deletar comentário
+DELETE http://localhost:8080/api/posts/1/comments/1
+
+###
+
+### Testes de Validação (devem retornar 400 Bad Request)
+
+# Produto sem nome (validação falha)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "description": "Teste",
+  "price": 100.00,
+  "stock": 10,
+  "categoryId": 1
+}
+
+###
+
+# Produto com preço negativo (validação falha)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Produto Teste",
+  "price": -50.00,
+  "stock": 10,
+  "categoryId": 1
+}
+
+###
+
+# Post sem título (validação falha)
+POST http://localhost:8080/api/posts
+Content-Type: application/json
+
+{
+  "content": "Conteúdo do post",
+  "author": "Teste"
+}
+
+###
+
+### Testes de Exception Handling
+
+# Buscar produto inexistente (404 Not Found)
+GET http://localhost:8080/api/products/999
+
+###
+
+# Buscar categoria inexistente (404 Not Found)
+GET http://localhost:8080/api/categories/999
+
+###
+
+# Criar categoria duplicada (409 Conflict)
+POST http://localhost:8080/api/categories
+Content-Type: application/json
+
+{
+  "name": "Eletrônicos",
+  "description": "Teste duplicado"
+}
+
+###
+
+# Criar produto com categoria inexistente (404 Not Found)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Produto Teste",
+  "price": 100.00,
+  "stock": 10,
+  "categoryId": 999
+}

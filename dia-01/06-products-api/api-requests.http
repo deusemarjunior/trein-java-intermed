@@ -1,0 +1,149 @@
+### Products API - Servlet + JDBC
+
+# ═══════════════════════════════════
+# CRIAR PRODUTOS
+# ═══════════════════════════════════
+
+### Criar produto - Laptop
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Laptop Gaming",
+  "description": "High-end gaming laptop with RTX 4080",
+  "price": 7500.00,
+  "category": "Electronics"
+}
+
+###
+
+### Criar produto - Mouse
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Mouse Gamer Pro",
+  "description": "Mouse com sensor de 25000 DPI",
+  "price": 250.00,
+  "category": "Electronics"
+}
+
+###
+
+### Criar produto - Cadeira
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Cadeira Ergonômica",
+  "description": "Cadeira para longas sessões de trabalho",
+  "price": 1800.00,
+  "category": "Furniture"
+}
+
+###
+
+# ═══════════════════════════════════
+# LISTAR / BUSCAR PRODUTOS
+# ═══════════════════════════════════
+
+### Listar todos os produtos
+GET http://localhost:8080/api/products
+
+###
+
+### Buscar produto por ID
+GET http://localhost:8080/api/products/1
+
+###
+
+### Filtrar por categoria
+GET http://localhost:8080/api/products?category=Electronics
+
+###
+
+### Buscar por nome
+GET http://localhost:8080/api/products?name=Laptop
+
+###
+
+### Buscar produto inexistente (404)
+GET http://localhost:8080/api/products/999
+
+###
+
+# ═══════════════════════════════════
+# ATUALIZAR PRODUTOS
+# ═══════════════════════════════════
+
+### Atualizar produto
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Laptop Gaming Pro",
+  "description": "Ultimate gaming laptop with RTX 4090",
+  "price": 9500.00,
+  "category": "Electronics"
+}
+
+###
+
+### Atualizar produto inexistente (404)
+PUT http://localhost:8080/api/products/999
+Content-Type: application/json
+
+{
+  "name": "Teste",
+  "description": "Teste",
+  "price": 100.00,
+  "category": "Test"
+}
+
+###
+
+# ═══════════════════════════════════
+# DELETAR PRODUTOS
+# ═══════════════════════════════════
+
+### Deletar produto
+DELETE http://localhost:8080/api/products/1
+
+###
+
+### Deletar produto inexistente (404)
+DELETE http://localhost:8080/api/products/999
+
+###
+
+# ═══════════════════════════════════
+# TESTES DE VALIDAÇÃO
+# ═══════════════════════════════════
+
+### Criar produto sem nome (400)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": 100.00
+}
+
+###
+
+### Criar produto com preço negativo (400)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Produto Teste",
+  "price": -10.00
+}
+
+###
+
+### JSON inválido (400)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{invalid json}

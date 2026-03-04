@@ -1,0 +1,114 @@
+### Exemplos de Requisições - Products API
+### Use com Postman, Insomnia, cURL ou REST Client do VS Code
+
+### 1. Listar todos os produtos
+GET http://localhost:8080/api/products
+
+###
+
+### 2. Listar produtos por categoria
+GET http://localhost:8080/api/products?category=Electronics
+
+###
+
+### 3. Buscar produto por ID
+GET http://localhost:8080/api/products/1
+
+###
+
+### 4. Criar produto
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Headset Gamer",
+  "description": "7.1 surround sound gaming headset",
+  "price": 350.00,
+  "category": "Electronics"
+}
+
+###
+
+### 5. Criar produto - Teste validação (preço negativo)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Produto Inválido",
+  "description": "Este produto tem preço negativo",
+  "price": -100.00,
+  "category": "Test"
+}
+
+###
+
+### 6. Criar produto - Teste validação (nome muito curto)
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "AB",
+  "description": "Nome tem apenas 2 caracteres",
+  "price": 100.00,
+  "category": "Test"
+}
+
+###
+
+### 7. Atualizar produto
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Laptop Gaming UPDATED",
+  "description": "High-end gaming laptop with RTX 4090",
+  "price": 9500.00,
+  "category": "Electronics"
+}
+
+###
+
+### 8. Deletar produto
+DELETE http://localhost:8080/api/products/2
+
+###
+
+### 9. Buscar produto inexistente (deve retornar 404)
+GET http://localhost:8080/api/products/999
+
+###
+
+### 10. Criar vários produtos
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Webcam 4K",
+  "description": "4K webcam for streaming",
+  "price": 800.00,
+  "category": "Electronics"
+}
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Microfone Condensador",
+  "description": "Professional condenser microphone",
+  "price": 650.00,
+  "category": "Electronics"
+}
+
+###
+
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Luminária LED",
+  "description": "RGB LED desk lamp",
+  "price": 180.00,
+  "category": "Furniture"
+}

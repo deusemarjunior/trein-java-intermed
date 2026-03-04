@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run BlogApiApplication",
+            "request": "launch",
+            "mainClass": "com.example.blog.BlogApiApplication",
+            "projectName": "blog-api",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}

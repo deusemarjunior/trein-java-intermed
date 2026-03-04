@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: movie-service
+
+  # ==================== Datasource ====================
+  datasource:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5435}/${SPRING_DATASOURCE_DB:moviedb}
+    username: ${SPRING_DATASOURCE_USERNAME:movie}
+    password: ${SPRING_DATASOURCE_PASSWORD:movie123}
+    driver-class-name: org.postgresql.Driver
+
+  # ==================== JPA ====================
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ==================== Flyway ====================
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  # ==================== Redis ====================
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6382}
+      timeout: 2000ms
+
+  # ==================== Cache ====================
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000  # 30 minutos em milissegundos
+
+  # ==================== Jackson ====================
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+# ==================== Server ====================
+server:
+  port: 8080
+
+# ==================== TheMovieDB ====================
+tmdb:
+  api:
+    base-url: https://api.themoviedb.org/3
+    key: ${TMDB_API_KEY:SUA_API_KEY_AQUI}
+    image-base-url: https://image.tmdb.org/t/p/w500
+
+# ==================== JWT ====================
+jwt:
+  secret: ${JWT_SECRET:minha-chave-secreta-super-segura-para-jwt-minimo-256-bits-ok}
+  expiration: 3600000  # 1 hora em milissegundos
+
+# ==================== Actuator ====================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ==================== Resilience4j ====================
+# TODO 6: Configurar Resilience4j para chamadas ao TheMovieDB
+# Descomente e configure:
+#
+# resilience4j:
+#   retry:
+#     instances:
+#       tmdbApi:
+#         max-attempts: 3
+#         wait-duration: 500ms
+#         retry-exceptions:
+#           - java.io.IOException
+#           - feign.FeignException.ServiceUnavailable
+#   circuitbreaker:
+#     instances:
+#       tmdbApi:
+#         failure-rate-threshold: 50
+#         sliding-window-size: 10
+#         wait-duration-in-open-state: 10s
+#         permitted-number-of-calls-in-half-open-state: 3
+
+# ==================== Logging ====================
+logging:
+  level:
+    com.example.movieservice: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG

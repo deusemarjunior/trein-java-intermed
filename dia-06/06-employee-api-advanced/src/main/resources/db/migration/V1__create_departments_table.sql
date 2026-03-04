@@ -1,0 +1,18 @@
+-- TODO 5a: Crie a migration para a tabela departments.
+--
+-- Esta migration deve criar a tabela "departments" com as colunas:
+-- - id BIGSERIAL PRIMARY KEY
+-- - name VARCHAR(100) NOT NULL
+-- - code VARCHAR(10) NOT NULL UNIQUE
+--
+-- Exemplo:
+--
+-- CREATE TABLE departments (
+--     id BIGSERIAL PRIMARY KEY,
+--     name VARCHAR(100) NOT NULL,
+--     code VARCHAR(10) NOT NULL UNIQUE
+-- );
+--
+-- Após criar o SQL, habilite o Flyway no application.yml:
+-- 1. Mude flyway.enabled para true
+-- 2. Mude jpa.hibernate.ddl-auto para "validate"

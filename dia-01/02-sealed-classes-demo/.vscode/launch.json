@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run SealedClassesDemo",
+            "request": "launch",
+            "mainClass": "com.example.sealed.SealedClassesDemo",
+            "projectName": "sealed-classes-demo",
+            "preLaunchTask": "build",
+            "console": "internalConsole"    
+        
+        }
+    ]
+}

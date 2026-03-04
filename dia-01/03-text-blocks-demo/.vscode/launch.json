@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run TextBlocksDemo",
+            "request": "launch",
+            "mainClass": "com.example.textblocks.TextBlocksDemo",
+            "projectName": "text-blocks-demo",
+            "preLaunchTask": "build",
+            "console": "internalConsole"
+        }
+    ]
+}
