@@ -50,7 +50,7 @@ server:
 tmdb:
   api:
     base-url: https://api.themoviedb.org/3
-    key: ${TMDB_API_KEY:SUA_API_KEY_AQUI}
+    key: ${TMDB_API_KEY}
     image-base-url: https://image.tmdb.org/t/p/w500
 
 # ==================== JWT ====================

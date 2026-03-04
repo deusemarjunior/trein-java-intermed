@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 // TODO 2: Implementar o Adapter REST TheMovieDbAdapter
-//
+
 // Esta classe:
 //   - Implementa MovieApiPort (o port de saída do domínio)
 //   - Usa o TheMovieDbClient (Feign) para fazer as chamadas HTTP
