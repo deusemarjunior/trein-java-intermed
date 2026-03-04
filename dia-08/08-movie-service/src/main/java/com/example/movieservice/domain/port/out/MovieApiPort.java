@@ -1,31 +1,50 @@
 package com.example.movieservice.domain.port.out;
 
-// TODO 1: Criar o Port de saída (interface) MovieApiPort
-//
-// Este port define o CONTRATO para consumir uma API externa de filmes.
-// A implementação concreta (TheMovieDbAdapter) ficará em adapter/out/rest/.
-//
-// Métodos que devem ser definidos:
-//
-//   MoviePage searchMovies(String query, int page);
-//       → Buscar filmes por texto (ex: "Matrix")
-//
-//   Movie getMovieDetails(Long movieId);
-//       → Detalhes de um filme específico (título, sinopse, nota, etc.)
-//
-//   MoviePage getPopularMovies(int page);
-//       → Listar filmes populares (paginado)
-//
-//   MovieCredits getMovieCredits(Long movieId);
-//       → Elenco e equipe técnica de um filme
-//
-// Imports necessários:
-//   import com.example.movieservice.domain.model.Movie;
-//   import com.example.movieservice.domain.model.MoviePage;
-//   import com.example.movieservice.domain.model.MovieCredits;
+import com.example.movieservice.domain.model.Movie;
+import com.example.movieservice.domain.model.MoviePage;
+import com.example.movieservice.domain.model.MovieCredits;
 
+/**
+ * Port de saída que define o contrato para consumir uma API externa de filmes.
+ * 
+ * Este port abstrai a implementação específica (TheMovieDB, OMDB, etc.),
+ * permitindo trocar a fonte de dados sem alterar o domínio.
+ * 
+ * Implementações: TheMovieDbAdapter, MockMovieAdapter (para testes)
+ */
 public interface MovieApiPort {
 
-    // TODO 1: Defina os 4 métodos acima
+    /**
+     * Busca filmes por texto de busca.
+     * 
+     * @param query texto de busca (ex: "Matrix", "Avatar")
+     * @param page número da página (começa em 1)
+     * @return resultado paginado com lista de filmes encontrados
+     */
+    MoviePage searchMovies(String query, int page);
 
+    /**
+     * Retorna detalhes de um filme específico.
+     * 
+     * @param movieId ID do filme na API externa
+     * @return detalhes completos do filme (título, sinopse, nota, etc.)
+     */
+    Movie getMovieDetails(Long movieId);
+
+    /**
+     * Lista filmes populares.
+     * 
+     * @param page número da página (começa em 1)
+     * @return resultado paginado com filmes populares
+     */
+    MoviePage getPopularMovies(int page);
+
+    /**
+     * Retorna elenco e equipe técnica de um filme.
+     * 
+     * @param movieId ID do filme na API externa
+     * @return créditos com atores e equipe técnica
+     */
+    MovieCredits getMovieCredits(Long movieId);
+    
 }

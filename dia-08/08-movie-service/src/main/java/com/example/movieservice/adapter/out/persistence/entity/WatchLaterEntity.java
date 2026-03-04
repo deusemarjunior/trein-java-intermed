@@ -23,6 +23,12 @@ public class WatchLaterEntity {
     @Column(name = "poster_path", length = 500)
     private String posterPath;
 
+    @Column(name = "vote_average")
+    private Double voteAverage;
+
+    @Column
+    private String overview;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -49,4 +55,10 @@ public class WatchLaterEntity {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Double getVoteAverage() { return voteAverage; }
+    public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
+
+    public String getOverview() { return overview; }
+    public void setOverview(String overview) { this.overview = overview; }
 }
