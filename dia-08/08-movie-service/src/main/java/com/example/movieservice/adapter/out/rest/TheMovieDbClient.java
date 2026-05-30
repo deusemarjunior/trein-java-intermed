@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.movieservice.adapter.out.rest.dto.TmdbCreditsResponse;
+import com.example.movieservice.adapter.out.rest.dto.TmdbMovieResponse;
+import com.example.movieservice.adapter.out.rest.dto.TmdbSearchResponse;
+
 // TODO 2: Implementar o Feign Client para consumir a API do TheMovieDB
 //
 // Este client é a interface DECLARATIVA que o Feign usa para fazer requisições HTTP.
@@ -41,30 +45,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 )
 public interface TheMovieDbClient {
 
-    // TODO 2: Mapear os 4 endpoints do TheMovieDB aqui
-    //
-    // Exemplo:
-    //
-    // @GetMapping("/search/movie")
-    // TmdbSearchResponse searchMovies(
-    //         @RequestParam("query") String query,
-    //         @RequestParam("page") int page,
-    //         @RequestParam("language") String language
-    // );
-    //
-    // @GetMapping("/movie/{movieId}")
-    // TmdbMovieResponse getMovieDetails(
-    //         @PathVariable("movieId") Long movieId,
-    //         @RequestParam("language") String language
-    // );
-    //
-    // @GetMapping("/movie/popular")
-    // TmdbSearchResponse getPopularMovies(
-    //         @RequestParam("page") int page,
-    //         @RequestParam("language") String language
-    // );
-    //
-    // @GetMapping("/movie/{movieId}/credits")
-    // TmdbCreditsResponse getMovieCredits(@PathVariable("movieId") Long movieId);
+    @GetMapping("/search/movie")
+    TmdbSearchResponse searchMovies(
+            @RequestParam("query") String query,
+            @RequestParam("page") int page,
+            @RequestParam("language") String language
+    );
+    
+    @GetMapping("/movie/{movieId}")
+    TmdbMovieResponse getMovieDetails(
+            @PathVariable("movieId") Long movieId,
+            @RequestParam("language") String language
+    );
+    
+    @GetMapping("/movie/popular")
+    TmdbSearchResponse getPopularMovies(
+            @RequestParam("page") int page,
+            @RequestParam("language") String language
+    );
+    
+    @GetMapping("/movie/{movieId}/credits")
+    TmdbCreditsResponse getMovieCredits(@PathVariable("movieId") Long movieId);
 
 }

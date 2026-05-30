@@ -39,6 +39,20 @@ import org.springframework.data.domain.Pageable;
 
 public interface MovieUseCasePort {
 
-    // TODO 3: Defina os 8 métodos acima
+    MoviePage searchMovies(String query, int page);
+
+    Movie getMovieDetails(Long movieId, Long userId);
+
+    MoviePage getPopularMovies(int page);
+
+    MovieCredits getMovieCredits(Long movieId);
+
+    void addFavorite(Long movieId, Long userId);
+
+    void removeFavorite(Long movieId, Long userId);
+
+    Page<Movie> getFavorites(Long userId, Pageable pageable);
+
+    void addWatchLater(Long movieId, Long userId);
 
 }

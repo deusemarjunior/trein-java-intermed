@@ -1,5 +1,9 @@
 package com.example.movieservice.domain.port.out;
 
+import com.example.movieservice.domain.model.Movie;
+import com.example.movieservice.domain.model.MovieCredits;
+import com.example.movieservice.domain.model.MoviePage;
+
 // TODO 1: Criar o Port de saída (interface) MovieApiPort
 //
 // Este port define o CONTRATO para consumir uma API externa de filmes.
@@ -26,6 +30,12 @@ package com.example.movieservice.domain.port.out;
 
 public interface MovieApiPort {
 
-    // TODO 1: Defina os 4 métodos acima
+    MoviePage searchMovies(String query, int page);
+
+    Movie getMovieDetails(Long movieId);
+
+    MoviePage getPopularMovies(int page);
+
+    MovieCredits getMovieCredits(Long movieId);
 
 }
